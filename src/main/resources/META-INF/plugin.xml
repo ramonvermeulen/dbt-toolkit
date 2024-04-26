@@ -8,6 +8,13 @@
 
     <resource-bundle>messages.MyBundle</resource-bundle>
 
+    <applicationListeners>
+        <listener
+                class="com.github.ramonvermeulen.dbtidea.listeners.FileOpenedListener"
+                topic="com.intellij.openapi.fileEditor.FileEditorManagerListener"
+        />
+    </applicationListeners>
+
     <extensions defaultExtensionNs="com.intellij">
         <projectConfigurable
             parentId="tools"
