@@ -1,6 +1,5 @@
 package com.github.ramonvermeulen.dbtidea.ui
 
-import com.github.ramonvermeulen.dbtidea.services.DbtCommandExecutorService
 import com.github.ramonvermeulen.dbtidea.services.ManifestService
 import com.intellij.openapi.components.service
 import com.intellij.openapi.progress.ProgressIndicator
@@ -18,9 +17,6 @@ class LineagePanel (private val project: Project, private val toolWindow: ToolWi
     private val manifestService = project.service<ManifestService>()
 
     fun getContent(): JComponent {
-        showLoadingIndicator {
-            manifestService.parseManifest()
-        }
         val panel = JPanel(BorderLayout())
         val browser = JBCefBrowserBuilder().setUrl("about:blank").build()
         panel.add(browser.component, BorderLayout.CENTER)
@@ -56,15 +52,5 @@ class LineagePanel (private val project: Project, private val toolWindow: ToolWi
             browser.loadHTML(htmlContent)
         }
         return panel
-    }
-
-    private fun showLoadingIndicator(task: () -> Unit) {
-        val dbtParseTask = object : Task.Backgroundable(project, "Executing dbt parse...", false) {
-            override fun run(indicator: ProgressIndicator) {
-                indicator.isIndeterminate = true // Set indeterminate mode to show loading animation
-                task.invoke()
-            }
-        }
-        ProgressManager.getInstance().run(dbtParseTask)
     }
 }

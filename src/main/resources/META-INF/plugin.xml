@@ -5,6 +5,7 @@
     <vendor>ramonvermeulen</vendor>
 
     <depends>com.intellij.modules.platform</depends>
+    <depends>org.jetbrains.plugins.terminal</depends>
 
     <resource-bundle>messages.MyBundle</resource-bundle>
 
@@ -27,7 +28,7 @@
                 id="dbtIdea"
                 anchor="bottom"
                 secondary="false"
-                icon="AllIcons.Actions.DependencyAnalyzer"
+                icon="AllIcons.Toolwindows.InfoEvents"
         />
     </extensions>
 </idea-plugin>

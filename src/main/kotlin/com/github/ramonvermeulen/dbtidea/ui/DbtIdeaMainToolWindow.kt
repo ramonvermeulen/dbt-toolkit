@@ -1,5 +1,10 @@
 package com.github.ramonvermeulen.dbtidea.ui
 
+import com.github.ramonvermeulen.dbtidea.services.ManifestService
+import com.intellij.openapi.components.service
+import com.intellij.openapi.progress.ProgressIndicator
+import com.intellij.openapi.progress.ProgressManager
+import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
@@ -11,15 +16,18 @@ import com.intellij.ui.content.ContentManagerListener
 class DbtIdeaMainToolWindow : ToolWindowFactory {
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
         val contentFactory = ContentFactory.getInstance()
-        val lineageToolWindow = LineagePanel(project, toolWindow)
+        val lineagePanel = LineagePanel(project, toolWindow)
+        val docsPanel = DocsPanel(project, toolWindow)
         toolWindow.contentManager.addContent(
-            contentFactory.createContent(lineageToolWindow.getContent(), "dbt lineage", false)
+            contentFactory.createContent(lineagePanel.getContent(), "dbt lineage", false)
+        )
+        toolWindow.contentManager.addContent(
+            contentFactory.createContent(docsPanel.getContent(), "dbt docs", false)
         )
         toolWindow.contentManager.addContentManagerListener(
             object : ContentManagerListener {
                 override fun selectionChanged(event: ContentManagerEvent) {
-                    // handle selection events
-                    println(event.toString())
+                    handleTabChange(project, event)
                 }
             }
         )
@@ -31,6 +39,25 @@ class DbtIdeaMainToolWindow : ToolWindowFactory {
         // call service to check if it is a valid dbt project, e.g. can find dbt_project.yml etc
         // if it is not a valid dbt project throw warning (also to the UI) and return false
         return true
+    }
+
+    private fun handleTabChange(project: Project, event: ContentManagerEvent) {
+        if (event.content.displayName == "dbt lineage") {
+            showLoadingIndicator(project) {
+                project.service<ManifestService>().parseManifest()
+            }
+        }
+        println(event.toString())
+    }
+
+    private fun showLoadingIndicator(project: Project, task: () -> Unit) {
+        val dbtParseTask = object : Task.Backgroundable(project, "Executing dbt parse...", false) {
+            override fun run(indicator: ProgressIndicator) {
+                indicator.isIndeterminate = true // Set indeterminate mode to show loading animation
+                task.invoke()
+            }
+        }
+        ProgressManager.getInstance().run(dbtParseTask)
     }
 }
 
