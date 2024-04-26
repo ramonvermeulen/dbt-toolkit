@@ -9,9 +9,15 @@
     <resource-bundle>messages.MyBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
+        <projectConfigurable
+            parentId="tools"
+            instance="com.github.ramonvermeulen.dbtidea.ui.DbtIdeaSettingsConfigurable"
+            id="dbtIdeaSettings"
+            displayName="dbtIdea Settings"
+        />
         <toolWindow
-                factoryClass="com.github.ramonvermeulen.dbtidea.toolWindow.LineageToolWindowFactory"
-                id="MyToolWindow"
+                factoryClass="com.github.ramonvermeulen.dbtidea.ui.DbtIdeaMainToolWindow"
+                id="dbtIdea"
                 anchor="bottom"
                 secondary="false"
                 icon="AllIcons.Actions.DependencyAnalyzer"
