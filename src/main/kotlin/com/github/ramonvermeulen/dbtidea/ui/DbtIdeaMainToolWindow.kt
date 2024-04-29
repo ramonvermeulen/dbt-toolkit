@@ -1,6 +1,7 @@
 package com.github.ramonvermeulen.dbtidea.ui
 
 import com.github.ramonvermeulen.dbtidea.services.ManifestService
+import com.github.ramonvermeulen.dbtidea.ui.console.ConsoleOutputPanel
 import com.github.ramonvermeulen.dbtidea.ui.docs.DocsPanel
 import com.github.ramonvermeulen.dbtidea.ui.lineage.LineagePanel
 import com.intellij.openapi.components.service
@@ -22,11 +23,15 @@ class DbtIdeaMainToolWindow : ToolWindowFactory {
         val contentFactory = ContentFactory.getInstance()
         val lineagePanel = LineagePanel(project, toolWindow)
         val docsPanel = DocsPanel(project, toolWindow)
+        val consolePanel = ConsoleOutputPanel(project, toolWindow)
         toolWindow.contentManager.addContent(
             contentFactory.createContent(lineagePanel.getContent(), "dbt lineage", false),
         )
         toolWindow.contentManager.addContent(
             contentFactory.createContent(docsPanel.getContent(), "dbt docs", false),
+        )
+        toolWindow.contentManager.addContent(
+            contentFactory.createContent(consolePanel.getContent(), "console", false),
         )
         toolWindow.contentManager.addContentManagerListener(
             object : ContentManagerListener {
@@ -54,7 +59,8 @@ class DbtIdeaMainToolWindow : ToolWindowFactory {
                 project.service<ManifestService>().parseManifest()
             }
         }
-        println(event.toString())
+        println(event.content)
+        println(event.operation)
     }
 
     private fun showLoadingIndicator(
