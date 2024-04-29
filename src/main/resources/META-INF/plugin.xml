@@ -19,7 +19,7 @@
     <extensions defaultExtensionNs="com.intellij">
         <projectConfigurable
             parentId="tools"
-            instance="com.github.ramonvermeulen.dbtidea.ui.DbtIdeaSettingsConfigurable"
+            instance="com.github.ramonvermeulen.dbtidea.ui.settings.DbtIdeaSettingsConfigurable"
             id="dbtIdeaSettings"
             displayName="dbtIdea Settings"
         />

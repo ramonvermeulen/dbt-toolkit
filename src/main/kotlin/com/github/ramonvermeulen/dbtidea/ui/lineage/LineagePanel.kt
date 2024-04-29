@@ -1,6 +1,7 @@
-package com.github.ramonvermeulen.dbtidea.ui
+package com.github.ramonvermeulen.dbtidea.ui.lineage
 
 import com.github.ramonvermeulen.dbtidea.services.ManifestService
+import com.github.ramonvermeulen.dbtidea.ui.APanel
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow
@@ -12,10 +13,10 @@ import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.SwingUtilities
 
-class LineagePanel (private val project: Project, private val toolWindow: ToolWindow) {
+class LineagePanel(private val project: Project, private val toolWindow: ToolWindow) : APanel(project, toolWindow) {
     private val manifestService = project.service<ManifestService>()
 
-    fun getContent(): JComponent {
+    override fun getContent(): JComponent {
         val panel = JPanel(BorderLayout())
         val browser = JBCefBrowserBuilder().setUrl("about:blank").build()
         val javaScriptEngineProxy: JBCefJSQuery = JBCefJSQuery.create(browser as JBCefBrowserBase)
@@ -27,7 +28,8 @@ class LineagePanel (private val project: Project, private val toolWindow: ToolWi
 
         panel.add(browser.component, BorderLayout.CENTER)
 
-        val javascriptCode = """
+        val javascriptCode =
+            """
             function sendDataToKotlin() {
                 // Example data to send to Kotlin
                 var data = {
@@ -36,9 +38,10 @@ class LineagePanel (private val project: Project, private val toolWindow: ToolWi
                 
                 ${javaScriptEngineProxy.inject("data")}
             }
-        """.trimIndent()
+            """.trimIndent()
 
-        val htmlContent = """
+        val htmlContent =
+            """
             <html>
             <head>
                 <script>
@@ -49,9 +52,9 @@ class LineagePanel (private val project: Project, private val toolWindow: ToolWi
                 <button onclick="sendDataToKotlin()">Click me!</button>
             </body>
             </html>
-        """.trimIndent()
+            """.trimIndent()
 
-        SwingUtilities.invokeLater{
+        SwingUtilities.invokeLater {
             browser.loadHTML(htmlContent)
         }
         return panel

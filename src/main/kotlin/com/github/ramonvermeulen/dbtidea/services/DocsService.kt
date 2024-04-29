@@ -8,11 +8,12 @@ import java.io.File
 @Service(Service.Level.PROJECT)
 class DocsService(private var project: Project) {
     private val dbtCommandExecutorService = project.service<DbtCommandExecutorService>()
+    private val settings = project.service<DbtIdeaSettingsService>()
 
     fun getDocs(): File {
-        val file = File(project.basePath + "/target/index.html")
+        val file = File(settings.state.dbtProjectDir + "/target/index.html")
         if (!file.exists()) {
-            dbtCommandExecutorService.executeCommand(listOf("dbt docs generate"))
+            dbtCommandExecutorService.executeCommand(listOf("docs", "generate"))
         }
         return file
     }
