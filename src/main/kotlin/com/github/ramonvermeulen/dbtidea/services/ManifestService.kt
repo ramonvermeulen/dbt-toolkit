@@ -22,11 +22,7 @@ class ManifestService(private var project: Project) {
     private val dbtCommandExecutorService = project.service<DbtCommandExecutorService>()
     private var manifest: JsonObject? = null
 
-    init {
-        parseManifest()
-    }
-
-    fun parseManifest() {
+    private fun parseManifest() {
         val currentTime = System.currentTimeMillis()
         val elapsedTime = currentTime - lastUpdateTimestamp
         if (elapsedTime > interval) {
@@ -44,6 +40,7 @@ class ManifestService(private var project: Project) {
 
     fun getLineageInfoForNode(node: String): LineageInfo? {
         if (manifest == null) {
+            parseManifest()
             return null
         }
         var parents = manifest!!.getAsJsonObject("child_map").getAsJsonArray(node)

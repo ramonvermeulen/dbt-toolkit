@@ -33,8 +33,8 @@ class DocsPanel(private var project: Project, private var toolWindow: ToolWindow
         object : JButton("Regenerate Docs") {
             init {
                 addActionListener {
-                    SwingUtilities.invokeLater {
-                        showLoadingIndicator("Executing dbt docs generate...") {
+                    showLoadingIndicator("Executing dbt docs generate...") {
+                        ApplicationManager.getApplication().executeOnPooledThread {
                             val docs = docsService.getDocs()
                             browser.loadURL(docs.absolutePath)
                         }
@@ -44,10 +44,7 @@ class DocsPanel(private var project: Project, private var toolWindow: ToolWindow
         }
 
     init {
-        SwingUtilities.invokeLater {
-            mainPanel.add(regenerateButton, BorderLayout.NORTH)
-            mainPanel.add(browser.component, BorderLayout.CENTER)
-
+        ApplicationManager.getApplication().executeOnPooledThread {
             val myRequestHandler = CefLocalRequestHandler()
             val docs = docsService.getDocs()
 
@@ -60,12 +57,15 @@ class DocsPanel(private var project: Project, private var toolWindow: ToolWindow
             myRequestHandler.addResource("catalog.json") {
                 CefStreamResourceHandler(FileInputStream(File("${docs.parent}/catalog.json")), "application/json", this@DocsPanel)
             }
-
             ourCefClient.addRequestHandler(myRequestHandler, browser.cefBrowser)
 
-            browser.loadURL(docs.absolutePath)
+            SwingUtilities.invokeLater {
+                mainPanel.add(regenerateButton, BorderLayout.NORTH)
+                mainPanel.add(browser.component, BorderLayout.CENTER)
+                browser.loadURL(docs.absolutePath)
+            }
+            Disposer.register(ApplicationManager.getApplication(), ourCefClient)
         }
-        Disposer.register(ApplicationManager.getApplication(), ourCefClient)
     }
 
     fun getContent(): JComponent {
