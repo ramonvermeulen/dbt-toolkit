@@ -8,6 +8,7 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
+import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
@@ -15,7 +16,7 @@ import com.intellij.ui.content.ContentFactory
 import com.intellij.ui.content.ContentManagerEvent
 import com.intellij.ui.content.ContentManagerListener
 
-class DbtIdeaMainToolWindow : ToolWindowFactory {
+class DbtIdeaMainToolWindow : ToolWindowFactory, DumbAware {
     override fun createToolWindowContent(
         project: Project,
         toolWindow: ToolWindow,
@@ -54,13 +55,7 @@ class DbtIdeaMainToolWindow : ToolWindowFactory {
         project: Project,
         event: ContentManagerEvent,
     ) {
-        if (event.content.displayName == "dbt lineage") {
-            showLoadingIndicator(project) {
-                project.service<ManifestService>().parseManifest()
-            }
-        }
-        println(event.content)
-        println(event.operation)
+        // handle tab change impl
     }
 
     private fun showLoadingIndicator(

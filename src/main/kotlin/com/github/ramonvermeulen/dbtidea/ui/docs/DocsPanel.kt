@@ -1,12 +1,14 @@
 package com.github.ramonvermeulen.dbtidea.ui.docs
 
 import com.github.ramonvermeulen.dbtidea.services.DocsService
-import com.github.ramonvermeulen.dbtidea.ui.APanel
 import com.github.ramonvermeulen.dbtidea.ui.cef.CefLocalRequestHandler
 import com.github.ramonvermeulen.dbtidea.ui.cef.CefStreamResourceHandler
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.service
+import com.intellij.openapi.progress.ProgressIndicator
+import com.intellij.openapi.progress.ProgressManager
+import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.wm.ToolWindow
@@ -21,7 +23,7 @@ import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.SwingUtilities
 
-class DocsPanel(private var project: Project, private var toolWindow: ToolWindow) : APanel(project, toolWindow), Disposable {
+class DocsPanel(private var project: Project, private var toolWindow: ToolWindow) : Disposable {
     private val docsService = project.service<DocsService>()
     private val ourCefClient = JBCefApp.getInstance().createClient()
     private val isDebug = System.getProperty("idea.plugin.in.sandbox.mode") == "true"
@@ -42,32 +44,46 @@ class DocsPanel(private var project: Project, private var toolWindow: ToolWindow
         }
 
     init {
-        val myRequestHandler = CefLocalRequestHandler()
-        val docs = docsService.getDocs()
-
-        myRequestHandler.addResource("index.html") {
-            CefStreamResourceHandler(FileInputStream(docs), "text/html", this@DocsPanel)
-        }
-        myRequestHandler.addResource("manifest.json") {
-            CefStreamResourceHandler(FileInputStream(File("${docs.parent}/manifest.json")), "application/json", this@DocsPanel)
-        }
-        myRequestHandler.addResource("catalog.json") {
-            CefStreamResourceHandler(FileInputStream(File("${docs.parent}/catalog.json")), "application/json", this@DocsPanel)
-        }
-
-        ourCefClient.addRequestHandler(myRequestHandler, browser.cefBrowser)
-
         SwingUtilities.invokeLater {
+            mainPanel.add(regenerateButton, BorderLayout.NORTH)
+            mainPanel.add(browser.component, BorderLayout.CENTER)
+
+            val myRequestHandler = CefLocalRequestHandler()
+            val docs = docsService.getDocs()
+
+            myRequestHandler.addResource("index.html") {
+                CefStreamResourceHandler(FileInputStream(docs), "text/html", this@DocsPanel)
+            }
+            myRequestHandler.addResource("manifest.json") {
+                CefStreamResourceHandler(FileInputStream(File("${docs.parent}/manifest.json")), "application/json", this@DocsPanel)
+            }
+            myRequestHandler.addResource("catalog.json") {
+                CefStreamResourceHandler(FileInputStream(File("${docs.parent}/catalog.json")), "application/json", this@DocsPanel)
+            }
+
+            ourCefClient.addRequestHandler(myRequestHandler, browser.cefBrowser)
+
             browser.loadURL(docs.absolutePath)
         }
-
         Disposer.register(ApplicationManager.getApplication(), ourCefClient)
     }
 
-    override fun getContent(): JComponent {
-        mainPanel.add(regenerateButton, BorderLayout.NORTH)
-        mainPanel.add(browser.component, BorderLayout.CENTER)
+    fun getContent(): JComponent {
         return mainPanel
+    }
+
+    fun showLoadingIndicator(
+        title: String,
+        task: () -> Unit,
+    ) {
+        val dbtParseTask =
+            object : Task.Backgroundable(project, title, false) {
+                override fun run(indicator: ProgressIndicator) {
+                    indicator.isIndeterminate = true
+                    task.invoke()
+                }
+            }
+        ProgressManager.getInstance().run(dbtParseTask)
     }
 
     override fun dispose() {
