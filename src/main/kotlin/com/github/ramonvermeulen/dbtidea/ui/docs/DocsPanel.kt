@@ -33,10 +33,21 @@ class DocsPanel(private var project: Project, private var toolWindow: ToolWindow
         object : JButton("Regenerate Docs") {
             init {
                 addActionListener {
+                    SwingUtilities.invokeLater {
+                        isEnabled = false
+                        text = "Loading..."
+                    }
                     showLoadingIndicator("Executing dbt docs generate...") {
                         ApplicationManager.getApplication().executeOnPooledThread {
-                            val docs = docsService.getDocs()
-                            browser.loadURL(docs.absolutePath)
+                            try {
+                                val docs = docsService.getDocs()
+                                browser.loadURL(docs.absolutePath)
+                            } finally {
+                                SwingUtilities.invokeLater {
+                                    isEnabled = true
+                                    text = "Regenerate Docs"
+                                }
+                            }
                         }
                     }
                 }
