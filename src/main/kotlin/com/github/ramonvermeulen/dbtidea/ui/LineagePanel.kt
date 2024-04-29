@@ -2,12 +2,11 @@ package com.github.ramonvermeulen.dbtidea.ui
 
 import com.github.ramonvermeulen.dbtidea.services.ManifestService
 import com.intellij.openapi.components.service
-import com.intellij.openapi.progress.ProgressIndicator
-import com.intellij.openapi.progress.ProgressManager
-import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow
+import com.intellij.ui.jcef.JBCefBrowserBase
 import com.intellij.ui.jcef.JBCefBrowserBuilder
+import com.intellij.ui.jcef.JBCefJSQuery
 import java.awt.BorderLayout
 import javax.swing.JComponent
 import javax.swing.JPanel
@@ -19,9 +18,15 @@ class LineagePanel (private val project: Project, private val toolWindow: ToolWi
     fun getContent(): JComponent {
         val panel = JPanel(BorderLayout())
         val browser = JBCefBrowserBuilder().setUrl("about:blank").build()
+        val javaScriptEngineProxy: JBCefJSQuery = JBCefJSQuery.create(browser as JBCefBrowserBase)
+
+        javaScriptEngineProxy.addHandler { result ->
+            println(result)
+            null
+        }
+
         panel.add(browser.component, BorderLayout.CENTER)
 
-        // JavaScript code to handle button click and send data to Kotlin
         val javascriptCode = """
             function sendDataToKotlin() {
                 // Example data to send to Kotlin
@@ -29,12 +34,10 @@ class LineagePanel (private val project: Project, private val toolWindow: ToolWi
                     message: "Hello from JavaScript!"
                 };
                 
-                // Send data to Kotlin
-                window.bridge.receiveDataFromJavaScript(JSON.stringify(data));
+                ${javaScriptEngineProxy.inject("data")}
             }
         """.trimIndent()
 
-        // Load HTML content with button and JavaScript code
         val htmlContent = """
             <html>
             <head>
