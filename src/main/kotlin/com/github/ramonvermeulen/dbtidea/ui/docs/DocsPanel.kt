@@ -17,10 +17,8 @@ import com.intellij.ui.jcef.JBCefApp
 import com.intellij.ui.jcef.JBCefBrowser
 import com.intellij.ui.jcef.JBCefBrowserBuilder
 import org.apache.commons.io.IOUtils
-import java.awt.BorderLayout
 import java.awt.FlowLayout
 import java.io.File
-import java.io.FileInputStream
 import java.nio.charset.StandardCharsets
 import javax.swing.BoxLayout
 import javax.swing.JButton
