@@ -19,7 +19,7 @@ class DbtCommandExecutorService(private var project: Project) {
         val exitCode = process.waitFor()
         val stdout = process.inputStream.bufferedReader().readText()
         if (exitCode != 0) {
-            loggingService.clearConsole()
+            loggingService.flush()
             loggingService.log(stdout, ConsoleViewContentType.ERROR_OUTPUT)
             notificationService.sendNotification("dbt command in the background failed", "check the console tab to see details")
         }

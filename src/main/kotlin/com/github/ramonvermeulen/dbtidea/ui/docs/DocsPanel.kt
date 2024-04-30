@@ -47,7 +47,7 @@ class DocsPanel(private var project: Project, private var toolWindow: ToolWindow
                         showLoadingIndicator("Executing dbt docs generate...") {
                             try {
                                 val docs = docsService.getDocs()
-                                print(docs.absolutePath)
+                                print(docs.absolutePath + "\n")
                                 browser.loadURL(docs.absolutePath)
                             } finally {
                                 SwingUtilities.invokeLater {

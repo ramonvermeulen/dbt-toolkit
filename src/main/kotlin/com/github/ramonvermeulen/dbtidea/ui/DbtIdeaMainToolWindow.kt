@@ -57,18 +57,4 @@ class DbtIdeaMainToolWindow : ToolWindowFactory, DumbAware {
     ) {
         // handle tab change impl
     }
-
-    private fun showLoadingIndicator(
-        project: Project,
-        task: () -> Unit,
-    ) {
-        val dbtParseTask =
-            object : Task.Backgroundable(project, "Executing dbt parse...", false) {
-                override fun run(indicator: ProgressIndicator) {
-                    indicator.isIndeterminate = true // Set indeterminate mode to show loading animation
-                    task.invoke()
-                }
-            }
-        ProgressManager.getInstance().run(dbtParseTask)
-    }
 }

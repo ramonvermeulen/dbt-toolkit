@@ -12,10 +12,11 @@ interface ActiveFileListener {
 @Service(Service.Level.PROJECT)
 class ActiveFileService(private val project: Project) {
     private var activeFile: VirtualFile? = null
+    private var publisher: ActiveFileListener = project.messageBus.syncPublisher(TOPIC)
 
     fun setActiveFile(file: VirtualFile) {
         activeFile = file
-        project.messageBus.syncPublisher(TOPIC).activeFileChanged(file)
+        publisher.activeFileChanged(file)
     }
 
     fun getActiveFile(): VirtualFile? = activeFile
