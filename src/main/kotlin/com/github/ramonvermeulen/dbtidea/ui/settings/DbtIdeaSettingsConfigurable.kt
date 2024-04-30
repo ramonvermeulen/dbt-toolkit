@@ -4,16 +4,15 @@ import com.github.ramonvermeulen.dbtidea.services.DbtIdeaSettingsService
 import com.intellij.openapi.components.service
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.Messages
 import com.intellij.ui.components.JBTextField
-import com.intellij.ui.components.labels.LinkLabel
 import com.intellij.ui.table.JBTable
+import com.intellij.util.ui.JBUI
 import java.awt.Dimension
-import java.awt.GridBagConstraints
-import java.awt.GridBagLayout
-import java.awt.Insets
 import javax.swing.*
 import javax.swing.table.DefaultTableModel
+import java.awt.BorderLayout
+import java.awt.GridBagConstraints
+import java.awt.GridBagLayout
 
 class DbtIdeaSettingsConfigurable(project: Project) : Configurable {
     private var dbtIdeaSettingsService = project.service<DbtIdeaSettingsService>()
@@ -26,12 +25,34 @@ class DbtIdeaSettingsConfigurable(project: Project) : Configurable {
     }
 
     override fun createComponent(): JComponent {
-        val settingsPanel = JPanel(GridBagLayout())
-        val gbc = GridBagConstraints()
+        val settingsPanel = JPanel(BorderLayout(5, 5))
 
-        gbc.fill = GridBagConstraints.HORIZONTAL
-        gbc.insets = Insets(2, 2, 2, 2)
+        val fieldsPanel = createFieldsPanel()
+        val envVarsPanel = createEnvVarsPanel()
 
+        settingsPanel.add(fieldsPanel, BorderLayout.NORTH)
+        settingsPanel.add(envVarsPanel, BorderLayout.CENTER)
+
+        return settingsPanel
+    }
+
+    private fun createFieldsPanel(): JPanel {
+        return JPanel(GridBagLayout()).apply {
+            val gbc = GridBagConstraints().apply {
+                anchor = GridBagConstraints.WEST
+                weightx = 1.0
+                gridwidth = GridBagConstraints.REMAINDER
+                fill = GridBagConstraints.HORIZONTAL
+                insets = JBUI.insets(5, 0)
+            }
+            add(JLabel("dbt project root:"), gbc)
+            add(dbtProjectDirField, gbc)
+            add(JLabel("dbt target directory:"), gbc)
+            add(dbtTargetDirField, gbc)
+        }
+    }
+
+    private fun createEnvVarsPanel(): JPanel {
         // Create table for environment variables
         val model = DefaultTableModel(arrayOf("Name", "Value"), 0)
         envVarsTable.model = model
@@ -53,39 +74,18 @@ class DbtIdeaSettingsConfigurable(project: Project) : Configurable {
             }
         }
 
-        // dbt project root
-        gbc.gridx = 0
-        gbc.gridy = 0
-        settingsPanel.add(JLabel("dbt project root:"), gbc)
+        val buttonsPanel = JPanel().apply {
+            layout = BoxLayout(this, BoxLayout.X_AXIS)
+            add(addButton)
+            add(Box.createRigidArea(Dimension(5, 0)))
+            add(removeButton)
+        }
 
-        gbc.gridx = 1
-        dbtProjectDirField.preferredSize = Dimension(200, 20)
-        settingsPanel.add(dbtProjectDirField, gbc)
-
-        // dbt target directory
-        gbc.gridx = 0
-        gbc.gridy = 1
-        settingsPanel.add(JLabel("dbt target directory:"), gbc)
-
-        gbc.gridx = 1
-        dbtTargetDirField.preferredSize = Dimension(200, 20)
-        settingsPanel.add(dbtTargetDirField, gbc)
-
-        // Environment Variables
-        gbc.gridx = 0
-        gbc.gridy = 2
-        settingsPanel.add(JLabel("Environment Variables:"), gbc)
-
-        gbc.gridx = 1
-        settingsPanel.add(envVarsTable, gbc)
-
-        gbc.gridx = 1
-        settingsPanel.add(addButton, gbc)
-
-        gbc.gridx = 1
-        settingsPanel.add(removeButton, gbc)
-
-        return settingsPanel
+        return JPanel(BorderLayout(5, 5)).apply {
+            add(JLabel("Environment Variables:"), BorderLayout.NORTH)
+            add(JScrollPane(envVarsTable), BorderLayout.CENTER)
+            add(buttonsPanel, BorderLayout.SOUTH)
+        }
     }
 
     override fun reset() {
@@ -100,6 +100,7 @@ class DbtIdeaSettingsConfigurable(project: Project) : Configurable {
     }
 
     override fun apply() {
-        TODO("Not yet implemented")
+        // apply settings
+        return
     }
 }

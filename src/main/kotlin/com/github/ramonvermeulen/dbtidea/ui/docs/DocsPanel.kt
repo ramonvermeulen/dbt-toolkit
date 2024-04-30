@@ -2,6 +2,7 @@ package com.github.ramonvermeulen.dbtidea.ui.docs
 
 import com.github.ramonvermeulen.dbtidea.services.DbtIdeaSettingsService
 import com.github.ramonvermeulen.dbtidea.services.DocsService
+import com.github.ramonvermeulen.dbtidea.ui.IdeaPanel
 import com.github.ramonvermeulen.dbtidea.ui.cef.CefLocalRequestHandler
 import com.github.ramonvermeulen.dbtidea.ui.cef.CefStreamResourceHandler
 import com.intellij.openapi.Disposable
@@ -26,7 +27,7 @@ import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.SwingUtilities
 
-class DocsPanel(private var project: Project, private var toolWindow: ToolWindow) : Disposable {
+class DocsPanel(private var project: Project, private var toolWindow: ToolWindow) : IdeaPanel, Disposable {
     private val docsService = project.service<DocsService>()
     private val settings = project.service<DbtIdeaSettingsService>()
     private val ourCefClient = JBCefApp.getInstance().createClient()
@@ -111,7 +112,7 @@ class DocsPanel(private var project: Project, private var toolWindow: ToolWindow
         }
     }
 
-    fun getContent(): JComponent {
+    override fun getContent(): JComponent {
         return mainPanel
     }
 

@@ -4,6 +4,8 @@ import com.github.ramonvermeulen.dbtidea.services.ActiveFileListener
 import com.github.ramonvermeulen.dbtidea.services.ActiveFileService
 import com.github.ramonvermeulen.dbtidea.services.LineageInfo
 import com.github.ramonvermeulen.dbtidea.services.ManifestService
+import com.github.ramonvermeulen.dbtidea.ui.IdeaPanel
+import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
@@ -12,10 +14,11 @@ import com.intellij.openapi.wm.ToolWindow
 import com.intellij.ui.jcef.*
 import java.awt.BorderLayout
 import javax.swing.JComponent
+import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.SwingUtilities
 
-class LineagePanel(private val project: Project, private val toolWindow: ToolWindow) : ActiveFileListener {
+class LineagePanel(private val project: Project, private val toolWindow: ToolWindow) : ActiveFileListener, IdeaPanel, Disposable {
     private val manifestService = project.service<ManifestService>()
     private val activeFileService = project.service<ActiveFileService>()
     private val ourCefClient = JBCefApp.getInstance().createClient()
@@ -26,7 +29,11 @@ class LineagePanel(private val project: Project, private val toolWindow: ToolWin
     private var lineageInfo: LineageInfo? = null
 
     init {
+        project.messageBus.connect().subscribe(ActiveFileService.TOPIC, this)
         ApplicationManager.getApplication().executeOnPooledThread {
+            SwingUtilities.invokeLater{
+                mainPanel.add(JLabel("Loading..."), BorderLayout.CENTER)
+            }
             javaScriptEngineProxy.addHandler { result ->
                 println(result)
                 null
@@ -34,11 +41,11 @@ class LineagePanel(private val project: Project, private val toolWindow: ToolWin
             getLineageInfo()
             val htmlContent = getHtmlContent()
             SwingUtilities.invokeLater {
+                mainPanel.removeAll()
                 mainPanel.add(browser.component, BorderLayout.CENTER)
                 browser.loadHTML(htmlContent)
             }
         }
-        project.messageBus.connect().subscribe(ActiveFileService.TOPIC, this)
     }
 
     private fun getHtmlContent(): String {
@@ -102,7 +109,11 @@ class LineagePanel(private val project: Project, private val toolWindow: ToolWin
         }
     }
 
-    fun getContent(): JComponent {
+    override fun getContent(): JComponent {
         return mainPanel
+    }
+
+    override fun dispose() {
+
     }
 }
