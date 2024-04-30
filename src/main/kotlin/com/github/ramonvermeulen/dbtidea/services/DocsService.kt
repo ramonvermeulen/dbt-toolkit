@@ -11,13 +11,8 @@ class DocsService(private var project: Project) {
     private val settings = project.service<DbtIdeaSettingsService>()
 
     fun getDocs(): File {
-        // apply smarter logic
-        val docs = File(settings.state.dbtTargetDir + "/index.html")
-        val manifest = File(settings.state.dbtTargetDir + "/manifest.json")
-        val catalog = File(settings.state.dbtTargetDir + "/catalog.json")
-        if (!docs.exists() || !manifest.exists() || !catalog.exists()) {
-            dbtCommandExecutorService.executeCommand(listOf("docs", "generate"))
-        }
+        dbtCommandExecutorService.executeCommand(listOf("docs", "generate"))
+        val docs = File("${settings.state.dbtTargetDir}/${settings.static.DBT_DOCS_FILE}")
         return docs
     }
 }

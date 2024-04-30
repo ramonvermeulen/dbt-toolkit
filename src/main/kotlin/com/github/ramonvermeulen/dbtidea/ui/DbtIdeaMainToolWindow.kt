@@ -32,7 +32,7 @@ class DbtIdeaMainToolWindow : ToolWindowFactory, DumbAware {
             contentFactory.createContent(docsPanel.getContent(), "dbt docs", false),
         )
         toolWindow.contentManager.addContent(
-            contentFactory.createContent(consolePanel.getContent(), "console", false),
+            contentFactory.createContent(consolePanel.getContent(), "console (read-only)", false),
         )
         toolWindow.contentManager.addContentManagerListener(
             object : ContentManagerListener {

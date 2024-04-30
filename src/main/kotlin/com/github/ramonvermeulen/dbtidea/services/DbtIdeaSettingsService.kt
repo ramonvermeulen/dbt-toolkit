@@ -17,6 +17,12 @@ class DbtIdeaSettingsService(private var project: Project) : PersistentStateComp
         var dbtProjectDir: String = "",
         var dbtTargetDir: String = "",
     )
+    companion object {
+        const val DBT_DOCS_FILE = "index.html"
+        const val DBT_MANIFEST_FILE = "manifest.json"
+        const val DBT_CATALOG_FILE = "catalog.json"
+    }
+    var static = Companion
 
     private var state =
         State(

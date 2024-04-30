@@ -10,6 +10,7 @@ import org.cef.handler.CefResourceRequestHandler
 import org.cef.handler.CefResourceRequestHandlerAdapter
 import org.cef.misc.BoolRef
 import org.cef.network.CefRequest
+import java.net.URI
 import java.net.URL
 
 private typealias CefResourceProvider = () -> CefResourceHandler?
@@ -35,9 +36,10 @@ class CefLocalRequestHandler : CefRequestHandlerAdapter() {
                 frame: CefFrame?,
                 request: CefRequest,
             ): CefResourceHandler {
-                val url = URL(request.url)
+                val url = URI.create(request.url).toURL()
                 return try {
-                    myResources[url.path.split("/").last()]?.let { it() } ?: rejectingResourceHandler
+                    val fileName = url.path.split("/").last()
+                    myResources[fileName]?.let { it() } ?: rejectingResourceHandler
                 } catch (e: RuntimeException) {
                     rejectingResourceHandler
                 }
