@@ -66,15 +66,15 @@ class LineagePanel(private val project: Project, private val toolWindow: ToolWin
                     <button onclick="sendDataToKotlin()">Click me!</button>
                     <table>
                         <tr>
-                            <td>Active Node</td>
+                            <td><b>current node:</b></td>
                             <td>${lineageInfo?.node}</td>
                         </tr>
                         <tr>
-                            <td>children</td>
+                            <td><b>children:</b></td>
                             <td>${lineageInfo?.children.toString()}</td>
                         </tr>
                         <tr>
-                            <td>parents</td>
+                            <td><b>parents:</b></td>
                             <td>${lineageInfo?.parents.toString()}</td>
                         </tr>
                     </table>
@@ -98,7 +98,7 @@ class LineagePanel(private val project: Project, private val toolWindow: ToolWin
     private fun getLineageInfo() {
         val activeFile = activeFileService.getActiveFile()
         if (activeFile != null) {
-            lineageInfo = manifestService.getLineageInfoForNode("model.dbt_training.${activeFile.name.split(".").first()}")
+            lineageInfo = manifestService.getLineageInfoForNode("model.jaffle_shop.${activeFile.name.split(".").first()}")
         }
     }
 

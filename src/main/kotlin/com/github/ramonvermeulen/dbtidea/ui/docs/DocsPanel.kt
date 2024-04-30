@@ -1,5 +1,6 @@
 package com.github.ramonvermeulen.dbtidea.ui.docs
 
+import com.github.ramonvermeulen.dbtidea.services.DbtIdeaSettingsService
 import com.github.ramonvermeulen.dbtidea.services.DocsService
 import com.github.ramonvermeulen.dbtidea.ui.cef.CefLocalRequestHandler
 import com.github.ramonvermeulen.dbtidea.ui.cef.CefStreamResourceHandler
@@ -15,9 +16,11 @@ import com.intellij.openapi.wm.ToolWindow
 import com.intellij.ui.jcef.JBCefApp
 import com.intellij.ui.jcef.JBCefBrowser
 import com.intellij.ui.jcef.JBCefBrowserBuilder
+import org.apache.commons.io.IOUtils
 import java.awt.BorderLayout
 import java.io.File
 import java.io.FileInputStream
+import java.nio.charset.StandardCharsets
 import javax.swing.JButton
 import javax.swing.JComponent
 import javax.swing.JPanel
@@ -25,6 +28,7 @@ import javax.swing.SwingUtilities
 
 class DocsPanel(private var project: Project, private var toolWindow: ToolWindow) : Disposable {
     private val docsService = project.service<DocsService>()
+    private val settings = project.service<DbtIdeaSettingsService>()
     private val ourCefClient = JBCefApp.getInstance().createClient()
     private val isDebug = System.getProperty("idea.plugin.in.sandbox.mode") == "true"
     private val browser: JBCefBrowser = JBCefBrowserBuilder().setClient(ourCefClient).setEnableOpenDevToolsMenuItem(isDebug).build()
@@ -37,8 +41,8 @@ class DocsPanel(private var project: Project, private var toolWindow: ToolWindow
                         isEnabled = false
                         text = "Loading..."
                     }
-                    showLoadingIndicator("Executing dbt docs generate...") {
-                        ApplicationManager.getApplication().executeOnPooledThread {
+                    ApplicationManager.getApplication().executeOnPooledThread {
+                        showLoadingIndicator("Executing dbt docs generate...") {
                             try {
                                 val docs = docsService.getDocs()
                                 browser.loadURL(docs.absolutePath)
@@ -56,24 +60,38 @@ class DocsPanel(private var project: Project, private var toolWindow: ToolWindow
 
     init {
         ApplicationManager.getApplication().executeOnPooledThread {
-            val myRequestHandler = CefLocalRequestHandler()
-            val docs = docsService.getDocs()
-
-            myRequestHandler.addResource("index.html") {
-                CefStreamResourceHandler(FileInputStream(docs), "text/html", this@DocsPanel)
+            showLoadingIndicator("Executing dbt docs generate...") {
+                val myRequestHandler = CefLocalRequestHandler()
+                val docs = docsService.getDocs()
+                val manifest = File("${docs.parent}/manifest.json")
+                val catalog = File("${docs.parent}/catalog.json")
+                if (docs.exists() && manifest.exists() && catalog.exists()) {
+                    myRequestHandler.addResource("index.html") {
+                        docs.bufferedReader().use {
+                            val inputStream = IOUtils.toInputStream(IOUtils.toString(it), StandardCharsets.UTF_8)
+                            CefStreamResourceHandler(inputStream, "text/html", this@DocsPanel)
+                        }
+                    }
+                    myRequestHandler.addResource("manifest.json") {
+                        manifest.bufferedReader().use {
+                            val inputStream = IOUtils.toInputStream(IOUtils.toString(it), StandardCharsets.UTF_8)
+                            CefStreamResourceHandler(inputStream, "text/html", this)
+                        }
+                    }
+                    myRequestHandler.addResource("catalog.json") {
+                        catalog.bufferedReader().use {
+                            val inputStream = IOUtils.toInputStream(IOUtils.toString(it), StandardCharsets.UTF_8)
+                            CefStreamResourceHandler(inputStream, "text/html", this)
+                        }
+                    }
+                    ourCefClient.addRequestHandler(myRequestHandler, browser.cefBrowser)
+                }
             }
-            myRequestHandler.addResource("manifest.json") {
-                CefStreamResourceHandler(FileInputStream(File("${docs.parent}/manifest.json")), "application/json", this@DocsPanel)
-            }
-            myRequestHandler.addResource("catalog.json") {
-                CefStreamResourceHandler(FileInputStream(File("${docs.parent}/catalog.json")), "application/json", this@DocsPanel)
-            }
-            ourCefClient.addRequestHandler(myRequestHandler, browser.cefBrowser)
 
             SwingUtilities.invokeLater {
                 mainPanel.add(regenerateButton, BorderLayout.NORTH)
                 mainPanel.add(browser.component, BorderLayout.CENTER)
-                browser.loadURL(docs.absolutePath)
+                browser.loadURL(settings.state.dbtTargetDir + "/index.html")
             }
             Disposer.register(ApplicationManager.getApplication(), ourCefClient)
         }
@@ -87,14 +105,14 @@ class DocsPanel(private var project: Project, private var toolWindow: ToolWindow
         title: String,
         task: () -> Unit,
     ) {
-        val dbtParseTask =
+        val backgroundTask =
             object : Task.Backgroundable(project, title, false) {
                 override fun run(indicator: ProgressIndicator) {
                     indicator.isIndeterminate = true
                     task.invoke()
                 }
             }
-        ProgressManager.getInstance().run(dbtParseTask)
+        ProgressManager.getInstance().run(backgroundTask)
     }
 
     override fun dispose() {

@@ -9,8 +9,8 @@ import com.intellij.openapi.project.Project
 import java.io.File
 
 data class LineageInfo(
-    val parents: JsonArray,
-    val children: JsonArray,
+    val parents: JsonArray?,
+    val children: JsonArray?,
     val node: String,
 )
 
@@ -43,8 +43,11 @@ class ManifestService(private var project: Project) {
             parseManifest()
             return null
         }
-        var parents = manifest!!.getAsJsonObject("child_map").getAsJsonArray(node)
-        var children = manifest!!.getAsJsonObject("parent_map").getAsJsonArray(node)
+        val parents = manifest!!.getAsJsonObject("child_map").getAsJsonArray(node)
+        val children = manifest!!.getAsJsonObject("parent_map").getAsJsonArray(node)
+        if (parents == null && children == null) {
+            return null
+        }
         return LineageInfo(parents, children, node)
     }
 }
