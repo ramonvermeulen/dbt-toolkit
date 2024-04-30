@@ -9,17 +9,10 @@
 
     <resource-bundle>messages.MyBundle</resource-bundle>
 
-    <applicationListeners>
-        <listener
-                class="com.github.ramonvermeulen.dbtidea.listeners.FileOpenedListener"
-                topic="com.intellij.openapi.fileEditor.FileEditorManagerListener"
-        />
-    </applicationListeners>
-
     <extensions defaultExtensionNs="com.intellij">
         <projectConfigurable
             parentId="tools"
-            instance="com.github.ramonvermeulen.dbtidea.ui.DbtIdeaSettingsConfigurable"
+            instance="com.github.ramonvermeulen.dbtidea.ui.settings.DbtIdeaSettingsConfigurable"
             id="dbtIdeaSettings"
             displayName="dbtIdea Settings"
         />
@@ -31,4 +24,10 @@
                 icon="AllIcons.Toolwindows.InfoEvents"
         />
     </extensions>
+
+    <projectListeners>
+        <listener
+                class="com.github.ramonvermeulen.dbtidea.listeners.DbtIdeaFileListener"
+                topic="com.intellij.openapi.fileEditor.FileEditorManagerListener"/>
+    </projectListeners>
 </idea-plugin>
