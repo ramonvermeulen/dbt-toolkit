@@ -12,7 +12,7 @@ class DocsService(private var project: Project) {
 
     fun getDocs(): File {
         dbtCommandExecutorService.executeCommand(listOf("docs", "generate"))
-        val docs = File("${settings.state.dbtTargetDir}/${settings.static.DBT_DOCS_FILE}")
+        val docs = File("${settings.state.settingsDbtTargetDir}/${settings.static.DBT_DOCS_FILE}")
         return docs
     }
 }

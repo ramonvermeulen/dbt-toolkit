@@ -1,9 +1,6 @@
 package com.github.ramonvermeulen.dbtidea.ui.lineage
 
-import com.github.ramonvermeulen.dbtidea.services.ActiveFileListener
-import com.github.ramonvermeulen.dbtidea.services.ActiveFileService
-import com.github.ramonvermeulen.dbtidea.services.LineageInfo
-import com.github.ramonvermeulen.dbtidea.services.ManifestService
+import com.github.ramonvermeulen.dbtidea.services.*
 import com.github.ramonvermeulen.dbtidea.ui.IdeaPanel
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
@@ -20,6 +17,7 @@ import javax.swing.SwingUtilities
 
 class LineagePanel(private val project: Project, private val toolWindow: ToolWindow) : ActiveFileListener, IdeaPanel, Disposable {
     private val manifestService = project.service<ManifestService>()
+    private val settings = project.service<DbtIdeaSettingsService>()
     private val activeFileService = project.service<ActiveFileService>()
     private val ourCefClient = JBCefApp.getInstance().createClient()
     private val isDebug = System.getProperty("idea.plugin.in.sandbox.mode") == "true"
@@ -38,7 +36,6 @@ class LineagePanel(private val project: Project, private val toolWindow: ToolWin
                 println(result)
                 null
             }
-            getLineageInfo()
             val htmlContent = getHtmlContent()
             SwingUtilities.invokeLater {
                 mainPanel.removeAll()
@@ -104,8 +101,21 @@ class LineagePanel(private val project: Project, private val toolWindow: ToolWin
 
     private fun getLineageInfo() {
         val activeFile = activeFileService.getActiveFile()
+        val projectName = settings.state.dbtProjectName
+        val modelsPattern = Regex(settings.state.dbtModelPaths.joinToString("|", prefix = ".*/(", postfix = ")/.*") { Regex.escape(it) })
+        val testsPattern = Regex(settings.state.dbtTestPaths.joinToString("|", prefix = ".*/(", postfix = ")/.*") { Regex.escape(it) })
+        val seedsPattern = Regex(settings.state.dbtSeedPaths.joinToString("|", prefix = ".*/(", postfix = ")/.*") { Regex.escape(it) })
+        val macrosPattern = Regex(settings.state.dbtMacroPaths.joinToString("|", prefix = ".*/(", postfix = ")/.*") { Regex.escape(it) })
         if (activeFile != null) {
-            lineageInfo = manifestService.getLineageInfoForNode("model.jaffle_shop.${activeFile.name.split(".").first()}")
+            if (activeFile.path.matches(modelsPattern)) {
+                lineageInfo = manifestService.getLineageInfoForNode("model.${projectName}.${activeFile.name.split(".").first()}")
+            } else if (activeFile.path.matches(testsPattern)) {
+                lineageInfo = manifestService.getLineageInfoForNode("test.${projectName}.${activeFile.name.split(".").first()}")
+            } else if (activeFile.path.matches(seedsPattern)) {
+                lineageInfo = manifestService.getLineageInfoForNode("seed.${projectName}.${activeFile.name.split(".").first()}")
+            } else if (activeFile.path.matches(macrosPattern)) {
+                lineageInfo = manifestService.getLineageInfoForNode("macro.${projectName}.${activeFile.name.split(".").first()}")
+            }
         }
     }
 

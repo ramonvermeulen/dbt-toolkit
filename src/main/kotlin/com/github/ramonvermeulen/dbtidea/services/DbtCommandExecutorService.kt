@@ -13,11 +13,17 @@ class DbtCommandExecutorService(private var project: Project) {
     private val loggingService = project.service<LoggingService>()
     private val notificationService = project.service<NotificationService>()
 
+    @Synchronized
     fun executeCommand(command: List<String>) {
-        val processBuilder = ProcessBuilder("dbt", *command.toTypedArray())
-        processBuilder.directory(settings.state.dbtProjectDir.let { File(it) })
+        val processBuilder = ProcessBuilder("dbt", "--no-use-colors", *command.toTypedArray())
+        loggingService.log(">>> dbt --no-use-colors ${command.joinToString(" ")}\n", ConsoleViewContentType.NORMAL_OUTPUT)
+        processBuilder.directory(settings.state.settingsDbtProjectDir.let { File(it) })
+
         var stdout = ""
         try {
+            val env = processBuilder.environment()
+            settings.state.settingsEnvVars.forEach{ (k, v) -> env[k] = v }
+
             val process = processBuilder.start()
             val exitCode = if (process.waitFor(20, TimeUnit.SECONDS)) {
                 process.exitValue()
@@ -25,9 +31,9 @@ class DbtCommandExecutorService(private var project: Project) {
                 process.destroy()
                 -1
             }
-            stdout = process.inputStream.bufferedReader().readText()
+            // dbt only uses stdout, even for errors
+            stdout = process.inputStream.bufferedReader().readText() + "\n"
             if (exitCode != 0) {
-                loggingService.flush()
                 loggingService.log(stdout, ConsoleViewContentType.ERROR_OUTPUT)
                 notificationService.sendNotification("dbt command in the background failed", "check the console tab to see details")
             } else {

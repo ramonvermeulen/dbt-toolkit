@@ -56,8 +56,8 @@ class DbtIdeaMainToolWindow : ToolWindowFactory, DumbAware {
 
     override fun isApplicable(project: Project): Boolean {
         val changeListManager = ChangeListManager.getInstance(project)
-
         var isDbtProject = false
+
         project.guessProjectDir()?.let {
             VfsUtil.visitChildrenRecursively(it, object: VirtualFileVisitor<Any>() {
                 override fun visitFile(file: VirtualFile): Boolean {

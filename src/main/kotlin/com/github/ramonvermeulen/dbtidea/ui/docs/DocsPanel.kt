@@ -12,7 +12,6 @@ import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.ui.jcef.JBCefApp
 import com.intellij.ui.jcef.JBCefBrowser
@@ -69,7 +68,7 @@ class DocsPanel(private var project: Project, private var toolWindow: ToolWindow
                 SwingUtilities.invokeLater {
                     regenerateButton.isEnabled = true
                     regenerateButton.text = "Regenerate Docs"
-                    browser.loadURL("${settings.state.dbtTargetDir}/${settings.static.DBT_DOCS_FILE}")
+                    browser.loadURL("${settings.state.settingsDbtTargetDir}/${settings.static.DBT_DOCS_FILE}")
                 }
             }
             SwingUtilities.invokeLater {
@@ -80,15 +79,14 @@ class DocsPanel(private var project: Project, private var toolWindow: ToolWindow
                 mainPanel.add(buttonPanel)
                 mainPanel.add(browser.component)
             }
-            Disposer.register(ApplicationManager.getApplication(), ourCefClient)
         }
     }
 
     private fun initiateCefRequestHandler() {
         val myRequestHandler = CefLocalRequestHandler()
         val docs = docsService.getDocs()
-        val manifest = File("${settings.state.dbtTargetDir}/${settings.static.DBT_MANIFEST_FILE}")
-        val catalog = File("${settings.state.dbtTargetDir}/${settings.static.DBT_CATALOG_FILE}")
+        val manifest = File("${settings.state.settingsDbtTargetDir}/${settings.static.DBT_MANIFEST_FILE}")
+        val catalog = File("${settings.state.settingsDbtTargetDir}/${settings.static.DBT_CATALOG_FILE}")
         if (docs.exists() && manifest.exists() && catalog.exists()) {
             myRequestHandler.addResource(settings.static.DBT_DOCS_FILE) {
                 docs.bufferedReader().use {

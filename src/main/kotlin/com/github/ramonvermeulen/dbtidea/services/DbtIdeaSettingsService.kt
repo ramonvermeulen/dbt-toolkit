@@ -5,7 +5,6 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.vfs.VirtualFile
 import org.yaml.snakeyaml.Yaml
 import java.io.BufferedReader
@@ -18,9 +17,17 @@ import java.io.InputStreamReader
 @Service(Service.Level.PROJECT)
 class DbtIdeaSettingsService(private var project: Project) : PersistentStateComponent<DbtIdeaSettingsService.State> {
     data class State(
-        var dbtProjectDir: String = "",
+        var settingsDbtProjectDir: String = "",
+        var settingsDbtTargetDir: String = "",
+        var settingsEnvVars: Map<String, String> = mapOf(),
+        var dbtProjectsDir: String = "",
         var dbtTargetDir: String = "",
         var dbtProject: Map<String, Any> = mapOf(),
+        var dbtModelPaths: List<String> = listOf(),
+        var dbtSeedPaths: List<String> = listOf(),
+        var dbtTestPaths: List<String> = listOf(),
+        var dbtMacroPaths: List<String> = listOf(),
+        var dbtProjectName: String = "",
     )
     companion object {
         const val DBT_DOCS_FILE = "index.html"
@@ -38,11 +45,22 @@ class DbtIdeaSettingsService(private var project: Project) : PersistentStateComp
 
     fun parseDbtProjectFile(file: VirtualFile) {
         val inputStream = file.inputStream
-        state.dbtProjectDir = file.parent.path
+        state.settingsDbtProjectDir = file.parent.path
+        state.dbtProjectsDir = file.parent.path
+        state.settingsDbtTargetDir = "${file.parent.path}/target"
         state.dbtTargetDir = "${file.parent.path}/target"
         val reader = BufferedReader(InputStreamReader(inputStream))
         val yaml = Yaml()
-        state.dbtProject = yaml.load(reader) as Map<String, Any>
+        state.dbtProject = yaml.load(reader)
+        state.dbtModelPaths = state.dbtProject["model-paths"].safeCastToList() ?: listOf()
+        state.dbtTestPaths = state.dbtProject["test-paths"].safeCastToList() ?: listOf()
+        state.dbtSeedPaths = state.dbtProject["seed-paths"].safeCastToList() ?: listOf()
+        state.dbtMacroPaths = state.dbtProject["macro-paths"].safeCastToList() ?: listOf()
+        state.dbtProjectName = (state.dbtProject["name"] as? String).toString()
         reader.close()
     }
+}
+
+private fun Any?.safeCastToList(): List<String>? {
+    return (this as? List<*>)?.filterIsInstance<String>()
 }

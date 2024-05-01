@@ -19,20 +19,20 @@ class DbtIdeaSettingsConfigurable(project: Project) : Configurable {
     private var dbtProjectDirField = JBTextField()
     private var dbtTargetDirField = JBTextField()
     private var envVarsTable = JBTable()
+    private var settingsPanel = JPanel(BorderLayout(5, 5))
 
     override fun getDisplayName(): String {
         return "dbtIdea Settings"
     }
 
     override fun createComponent(): JComponent {
-        val settingsPanel = JPanel(BorderLayout(5, 5))
+        SwingUtilities.invokeLater {
+            val fieldsPanel = createFieldsPanel()
+            val envVarsPanel = createEnvVarsPanel()
 
-        val fieldsPanel = createFieldsPanel()
-        val envVarsPanel = createEnvVarsPanel()
-
-        settingsPanel.add(fieldsPanel, BorderLayout.NORTH)
-        settingsPanel.add(envVarsPanel, BorderLayout.CENTER)
-
+            settingsPanel.add(fieldsPanel, BorderLayout.NORTH)
+            settingsPanel.add(envVarsPanel, BorderLayout.CENTER)
+        }
         return settingsPanel
     }
 
@@ -53,7 +53,6 @@ class DbtIdeaSettingsConfigurable(project: Project) : Configurable {
     }
 
     private fun createEnvVarsPanel(): JPanel {
-        // Create table for environment variables
         val model = DefaultTableModel(arrayOf("Name", "Value"), 0)
         envVarsTable.model = model
 
@@ -64,7 +63,6 @@ class DbtIdeaSettingsConfigurable(project: Project) : Configurable {
             }
         }
 
-        // Add "-" button to remove a row from the table
         val removeButton = JButton("-").apply {
             addActionListener {
                 val selectedRow = envVarsTable.selectedRow
@@ -81,6 +79,10 @@ class DbtIdeaSettingsConfigurable(project: Project) : Configurable {
             add(removeButton)
         }
 
+        dbtIdeaSettingsService.state.settingsEnvVars.forEach { (name, value) ->
+            (envVarsTable.model as DefaultTableModel).addRow(arrayOf(name, value))
+        }
+
         return JPanel(BorderLayout(5, 5)).apply {
             add(JLabel("Environment Variables:"), BorderLayout.NORTH)
             add(JScrollPane(envVarsTable), BorderLayout.CENTER)
@@ -88,19 +90,39 @@ class DbtIdeaSettingsConfigurable(project: Project) : Configurable {
         }
     }
 
+
     override fun reset() {
-        dbtProjectDirField.text = dbtIdeaSettingsService.state.dbtProjectDir
+        dbtProjectDirField.text = dbtIdeaSettingsService.state.dbtProjectsDir
         dbtTargetDirField.text = dbtIdeaSettingsService.state.dbtTargetDir
-        // Reset the environment variables table
+
+        while (envVarsTable.model.rowCount > 0) {
+            (envVarsTable.model as DefaultTableModel).removeRow(0)
+        }
     }
 
     override fun isModified(): Boolean {
-        // check if settings have been modified
-        return true
+        val envVars = mutableMapOf<String, String>()
+        for (i in 0 until envVarsTable.model.rowCount) {
+            val name = envVarsTable.model.getValueAt(i, 0) as String
+            val value = envVarsTable.model.getValueAt(i, 1) as String
+            envVars[name] = value
+        }
+
+        return dbtProjectDirField.text != dbtIdeaSettingsService.state.settingsDbtProjectDir ||
+                dbtTargetDirField.text != dbtIdeaSettingsService.state.settingsDbtTargetDir ||
+                envVars != dbtIdeaSettingsService.state.settingsEnvVars
     }
 
     override fun apply() {
-        // apply settings
-        return
+        val envVars = mutableMapOf<String, String>()
+        for (i in 0 until envVarsTable.model.rowCount) {
+            val name = envVarsTable.model.getValueAt(i, 0) as String
+            val value = envVarsTable.model.getValueAt(i, 1) as String
+            envVars[name] = value
+        }
+
+        dbtIdeaSettingsService.state.settingsDbtProjectDir = dbtProjectDirField.text
+        dbtIdeaSettingsService.state.settingsDbtTargetDir = dbtTargetDirField.text
+        dbtIdeaSettingsService.state.settingsEnvVars = envVars
     }
 }

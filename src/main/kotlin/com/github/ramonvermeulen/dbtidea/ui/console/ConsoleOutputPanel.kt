@@ -30,15 +30,21 @@ class ConsoleOutputPanel(private val project: Project, private val toolWindow: T
     }
 
     override fun logEvent(event: LoggingEvent) {
-        consoleView.print(event.message, event.type)
+        SwingUtilities.invokeLater {
+            consoleView.print(event.message, event.type)
+        }
     }
 
     override fun flush() {
-        consoleView.clear()
+        SwingUtilities.invokeLater {
+            consoleView.clear()
+        }
     }
 
     override fun dispose() {
-        consoleView.dispose()
+        SwingUtilities.invokeLater {
+            consoleView.dispose()
+        }
     }
 }
 
