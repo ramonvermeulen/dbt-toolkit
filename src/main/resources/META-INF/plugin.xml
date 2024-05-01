@@ -5,9 +5,8 @@
     <vendor>ramonvermeulen</vendor>
 
     <depends>com.intellij.modules.platform</depends>
-    <depends>org.jetbrains.plugins.terminal</depends>
 
-    <resource-bundle>messages.MyBundle</resource-bundle>
+    <resource-bundle>messages.DbtIdeaBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
         <projectConfigurable
@@ -22,6 +21,11 @@
                 anchor="bottom"
                 secondary="false"
                 icon="AllIcons.Toolwindows.InfoEvents"
+        />
+        <notificationGroup
+                id="dbtIdeaNotificationGroup"
+                displayType="BALLOON"
+                key="notification.group.name"
         />
     </extensions>
 
