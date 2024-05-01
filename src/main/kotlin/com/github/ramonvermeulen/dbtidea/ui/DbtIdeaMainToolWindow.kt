@@ -31,22 +31,46 @@ class DbtIdeaMainToolWindow : ToolWindowFactory, DumbAware {
         toolWindow: ToolWindow,
     ) {
         val contentFactory = ContentFactory.getInstance()
-        val panels = listOf(
-            LineagePanel(project, toolWindow) to "dbt lineage",
-            DocsPanel(project, toolWindow) to "dbt docs",
-            ConsoleOutputPanel(project, toolWindow) to "console (read-only)"
-        )
 
-        panels.forEach { (panel, title) ->
-            toolWindow.contentManager.addContent(
-                contentFactory.createContent(panel.getContent(), title, false),
-            )
+        val panelTitles = listOf("dbt lineage", "dbt docs", "console (read-only)")
+        val panels = mutableMapOf<String, IdeaPanel>()
+
+        panelTitles.forEach { title ->
+            // not lazy loaded panel
+            if (title == "console (read-only)") {
+                val panel = ConsoleOutputPanel(project, toolWindow)
+                panels[title] = panel
+                val content = contentFactory.createContent(panel.getContent(), title, false)
+                toolWindow.contentManager.addContent(content)
+                return@forEach
+            }
+            if (title == "dbt lineage") {
+                val panel = LineagePanel(project, toolWindow)
+                panels[title] = panel
+                val content = contentFactory.createContent(panel.getContent(), title, false)
+                toolWindow.contentManager.addContent(content)
+                return@forEach
+            }
+            val dummyPanel = JPanel()
+            val content = contentFactory.createContent(dummyPanel, title, false)
+            toolWindow.contentManager.addContent(content)
         }
 
         toolWindow.contentManager.addContentManagerListener(
             object : ContentManagerListener {
                 override fun selectionChanged(event: ContentManagerEvent) {
-                    handleTabChange(project, event)
+                    val selectedContent = event.content
+                    val selectedTitle = selectedContent.tabName
+
+                    // lazy loaded panels
+                    if (panels[selectedTitle] == null) {
+                        val panel = when (selectedTitle) {
+                            "dbt docs" -> DocsPanel(project, toolWindow)
+                            else -> throw IllegalArgumentException("Unknown panel title: $selectedTitle")
+                        }
+                        panels[selectedTitle] = panel
+                        selectedContent.component = panel.getContent()
+                    }
                 }
             },
         )
@@ -59,7 +83,7 @@ class DbtIdeaMainToolWindow : ToolWindowFactory, DumbAware {
         var isDbtProject = false
 
         project.guessProjectDir()?.let {
-            VfsUtil.visitChildrenRecursively(it, object: VirtualFileVisitor<Any>() {
+            VfsUtil.visitChildrenRecursively(it, object : VirtualFileVisitor<Any>() {
                 override fun visitFile(file: VirtualFile): Boolean {
                     if (changeListManager.isIgnoredFile(file) || file.path.matches(Regex(".*/(target|dbt_packages)/.*"))) {
                         return false
@@ -74,12 +98,5 @@ class DbtIdeaMainToolWindow : ToolWindowFactory, DumbAware {
             })
         }
         return isDbtProject
-    }
-
-    private fun handleTabChange(
-        project: Project,
-        event: ContentManagerEvent,
-    ) {
-        // handle tab change impl
     }
 }
