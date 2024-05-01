@@ -5,6 +5,7 @@ import com.github.ramonvermeulen.dbtidea.services.DocsService
 import com.github.ramonvermeulen.dbtidea.ui.IdeaPanel
 import com.github.ramonvermeulen.dbtidea.ui.cef.CefLocalRequestHandler
 import com.github.ramonvermeulen.dbtidea.ui.cef.CefStreamResourceHandler
+import com.ibm.icu.text.SimpleDateFormat
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.service
@@ -23,6 +24,7 @@ import java.nio.charset.StandardCharsets
 import javax.swing.BoxLayout
 import javax.swing.JButton
 import javax.swing.JComponent
+import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.SwingUtilities
 
@@ -34,7 +36,6 @@ class DocsPanel(private var project: Project, private var toolWindow: ToolWindow
     private val browser: JBCefBrowser = JBCefBrowserBuilder().setClient(ourCefClient).setEnableOpenDevToolsMenuItem(isDebug).build()
     private val mainPanel: JPanel = JPanel()
     private val buttonPanel = JPanel(FlowLayout(FlowLayout.LEFT))
-
     private val regenerateButton =
         object : JButton("Regenerate Docs") {
             init {
@@ -46,8 +47,11 @@ class DocsPanel(private var project: Project, private var toolWindow: ToolWindow
                     ApplicationManager.getApplication().executeOnPooledThread {
                         showLoadingIndicator("Executing dbt docs generate...") {
                             try {
-                                val docs = docsService.getDocs()
-                                print(docs.absolutePath + "\n")
+                                val docs = docsService.getDocs(forceRegen=true)
+                                docs.lastModified().let {
+                                    val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+                                    lastModifiedLabel.text = "Last modified: ${sdf.format(it)}"
+                                }
                                 browser.loadURL(docs.absolutePath)
                             } finally {
                                 SwingUtilities.invokeLater {
@@ -60,6 +64,7 @@ class DocsPanel(private var project: Project, private var toolWindow: ToolWindow
                 }
             }
         }
+    private val lastModifiedLabel = JLabel()
 
     init {
         ApplicationManager.getApplication().executeOnPooledThread {
@@ -76,6 +81,7 @@ class DocsPanel(private var project: Project, private var toolWindow: ToolWindow
                 regenerateButton.isEnabled = false
                 regenerateButton.text = "Loading..."
                 buttonPanel.add(regenerateButton)
+                buttonPanel.add(lastModifiedLabel)
                 mainPanel.add(buttonPanel)
                 mainPanel.add(browser.component)
             }
@@ -85,6 +91,10 @@ class DocsPanel(private var project: Project, private var toolWindow: ToolWindow
     private fun initiateCefRequestHandler() {
         val myRequestHandler = CefLocalRequestHandler()
         val docs = docsService.getDocs()
+        docs.lastModified().let {
+            val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+            lastModifiedLabel.text = "Last modified: ${sdf.format(it)}"
+        }
         val manifest = File("${settings.state.settingsDbtTargetDir}/${settings.static.DBT_MANIFEST_FILE}")
         val catalog = File("${settings.state.settingsDbtTargetDir}/${settings.static.DBT_CATALOG_FILE}")
         if (docs.exists() && manifest.exists() && catalog.exists()) {

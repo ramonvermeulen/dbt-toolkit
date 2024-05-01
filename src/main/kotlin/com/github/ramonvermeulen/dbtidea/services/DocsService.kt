@@ -10,9 +10,12 @@ class DocsService(private var project: Project) {
     private val dbtCommandExecutorService = project.service<DbtCommandExecutorService>()
     private val settings = project.service<DbtIdeaSettingsService>()
 
-    fun getDocs(): File {
-        dbtCommandExecutorService.executeCommand(listOf("docs", "generate"))
+    fun getDocs(forceRegen: Boolean = false): File {
         val docs = File("${settings.state.settingsDbtTargetDir}/${settings.static.DBT_DOCS_FILE}")
+        if (docs.exists() && !forceRegen) {
+            return docs
+        }
+        dbtCommandExecutorService.executeCommand(listOf("docs", "generate"))
         return docs
     }
 }
