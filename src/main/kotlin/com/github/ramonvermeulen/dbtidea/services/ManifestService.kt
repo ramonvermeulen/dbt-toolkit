@@ -7,6 +7,8 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import java.io.File
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
 
 data class LineageInfo(
     val parents: JsonArray?,
@@ -19,6 +21,7 @@ class ManifestService(private var project: Project) {
     private var settings = project.service<DbtIdeaSettingsService>()
     private val dbtCommandExecutorService = project.service<DbtCommandExecutorService>()
     private var manifest: JsonObject? = null
+    private val manifestLock = ReentrantLock()
 
     private fun parseManifest() {
         dbtCommandExecutorService.executeCommand(listOf("parse"))
@@ -32,15 +35,16 @@ class ManifestService(private var project: Project) {
     }
 
     fun getLineageInfoForNode(node: String): LineageInfo? {
-        if (manifest == null) {
-            parseManifest()
-            return null
+        manifestLock.withLock {
+            if (manifest == null) {
+                parseManifest()
+            }
+            val parents = manifest!!.getAsJsonObject("child_map").getAsJsonArray(node)
+            val children = manifest!!.getAsJsonObject("parent_map").getAsJsonArray(node)
+            if (parents == null && children == null) {
+                return null
+            }
+            return LineageInfo(parents, children, node)
         }
-        val parents = manifest!!.getAsJsonObject("child_map").getAsJsonArray(node)
-        val children = manifest!!.getAsJsonObject("parent_map").getAsJsonArray(node)
-        if (parents == null && children == null) {
-            return null
-        }
-        return LineageInfo(parents, children, node)
     }
 }

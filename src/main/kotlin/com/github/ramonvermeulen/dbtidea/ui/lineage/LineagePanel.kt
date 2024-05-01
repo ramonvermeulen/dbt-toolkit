@@ -18,7 +18,6 @@ import javax.swing.SwingUtilities
 class LineagePanel(private val project: Project, private val toolWindow: ToolWindow) : ActiveFileListener, IdeaPanel, Disposable {
     private val manifestService = project.service<ManifestService>()
     private val settings = project.service<DbtIdeaSettingsService>()
-    private val activeFileService = project.service<ActiveFileService>()
     private val ourCefClient = JBCefApp.getInstance().createClient()
     private val isDebug = System.getProperty("idea.plugin.in.sandbox.mode") == "true"
     private val browser: JBCefBrowser = JBCefBrowserBuilder().setClient(ourCefClient).setEnableOpenDevToolsMenuItem(isDebug).build()
@@ -91,7 +90,7 @@ class LineagePanel(private val project: Project, private val toolWindow: ToolWin
 
     override fun activeFileChanged(file: VirtualFile?) {
         ApplicationManager.getApplication().executeOnPooledThread {
-            getLineageInfo()
+            getLineageInfo(file)
             val htmlContent = getHtmlContent()
             SwingUtilities.invokeLater {
                 browser.loadHTML(htmlContent)
@@ -99,8 +98,7 @@ class LineagePanel(private val project: Project, private val toolWindow: ToolWin
         }
     }
 
-    private fun getLineageInfo() {
-        val activeFile = activeFileService.getActiveFile()
+    private fun getLineageInfo(activeFile: VirtualFile?) {
         val projectName = settings.state.dbtProjectName
         val modelsPattern = Regex(settings.state.dbtModelPaths.joinToString("|", prefix = ".*/(", postfix = ")/.*") { Regex.escape(it) })
         val testsPattern = Regex(settings.state.dbtTestPaths.joinToString("|", prefix = ".*/(", postfix = ")/.*") { Regex.escape(it) })

@@ -3,8 +3,6 @@ package com.github.ramonvermeulen.dbtidea.services
 import com.github.ramonvermeulen.dbtidea.actions.OpenConsoleAction
 import com.intellij.execution.ui.ConsoleViewContentType
 import com.intellij.notification.NotificationType
-import com.intellij.openapi.actionSystem.AnAction
-import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
