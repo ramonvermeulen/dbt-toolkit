@@ -23,37 +23,36 @@ import com.intellij.openapi.wm.ToolWindowFactory
 import com.intellij.ui.content.ContentFactory
 import com.intellij.ui.content.ContentManagerEvent
 import com.intellij.ui.content.ContentManagerListener
+import java.util.function.Supplier
 import javax.swing.JPanel
 
 class DbtIdeaMainToolWindow : ToolWindowFactory, DumbAware {
+    data class PanelInfo(val creator: Supplier<IdeaPanel>, val isLazy: Boolean)
     override fun createToolWindowContent(
         project: Project,
         toolWindow: ToolWindow,
     ) {
         val contentFactory = ContentFactory.getInstance()
 
-        val panelTitles = listOf("dbt lineage", "dbt docs", "console (read-only)")
+        val panelCreators = mapOf(
+            "dbt lineage" to PanelInfo(Supplier { LineagePanel(project, toolWindow) }, false),
+            "dbt docs" to PanelInfo(Supplier { DocsPanel(project, toolWindow) }, true),
+            "console (read-only)" to PanelInfo(Supplier { ConsoleOutputPanel(project, toolWindow) }, false),
+        )
+
         val panels = mutableMapOf<String, IdeaPanel>()
 
-        panelTitles.forEach { title ->
-            // not lazy loaded panel
-            if (title == "console (read-only)") {
-                val panel = ConsoleOutputPanel(project, toolWindow)
+        panelCreators.forEach { (title, panelInfo) ->
+            if (!panelInfo.isLazy) {
+                val panel = panelInfo.creator.get()
                 panels[title] = panel
                 val content = contentFactory.createContent(panel.getContent(), title, false)
                 toolWindow.contentManager.addContent(content)
-                return@forEach
-            }
-            if (title == "dbt lineage") {
-                val panel = LineagePanel(project, toolWindow)
-                panels[title] = panel
-                val content = contentFactory.createContent(panel.getContent(), title, false)
+            } else {
+                val dummyPanel = JPanel()
+                val content = contentFactory.createContent(dummyPanel, title, false)
                 toolWindow.contentManager.addContent(content)
-                return@forEach
             }
-            val dummyPanel = JPanel()
-            val content = contentFactory.createContent(dummyPanel, title, false)
-            toolWindow.contentManager.addContent(content)
         }
 
         toolWindow.contentManager.addContentManagerListener(
@@ -62,14 +61,12 @@ class DbtIdeaMainToolWindow : ToolWindowFactory, DumbAware {
                     val selectedContent = event.content
                     val selectedTitle = selectedContent.tabName
 
-                    // lazy loaded panels
-                    if (panels[selectedTitle] == null) {
-                        val panel = when (selectedTitle) {
-                            "dbt docs" -> DocsPanel(project, toolWindow)
-                            else -> throw IllegalArgumentException("Unknown panel title: $selectedTitle")
+                    if (panels[selectedTitle] == null && panelCreators[selectedTitle]?.isLazy == true) {
+                        val panel = panelCreators[selectedTitle]?.creator?.get()
+                        if (panel != null) {
+                            panels[selectedTitle] = panel
+                            selectedContent.component = panel.getContent()
                         }
-                        panels[selectedTitle] = panel
-                        selectedContent.component = panel.getContent()
                     }
                 }
             },
