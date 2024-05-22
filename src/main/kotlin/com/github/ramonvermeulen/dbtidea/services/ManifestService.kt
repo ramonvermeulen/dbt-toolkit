@@ -47,8 +47,8 @@ class ManifestService(private var project: Project) {
             if (manifest == null) {
                 parseManifest()
             }
-            val children = manifest!!.getAsJsonObject("child_map").getAsJsonArray(node)
-            val parents = manifest!!.getAsJsonObject("parent_map").getAsJsonArray(node)
+            val parents = manifest!!.getAsJsonObject("child_map").getAsJsonArray(node)
+            val children = manifest!!.getAsJsonObject("parent_map").getAsJsonArray(node)
             if (parents == null && children == null) {
                 return null
             }
