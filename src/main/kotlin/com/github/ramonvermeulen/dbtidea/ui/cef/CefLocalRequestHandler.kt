@@ -11,7 +11,6 @@ import org.cef.handler.CefResourceRequestHandlerAdapter
 import org.cef.misc.BoolRef
 import org.cef.network.CefRequest
 import java.net.URI
-import java.net.URL
 
 private typealias CefResourceProvider = () -> CefResourceHandler?
 

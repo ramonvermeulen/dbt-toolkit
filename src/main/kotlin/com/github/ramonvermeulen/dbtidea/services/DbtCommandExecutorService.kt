@@ -17,8 +17,9 @@ class DbtCommandExecutorService(private var project: Project) {
 
     @Synchronized
     fun executeCommand(command: List<String>) {
-        val processBuilder = ProcessBuilder("dbt", "--no-use-colors", *command.toTypedArray())
-        loggingService.log(">>> dbt --no-use-colors ${command.joinToString(" ")}\n", ConsoleViewContentType.NORMAL_OUTPUT)
+        val cmd = listOf("dbt", "--no-use-colors", *command.toTypedArray())
+        val processBuilder = ProcessBuilder(cmd)
+        loggingService.log(">>> ${cmd.joinToString(" ")}\n", ConsoleViewContentType.NORMAL_OUTPUT)
         processBuilder.directory(settings.state.settingsDbtProjectDir.let { File(it) })
 
         var stdout = ""

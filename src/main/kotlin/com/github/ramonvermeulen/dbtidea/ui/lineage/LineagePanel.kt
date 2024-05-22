@@ -67,6 +67,7 @@ class LineagePanel(private val project: Project, private val toolWindow: ToolWin
                 </head>
                 <body>
                     <button onclick="sendDataToKotlin()">Click me!</button>
+                    ${lineageInfo?.toJson()?.toString()}
                     <table>
                         <tr>
                             <td><b>current node:</b></td>
@@ -100,19 +101,18 @@ class LineagePanel(private val project: Project, private val toolWindow: ToolWin
 
     private fun getLineageInfo(activeFile: VirtualFile?) {
         val projectName = settings.state.dbtProjectName
-        val modelsPattern = Regex(settings.state.dbtModelPaths.joinToString("|", prefix = ".*/(", postfix = ")/.*") { Regex.escape(it) })
-        val testsPattern = Regex(settings.state.dbtTestPaths.joinToString("|", prefix = ".*/(", postfix = ")/.*") { Regex.escape(it) })
-        val seedsPattern = Regex(settings.state.dbtSeedPaths.joinToString("|", prefix = ".*/(", postfix = ")/.*") { Regex.escape(it) })
-        val macrosPattern = Regex(settings.state.dbtMacroPaths.joinToString("|", prefix = ".*/(", postfix = ")/.*") { Regex.escape(it) })
-        if (activeFile != null) {
-            if (activeFile.path.matches(modelsPattern)) {
-                lineageInfo = manifestService.getLineageInfoForNode("model.${projectName}.${activeFile.name.split(".").first()}")
-            } else if (activeFile.path.matches(testsPattern)) {
-                lineageInfo = manifestService.getLineageInfoForNode("test.${projectName}.${activeFile.name.split(".").first()}")
-            } else if (activeFile.path.matches(seedsPattern)) {
-                lineageInfo = manifestService.getLineageInfoForNode("seed.${projectName}.${activeFile.name.split(".").first()}")
-            } else if (activeFile.path.matches(macrosPattern)) {
-                lineageInfo = manifestService.getLineageInfoForNode("macro.${projectName}.${activeFile.name.split(".").first()}")
+        data class NodeType(val pattern: Regex, val type: String)
+
+        val nodeTypes = listOf(
+            NodeType(Regex(settings.state.dbtModelPaths.joinToString("|", prefix = ".*/(", postfix = ")/.*") { Regex.escape(it) }), "model"),
+            NodeType(Regex(settings.state.dbtTestPaths.joinToString("|", prefix = ".*/(", postfix = ")/.*") { Regex.escape(it) }), "test"),
+            NodeType(Regex(settings.state.dbtSeedPaths.joinToString("|", prefix = ".*/(", postfix = ")/.*") { Regex.escape(it) }), "seed"),
+            NodeType(Regex(settings.state.dbtMacroPaths.joinToString("|", prefix = ".*/(", postfix = ")/.*") { Regex.escape(it) }), "macro")
+        )
+
+        activeFile?.let { file ->
+            nodeTypes.firstOrNull { file.path.matches(it.pattern) }?.let { nodeType ->
+                lineageInfo = manifestService.getLineageInfoForNode("${nodeType.type}.$projectName.${file.nameWithoutExtension}")
             }
         }
     }

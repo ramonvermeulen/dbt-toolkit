@@ -16,6 +16,14 @@ data class LineageInfo(
     val node: String,
 )
 
+fun LineageInfo.toJson(): JsonObject {
+    val json = JsonObject()
+    json.addProperty("node", node)
+    json.add("parents", parents)
+    json.add("children", children)
+    return json
+}
+
 @Service(Service.Level.PROJECT)
 class ManifestService(private var project: Project) {
     private var settings = project.service<DbtIdeaSettingsService>()
@@ -39,8 +47,8 @@ class ManifestService(private var project: Project) {
             if (manifest == null) {
                 parseManifest()
             }
-            val parents = manifest!!.getAsJsonObject("child_map").getAsJsonArray(node)
-            val children = manifest!!.getAsJsonObject("parent_map").getAsJsonArray(node)
+            val children = manifest!!.getAsJsonObject("child_map").getAsJsonArray(node)
+            val parents = manifest!!.getAsJsonObject("parent_map").getAsJsonArray(node)
             if (parents == null && children == null) {
                 return null
             }
