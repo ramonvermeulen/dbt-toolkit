@@ -1,7 +1,11 @@
 package com.github.ramonvermeulen.dbtidea.ui
 
+import com.intellij.openapi.Disposable
 import javax.swing.JComponent
 
-interface IdeaPanel {
+interface IdeaPanel : Disposable {
     fun getContent(): JComponent
+    override fun dispose() {
+        TODO("Not yet implemented")
+    }
 }

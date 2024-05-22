@@ -2,6 +2,9 @@ package com.github.ramonvermeulen.dbtidea.ui.lineage
 
 import com.github.ramonvermeulen.dbtidea.services.*
 import com.github.ramonvermeulen.dbtidea.ui.IdeaPanel
+import com.github.ramonvermeulen.dbtidea.ui.cef.CefLocalRequestHandler
+import com.github.ramonvermeulen.dbtidea.ui.cef.CefStreamResourceHandler
+import com.ibm.icu.text.SimpleDateFormat
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.service
@@ -14,6 +17,7 @@ import javax.swing.JComponent
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.SwingUtilities
+
 
 class LineagePanel(private val project: Project, private val toolWindow: ToolWindow) : ActiveFileListener, IdeaPanel, Disposable {
     private val manifestService = project.service<ManifestService>()
@@ -28,6 +32,7 @@ class LineagePanel(private val project: Project, private val toolWindow: ToolWin
     init {
         project.messageBus.connect().subscribe(ActiveFileService.TOPIC, this)
         ApplicationManager.getApplication().executeOnPooledThread {
+            initiateCefRequestHandler()
             SwingUtilities.invokeLater{
                 mainPanel.add(JLabel("Loading..."), BorderLayout.CENTER)
             }
@@ -35,13 +40,33 @@ class LineagePanel(private val project: Project, private val toolWindow: ToolWin
                 println(result)
                 null
             }
-            val htmlContent = getHtmlContent()
+            //val htmlContent = getHtmlContent()
             SwingUtilities.invokeLater {
                 mainPanel.removeAll()
                 mainPanel.add(browser.component, BorderLayout.CENTER)
-                browser.loadHTML(htmlContent)
+                browser.loadURL("lineage-panel-dist/${settings.static.LINEAGE_PANEL_INDEX}")
             }
         }
+    }
+
+    private fun initiateCefRequestHandler() {
+        val myRequestHandler = CefLocalRequestHandler()
+        myRequestHandler.addResource(settings.static.LINEAGE_PANEL_INDEX) {
+            javaClass.classLoader.getResourceAsStream("lineage-panel-dist/${settings.static.LINEAGE_PANEL_INDEX}")?.let {
+                CefStreamResourceHandler(it, "text/html", this@LineagePanel)
+            }
+        }
+        myRequestHandler.addResource(settings.static.LINEAGE_PANEL_JS) {
+            javaClass.classLoader.getResourceAsStream("lineage-panel-dist/${settings.static.LINEAGE_PANEL_JS}")?.let {
+                CefStreamResourceHandler(it, "text/javascript", this)
+            }
+        }
+        myRequestHandler.addResource(settings.static.LINEAGE_PANEL_CSS) {
+            javaClass.classLoader.getResourceAsStream("lineage-panel-dist/${settings.static.LINEAGE_PANEL_CSS}")?.let {
+                CefStreamResourceHandler(it, "text/css", this)
+            }
+        }
+        ourCefClient.addRequestHandler(myRequestHandler, browser.cefBrowser)
     }
 
     private fun getHtmlContent(): String {
@@ -93,9 +118,9 @@ class LineagePanel(private val project: Project, private val toolWindow: ToolWin
         ApplicationManager.getApplication().executeOnPooledThread {
             getLineageInfo(file)
             val htmlContent = getHtmlContent()
-            SwingUtilities.invokeLater {
-                browser.loadHTML(htmlContent)
-            }
+            //SwingUtilities.invokeLater {
+            //    browser.loadHTML(htmlContent)
+            //}
         }
     }
 

@@ -1,6 +1,6 @@
 package com.github.ramonvermeulen.dbtidea.ui.cef
 
-import com.github.ramonvermeulen.dbtidea.ui.docs.DocsPanel
+import com.github.ramonvermeulen.dbtidea.ui.IdeaPanel
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.util.Disposer
@@ -16,7 +16,7 @@ import java.io.InputStream
 class CefStreamResourceHandler(
     private val myStream: InputStream,
     private val myMimeType: String,
-    parent: DocsPanel,
+    parent: IdeaPanel,
     private val headers: Map<String, String> = mapOf(),
 ) : CefResourceHandler, Disposable {
     init {
