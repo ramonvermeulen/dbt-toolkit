@@ -1,6 +1,6 @@
 import type { OnConnect } from "reactflow";
 
-import { useCallback } from "react";
+import {useCallback, useEffect} from "react";
 import {
   Background,
   Controls,
@@ -24,6 +24,19 @@ export default function App() {
     [setEdges]
   );
 
+  function testKotlinRuntimeCall(event: string) {
+    console.log("Click Click: ", event);
+  }
+
+  useEffect(() => {
+    // making function available from the browser console
+    (window as any).testKotlinRuntimeCall = testKotlinRuntimeCall;
+
+    return () => {
+        (window as any).testKotlinRuntimeCall = undefined;
+    }
+  });
+
   return (
     <ReactFlow
       nodes={nodes}
@@ -33,6 +46,7 @@ export default function App() {
       edgeTypes={edgeTypes}
       onEdgesChange={onEdgesChange}
       onConnect={onConnect}
+      nodesConnectable={false}
       fitView
     >
       <Background />

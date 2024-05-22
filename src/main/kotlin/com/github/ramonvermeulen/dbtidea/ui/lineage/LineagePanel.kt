@@ -4,7 +4,6 @@ import com.github.ramonvermeulen.dbtidea.services.*
 import com.github.ramonvermeulen.dbtidea.ui.IdeaPanel
 import com.github.ramonvermeulen.dbtidea.ui.cef.CefLocalRequestHandler
 import com.github.ramonvermeulen.dbtidea.ui.cef.CefStreamResourceHandler
-import com.ibm.icu.text.SimpleDateFormat
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.service
@@ -27,7 +26,6 @@ class LineagePanel(private val project: Project, private val toolWindow: ToolWin
     private val browser: JBCefBrowser = JBCefBrowserBuilder().setClient(ourCefClient).setEnableOpenDevToolsMenuItem(isDebug).build()
     private val javaScriptEngineProxy: JBCefJSQuery = JBCefJSQuery.create(browser as JBCefBrowserBase)
     private val mainPanel = JPanel(BorderLayout())
-    private var lineageInfo: LineageInfo? = null
 
     init {
         project.messageBus.connect().subscribe(ActiveFileService.TOPIC, this)
@@ -69,62 +67,18 @@ class LineagePanel(private val project: Project, private val toolWindow: ToolWin
         ourCefClient.addRequestHandler(myRequestHandler, browser.cefBrowser)
     }
 
-    private fun getHtmlContent(): String {
-        val javascriptCode =
-            """
-            function sendDataToKotlin() {
-                // Example data to send to Kotlin
-                var data = {
-                    message: "Hello from JavaScript!"
-                };
-    
-                ${javaScriptEngineProxy.inject("data")}
-            }
-            """.trimIndent()
-
-        val htmlContent =
-            """
-            <html>
-                <head>
-                    <script>
-                        $javascriptCode
-                    </script>
-                </head>
-                <body>
-                    <button onclick="sendDataToKotlin()">Click me!</button>
-                    ${lineageInfo?.toJson()?.toString()}
-                    <table>
-                        <tr>
-                            <td><b>current node:</b></td>
-                            <td>${lineageInfo?.node}</td>
-                        </tr>
-                        <tr>
-                            <td><b>children:</b></td>
-                            <td>${lineageInfo?.children.toString()}</td>
-                        </tr>
-                        <tr>
-                            <td><b>parents:</b></td>
-                            <td>${lineageInfo?.parents.toString()}</td>
-                        </tr>
-                    </table>
-                </body>
-            </html>
-            """.trimIndent()
-
-        return htmlContent
-    }
-
     override fun activeFileChanged(file: VirtualFile?) {
         ApplicationManager.getApplication().executeOnPooledThread {
-            getLineageInfo(file)
-            val htmlContent = getHtmlContent()
-            //SwingUtilities.invokeLater {
-            //    browser.loadHTML(htmlContent)
-            //}
+            val lineageInfo = getLineageInfo(file)
+            SwingUtilities.invokeLater {
+                if (lineageInfo != null) {
+                    browser.cefBrowser.executeJavaScript("testKotlinRuntimeCall(${lineageInfo.toJson()})", browser.cefBrowser.url, 0)
+                }
+            }
         }
     }
 
-    private fun getLineageInfo(activeFile: VirtualFile?) {
+    private fun getLineageInfo(activeFile: VirtualFile?): LineageInfo? {
         val projectName = settings.state.dbtProjectName
         data class NodeType(val pattern: Regex, val type: String)
 
@@ -137,9 +91,10 @@ class LineagePanel(private val project: Project, private val toolWindow: ToolWin
 
         activeFile?.let { file ->
             nodeTypes.firstOrNull { file.path.matches(it.pattern) }?.let { nodeType ->
-                lineageInfo = manifestService.getLineageInfoForNode("${nodeType.type}.$projectName.${file.nameWithoutExtension}")
+                 return manifestService.getLineageInfoForNode("${nodeType.type}.$projectName.${file.nameWithoutExtension}")
             }
         }
+        return null
     }
 
     override fun getContent(): JComponent {
