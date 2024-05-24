@@ -1,21 +1,25 @@
-import {MarkerType, OnConnect, Position} from "reactflow";
-
-import {useCallback, useEffect} from "react";
 import {
+    addEdge,
     Background,
     Controls,
+    Edge,
+    MarkerType,
     MiniMap,
-    ReactFlow,
     Node,
-    addEdge,
-    useNodesState,
+    Position,
+    ReactFlow,
     useEdgesState,
+    useNodesState
 } from "reactflow";
+
+import {useEffect} from "react";
 
 import "reactflow/dist/style.css";
 
-import {initialNodes, LineageInfo, nodeTypes} from "./nodes";
-import {initialEdges, edgeTypes} from "./edges";
+import {LineageInfo} from "./nodes";
+import {edgeTypes} from "./edges";
+import dagre from "dagre";
+import {DbtModelNode} from "./nodes/DbtModelNode.tsx";
 
 const testData = {
     "nodes": [
@@ -282,54 +286,73 @@ const testData = {
     ]
 }
 
+
+const dagreGraph = new dagre.graphlib.Graph();
+dagreGraph.setDefaultEdgeLabel(() => ({}));
+
+const nodeWidth = 200;
+const nodeHeight = 50;
+
+const getLayoutedElements = (nodes: Node[], edges: Edge[], direction = 'LR') => {
+    dagreGraph.setGraph({ rankdir: direction });
+
+    nodes.forEach((node) => {
+        dagreGraph.setNode(node.id, { width: nodeWidth, height: nodeHeight });
+    });
+
+    edges.forEach((edge) => {
+        dagreGraph.setEdge(edge.source, edge.target);
+    });
+
+    dagre.layout(dagreGraph);
+
+    nodes.forEach((node) => {
+        const nodeWithPosition = dagreGraph.node(node.id);
+        node.targetPosition = Position.Left;
+        node.sourcePosition = Position.Right;
+
+        // We are shifting the dagre node position (anchor=center center) to the top left
+        // so it matches the React Flow node anchor point (top left).
+        node.position = {
+            x: nodeWithPosition.x - nodeWidth / 2,
+            y: nodeWithPosition.y - nodeHeight / 2,
+        };
+
+        return node;
+    });
+
+    return { nodes, edges };
+};
+
+const nodeTypes = {
+    dbtModel: DbtModelNode
+}
+
 export default function App() {
-    const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-    const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-    const onConnect: OnConnect = useCallback(
-        (connection) => setEdges((edges) => addEdge(connection, edges)),
-        [setEdges]
-    );
+    const [nodes, setNodes, onNodesChange] = useNodesState([]);
+    const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
-    function configureNodes(info: LineageInfo) {
+    function configureNodes(info: LineageInfo): Node[] {
         const newNodes: Node[] = [];
-        const baseX = 0; // base x position
-        const baseY = 0; // base y position
-        const offset = 100; // offset for each node
 
-        // Find the selected node
-        const selectedNode = info.nodes.find(node => node.isSelected);
-
-        // Add the selected node
-        if (selectedNode) {
-            newNodes.push({
-                id: selectedNode.id,
-                position: {x: baseX, y: baseY},
-                data: {label: selectedNode.id},
-                sourcePosition: Position.Right,
-                targetPosition: Position.Left,
-            });
-        }
-
-        // Add the child nodes
         info.nodes.forEach((node) => {
-            if (node.id !== selectedNode?.id) {
-                newNodes.push({
-                    id: node.id,
-                    position: {x: baseX + offset, y: baseY + offset},
-                    data: {label: node.id},
-                    sourcePosition: Position.Right,
-                    targetPosition: Position.Left,
-                });
-            }
+            newNodes.push({
+                id: node.id,
+                position: {x: 0, y: 0},
+                data: {
+                    label: node.id,
+                    isSelected: node.isSelected
+                },
+                type: "dbtModel",
+            });
         });
 
-        // Update the nodes state
-        setNodes(newNodes);
+        return newNodes
     }
 
-    function configureEdges(info: LineageInfo) {
-        info.edges.map((e) => {
-            const edge = {
+    function configureEdges(info: LineageInfo): Edge[] {
+        return info.edges.map((e) => {
+            return {
                 id: `${e.parent.id}-${e.child.id}`,
                 source: e.parent.id,
                 target: e.child.id,
@@ -337,42 +360,49 @@ export default function App() {
                     type: MarkerType.ArrowClosed,
                 },
             };
-            setEdges((edges) => addEdge(edge, edges));
         });
     }
 
     function testKotlinRuntimeCall(info: LineageInfo) {
-        console.log(info);
-        configureNodes(info)
-        configureEdges(info)
+        const nodes = configureNodes(info)
+        const edges = configureEdges(info)
+        const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
+            nodes,
+            edges
+        );
+        setNodes(layoutedNodes)
+        layoutedEdges.forEach(layoutEdge => setEdges((edges) => addEdge(layoutEdge, edges)));
     }
 
     useEffect(() => {
         // making function available from the browser console
         (window as any).testKotlinRuntimeCall = testKotlinRuntimeCall;
-        testKotlinRuntimeCall(testData)
+        if (process.env.NODE_ENV === 'development') {
+            testKotlinRuntimeCall(testData);
+        }
         return () => {
             (window as any).testKotlinRuntimeCall = undefined;
         }
     }, []);
 
     return (
-        <ReactFlow
-            nodes={nodes}
-            nodeTypes={nodeTypes}
-            onNodesChange={onNodesChange}
-            edges={edges}
-            edgeTypes={edgeTypes}
-            onEdgesChange={onEdgesChange}
-            onConnect={onConnect}
-            nodesConnectable={false}
-            proOptions={{ hideAttribution: true }}
-            fitView
-            attributionPosition="bottom-left"
-        >
-            <Background/>
-            <MiniMap/>
-            <Controls/>
-        </ReactFlow>
+        <div style={{ height: "100vh", width: "100vw" }}>
+            <ReactFlow
+                nodes={nodes}
+                nodeTypes={nodeTypes}
+                onNodesChange={onNodesChange}
+                edges={edges}
+                edgeTypes={edgeTypes}
+                onEdgesChange={onEdgesChange}
+                nodesConnectable={false}
+                proOptions={{ hideAttribution: true }}
+                fitView
+                autoPanOnConnect={true}
+            >
+                <Background color="#E9E3E6"/>
+                <MiniMap/>
+                <Controls/>
+            </ReactFlow>
+        </div>
     );
 }

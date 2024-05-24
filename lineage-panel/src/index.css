@@ -2,6 +2,7 @@
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
+  background-color: #272932;
 }
 
 html,
@@ -9,4 +10,51 @@ body,
 #root {
   height: 100%;
   margin: 0;
+}
+
+.dbt-model-node {
+  border-radius: 8px;
+  background-color: #E9E3E6;
+}
+
+.active {
+  background-color: #ffffff;
+  box-shadow: 0px 0px 10px 5px orange;
+}
+
+.node-title {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.icon-box {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+  padding: 8px;
+  font-size: 8px!important;
+  color: #FFF;
+  background-color: #4D7EA8;
+}
+
+.icon-box.icon {
+  max-height: 14px;
+}
+
+.icon-box.title {
+  font-size: 8px;
+}
+
+.dbt-model-title {
+  padding-left: 8px;
+}
+
+.react-flow__handle {
+  visibility: hidden;
 }
