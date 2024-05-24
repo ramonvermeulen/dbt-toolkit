@@ -1,10 +1,20 @@
 import type { Node, NodeTypes } from "reactflow";
 import { PositionLoggerNode } from "./PositionLoggerNode";
 
+export type DNode = {
+  id: string;
+  tests: string[];
+  isSelected: boolean;
+}
+
+export type DEdge = {
+  parent: DNode;
+  child: DNode;
+}
+
 export type LineageInfo = {
-  parents: string[];
-  children: string[];
-  node: string;
+  nodes: DNode[];
+  edges: DEdge[];
 }
 
 export const initialNodes = [

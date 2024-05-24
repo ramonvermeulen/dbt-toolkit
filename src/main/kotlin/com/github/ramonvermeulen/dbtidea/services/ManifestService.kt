@@ -10,17 +10,41 @@ import java.io.File
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
+data class Node(
+    val id: String,
+    val tests: MutableList<String> = mutableListOf(),
+    val isSelected: Boolean = false,
+)
+
+fun Node.toJson(): JsonObject {
+    val json = JsonObject()
+    json.addProperty("id", id)
+    json.addProperty("isSelected", isSelected)
+    json.add("tests", JsonArray().apply { tests.forEach { add(it) } })
+    return json
+}
+
+data class Edge(
+    val parent: Node,
+    val child: Node,
+)
+
+fun Edge.toJson(): JsonObject {
+    val json = JsonObject()
+    json.add("parent", parent.toJson())
+    json.add("child", child.toJson())
+    return json
+}
+
 data class LineageInfo(
-    val parents: JsonArray?,
-    val children: JsonArray?,
-    val node: String,
+    val nodes: MutableList<Node>,
+    val edges: MutableList<Edge>,
 )
 
 fun LineageInfo.toJson(): JsonObject {
-    val json = JsonObject()
-    json.addProperty("node", node)
-    json.add("parents", parents)
-    json.add("children", children)
+    val json = JsonObject() // t.b.d.
+    json.add("nodes", JsonArray().apply { nodes.forEach { add(it.toJson()) } })
+    json.add("edges", JsonArray().apply { edges.forEach { add(it.toJson()) } })
     return json
 }
 
@@ -42,30 +66,38 @@ class ManifestService(private var project: Project) {
         }
     }
 
-    fun getCompleteLineageForNode(node: String): LineageInfo? {
+    private fun getCompleteLineageForNode(node: String): LineageInfo? {
         val visited = mutableSetOf<String>()
-        val lineage = mutableListOf<String>()
+        val nodes = mutableListOf<Node>()
+        val relationships = mutableListOf<Edge>()
 
-        fun depthFirstSearch(node: String) {
-            if (visited.contains(node)) return
+        fun depthFirstSearch(node: String, initialNode: Boolean = false) {
+            if (node in visited) return
+            val tests = mutableListOf<String>()
             visited.add(node)
-            lineage.add(node)
 
-            val children = manifest!!.getAsJsonObject("parent_map").getAsJsonArray(node)
-            val parents = manifest!!.getAsJsonObject("child_map").getAsJsonArray(node)
+            val children = manifest!!.getAsJsonObject("child_map").getAsJsonArray(node)
+            val parents = manifest!!.getAsJsonObject("parent_map").getAsJsonArray(node)
 
-            children.forEach { child -> depthFirstSearch(child.asString) }
-            parents.forEach { parent -> depthFirstSearch(parent.asString) }
+            children?.forEach { child ->
+                if (child.asString.startsWith("test.")) {
+                    tests.add(child.asString)
+                    return@forEach
+                }
+                depthFirstSearch(child.asString)
+                relationships.add(Edge(Node(node), Node(child.asString)))
+            }
+            parents?.forEach { parent ->
+                depthFirstSearch(parent.asString)
+                relationships.add(Edge(Node(parent.asString), Node(node)))
+            }
+
+            nodes.add(Node(node, isSelected = initialNode, tests = tests))
         }
 
-        depthFirstSearch(node)
+        depthFirstSearch(node, true)
 
-        val parents = manifest!!.getAsJsonObject("child_map").getAsJsonArray(node)
-        val children = manifest!!.getAsJsonObject("parent_map").getAsJsonArray(node)
-        if (parents == null && children == null) {
-            return null
-        }
-        return LineageInfo(parents, children, node)
+        return LineageInfo(nodes, relationships)
     }
 
     fun getLineageInfoForNode(node: String): LineageInfo? {
@@ -73,7 +105,7 @@ class ManifestService(private var project: Project) {
             if (manifest == null) {
                 parseManifest()
             }
-
+            return getCompleteLineageForNode(node)
         }
     }
 }
