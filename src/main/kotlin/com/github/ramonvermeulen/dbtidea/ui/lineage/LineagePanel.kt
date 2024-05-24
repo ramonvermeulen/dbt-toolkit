@@ -7,10 +7,15 @@ import com.github.ramonvermeulen.dbtidea.ui.cef.CefStreamResourceHandler
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.service
+import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.ui.jcef.*
+import org.cef.browser.CefBrowser
+import org.cef.browser.CefFrame
+import org.cef.handler.CefLoadHandlerAdapter
 import java.awt.BorderLayout
 import javax.swing.JComponent
 import javax.swing.JLabel
@@ -35,10 +40,25 @@ class LineagePanel(private val project: Project, private val toolWindow: ToolWin
                 mainPanel.add(JLabel("Loading..."), BorderLayout.CENTER)
             }
             javaScriptEngineProxy.addHandler { result ->
-                println(result)
+                val path = "file://${settings.state.dbtProjectsDir}/${result}"
+                val file = VirtualFileManager.getInstance().findFileByUrl(path)
+                print(file?.path)
+                if (file !== null) {
+                    SwingUtilities.invokeLater {
+                        FileEditorManager.getInstance(project).openFile(file, true)
+                    }
+                }
                 null
             }
-            //val htmlContent = getHtmlContent()
+            browser.jbCefClient.addLoadHandler(object : CefLoadHandlerAdapter() {
+                override fun onLoadEnd(browser: CefBrowser?, frame: CefFrame?, httpStatusCode: Int) {
+                    browser?.executeJavaScript(
+                        "window.selectNode = function(node) { ${javaScriptEngineProxy.inject("node")} };",
+                        browser.url,
+                        0
+                    )
+                }
+            }, browser.cefBrowser)
             SwingUtilities.invokeLater {
                 mainPanel.removeAll()
                 mainPanel.add(browser.component, BorderLayout.CENTER)

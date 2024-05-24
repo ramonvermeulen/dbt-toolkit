@@ -14,6 +14,7 @@ data class Node(
     val id: String,
     val tests: MutableList<String> = mutableListOf(),
     val isSelected: Boolean = false,
+    val relativePath: String
 )
 
 fun Node.toJson(): JsonObject {
@@ -21,18 +22,19 @@ fun Node.toJson(): JsonObject {
     json.addProperty("id", id)
     json.addProperty("isSelected", isSelected)
     json.add("tests", JsonArray().apply { tests.forEach { add(it) } })
+    json.addProperty("relativePath", relativePath)
     return json
 }
 
 data class Edge(
-    val parent: Node,
-    val child: Node,
+    val parent: String,
+    val child: String,
 )
 
 fun Edge.toJson(): JsonObject {
     val json = JsonObject()
-    json.add("parent", parent.toJson())
-    json.add("child", child.toJson())
+    json.addProperty("parent", parent)
+    json.addProperty("child", child)
     return json
 }
 
@@ -78,6 +80,7 @@ class ManifestService(private var project: Project) {
 
             val children = manifest!!.getAsJsonObject("child_map").getAsJsonArray(node)
             val parents = manifest!!.getAsJsonObject("parent_map").getAsJsonArray(node)
+            val nodePath = manifest!!.getAsJsonObject("nodes").getAsJsonObject(node).get("original_file_path")
 
             children?.forEach { child ->
                 if (child.asString.startsWith("test.")) {
@@ -85,14 +88,14 @@ class ManifestService(private var project: Project) {
                     return@forEach
                 }
                 depthFirstSearch(child.asString)
-                relationships.add(Edge(Node(node), Node(child.asString)))
+                relationships.add(Edge(node, child.asString))
             }
             parents?.forEach { parent ->
                 depthFirstSearch(parent.asString)
-                relationships.add(Edge(Node(parent.asString), Node(node)))
+                relationships.add(Edge(parent.asString, node))
             }
 
-            nodes.add(Node(node, isSelected = initialNode, tests = tests))
+            nodes.add(Node(node, isSelected = initialNode, tests = tests, relativePath = nodePath.asString))
         }
 
         depthFirstSearch(node, true)
