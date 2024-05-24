@@ -42,17 +42,38 @@ class ManifestService(private var project: Project) {
         }
     }
 
+    fun getCompleteLineageForNode(node: String): LineageInfo? {
+        val visited = mutableSetOf<String>()
+        val lineage = mutableListOf<String>()
+
+        fun depthFirstSearch(node: String) {
+            if (visited.contains(node)) return
+            visited.add(node)
+            lineage.add(node)
+
+            val children = manifest!!.getAsJsonObject("parent_map").getAsJsonArray(node)
+            val parents = manifest!!.getAsJsonObject("child_map").getAsJsonArray(node)
+
+            children.forEach { child -> depthFirstSearch(child.asString) }
+            parents.forEach { parent -> depthFirstSearch(parent.asString) }
+        }
+
+        depthFirstSearch(node)
+
+        val parents = manifest!!.getAsJsonObject("child_map").getAsJsonArray(node)
+        val children = manifest!!.getAsJsonObject("parent_map").getAsJsonArray(node)
+        if (parents == null && children == null) {
+            return null
+        }
+        return LineageInfo(parents, children, node)
+    }
+
     fun getLineageInfoForNode(node: String): LineageInfo? {
         manifestLock.withLock {
             if (manifest == null) {
                 parseManifest()
             }
-            val parents = manifest!!.getAsJsonObject("child_map").getAsJsonArray(node)
-            val children = manifest!!.getAsJsonObject("parent_map").getAsJsonArray(node)
-            if (parents == null && children == null) {
-                return null
-            }
-            return LineageInfo(parents, children, node)
+
         }
     }
 }
