@@ -105,7 +105,8 @@ export default function App() {
         });
     }
 
-    function testKotlinRuntimeCall(info: LineageInfo) {
+    function setLineageInfo(info: LineageInfo) {
+        console.log(info)
         const nodes = configureNodes(info)
         const edges = configureEdges(info)
         const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
@@ -118,12 +119,14 @@ export default function App() {
 
     useEffect(() => {
         // making function available from the browser console
-        (window as any).testKotlinRuntimeCall = testKotlinRuntimeCall;
+        (window as any).setLineageInfo = setLineageInfo;
         if (process.env.NODE_ENV === 'development') {
-            //testKotlinRuntimeCall(testData);
+            fetch('./test-data.json').then(response => response.json()).then(data => {
+                setLineageInfo(data);
+            });
         }
         return () => {
-            (window as any).testKotlinRuntimeCall = undefined;
+            (window as any).setLineageInfo = undefined;
         }
     }, []);
 

@@ -92,7 +92,7 @@ class LineagePanel(private val project: Project, private val toolWindow: ToolWin
             val lineageInfo = getLineageInfo(file)
             SwingUtilities.invokeLater {
                 if (lineageInfo != null) {
-                    browser.cefBrowser.executeJavaScript("testKotlinRuntimeCall(${lineageInfo.toJson()})", browser.cefBrowser.url, 0)
+                    browser.cefBrowser.executeJavaScript("setLineageInfo(${lineageInfo.toJson()})", browser.cefBrowser.url, 0)
                 }
             }
         }
