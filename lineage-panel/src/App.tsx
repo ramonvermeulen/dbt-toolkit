@@ -1,5 +1,4 @@
 import {
-    addEdge,
     Background,
     Controls,
     Edge,
@@ -8,23 +7,25 @@ import {
     Node,
     Position,
     ReactFlow,
+    addEdge,
     useEdgesState,
     useNodesState
-} from "reactflow";
+} from 'reactflow';
 
-import {type MouseEvent as ReactMouseEvent, useEffect} from "react";
+import { type MouseEvent as ReactMouseEvent, useCallback, useEffect } from 'react';
 
-import "reactflow/dist/style.css";
+import 'reactflow/dist/style.css';
 
-import {LineageInfo} from "./nodes";
-import {edgeTypes} from "./edges";
-import dagre from "dagre";
-import {DbtModelNode} from "./nodes/DbtModelNode.tsx";
+import { DbtModelNode } from './nodes/DbtModelNode.tsx';
+import dagre from 'dagre';
+import { edgeTypes } from './edges';
+
+import { LineageInfo } from './nodes';
 
 declare global {
     interface Window {
         selectNode: (nodeId: string) => void;
-        testKotlinRuntimeCall: (info: LineageInfo) => void;
+        setLineageInfo?: (info: LineageInfo) => void;
     }
 }
 
@@ -67,32 +68,32 @@ const getLayoutedElements = (nodes: Node[], edges: Edge[], direction = 'LR') => 
 
 const nodeTypes = {
     dbtModel: DbtModelNode
-}
+};
 
 export default function App() {
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
-    function configureNodes(info: LineageInfo): Node[] {
+    const configureNodes = useCallback((info: LineageInfo): Node[] => {
         const newNodes: Node[] = [];
 
         info.nodes.forEach((node) => {
             newNodes.push({
                 id: node.id,
-                position: {x: 0, y: 0},
+                position: { x: 0, y: 0 },
                 data: {
                     label: node.id,
                     isSelected: node.isSelected,
                     relativePath: node.relativePath,
                 },
-                type: "dbtModel",
+                type: 'dbtModel',
             });
         });
 
-        return newNodes
-    }
+        return newNodes;
+    }, []);
 
-    function configureEdges(info: LineageInfo): Edge[] {
+    const configureEdges = useCallback((info: LineageInfo): Edge[] => {
         return info.edges.map((e) => {
             return {
                 id: `${e.parent}-${e.child}`,
@@ -103,32 +104,32 @@ export default function App() {
                 },
             };
         });
-    }
+    }, []);
 
-    function setLineageInfo(info: LineageInfo) {
-        console.log(info)
-        const nodes = configureNodes(info)
-        const edges = configureEdges(info)
+    const setLineageInfo = useCallback((info: LineageInfo) => {
+        console.log(info);
+        const nodes = configureNodes(info);
+        const edges = configureEdges(info);
         const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
             nodes,
             edges
         );
-        setNodes(layoutedNodes)
+        setNodes(layoutedNodes);
         layoutedEdges.forEach(layoutEdge => setEdges((edges) => addEdge(layoutEdge, edges)));
-    }
+    }, [configureNodes, configureEdges, setEdges, setNodes]);
 
     useEffect(() => {
         // making function available from the browser console
-        (window as any).setLineageInfo = setLineageInfo;
+        (window as Window).setLineageInfo = setLineageInfo;
         if (process.env.NODE_ENV === 'development') {
             fetch('./test-data.json').then(response => response.json()).then(data => {
                 setLineageInfo(data);
             });
         }
         return () => {
-            (window as any).setLineageInfo = undefined;
-        }
-    }, []);
+            (window as Window).setLineageInfo = undefined;
+        };
+    }, [setLineageInfo]);
 
     function onNodeClick(_event: ReactMouseEvent, node: Node) : void {
         // ts-ignore
@@ -136,7 +137,7 @@ export default function App() {
     }
 
     return (
-        <div style={{ height: "100vh", width: "100vw" }}>
+        <div style={{ height: '100vh', width: '100vw' }}>
             <ReactFlow
                 nodes={nodes}
                 nodeTypes={nodeTypes}

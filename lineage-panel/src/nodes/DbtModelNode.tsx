@@ -1,8 +1,11 @@
-import type { NodeProps } from "reactflow";
-import { Handle, Position } from "reactflow";
-import { RiSeedlingLine } from "react-icons/ri";
-import { PiCubeDuotone } from "react-icons/pi";
-import { GoDatabase } from "react-icons/go";
+import { Handle, Position } from 'reactflow';
+
+import { GoDatabase } from 'react-icons/go';
+import { PiCubeDuotone } from 'react-icons/pi';
+import { RiSeedlingLine } from 'react-icons/ri';
+
+import type { NodeProps } from 'reactflow';
+
 
 export type PositionLoggerNodeData = {
     isSelected?: boolean;
@@ -12,7 +15,7 @@ export type PositionLoggerNodeData = {
 export function DbtModelNode({
     data,
 }: NodeProps<PositionLoggerNodeData>) {
-    const parts = data?.label?.split(".");
+    const parts = data?.label?.split('.');
     const type = parts?.[0];
     const name = parts?.[2];
 
