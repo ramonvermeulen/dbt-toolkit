@@ -72,8 +72,6 @@ class ManifestService(private var project: Project) {
         val visited = mutableSetOf<String>()
         val nodes = mutableListOf<Node>()
         val relationships = mutableListOf<Edge>()
-        val children = manifest!!.getAsJsonObject("child_map").getAsJsonArray(node)
-        val parents = manifest!!.getAsJsonObject("parent_map").getAsJsonArray(node)
         val manifestNodes = manifest!!.getAsJsonObject("nodes")
 
         fun depthFirstSearch(node: String, initialNode: Boolean = false) {
@@ -81,6 +79,9 @@ class ManifestService(private var project: Project) {
             val tests = mutableListOf<String>()
             visited.add(node)
             var nodePath = ""
+
+            val children = manifest!!.getAsJsonObject("child_map").getAsJsonArray(node)
+            val parents = manifest!!.getAsJsonObject("parent_map").getAsJsonArray(node)
 
             if (manifestNodes.has(node)) {
                 nodePath = manifestNodes.getAsJsonObject(node).get("original_file_path").toString()
