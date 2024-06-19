@@ -107,7 +107,6 @@ export default function App() {
     }, []);
 
     const setLineageInfo = useCallback((info: LineageInfo) => {
-        console.log(info);
         const nodes = configureNodes(info);
         const edges = configureEdges(info);
         const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
@@ -133,6 +132,14 @@ export default function App() {
 
     function onNodeClick(_event: ReactMouseEvent, node: Node) : void {
         // ts-ignore
+        const newNodes = nodes.map(n => ({
+            ...n,
+            data: {
+                ...n.data,
+                isSelected: n.id === node.id,
+            }
+        }));
+        setNodes(newNodes)
         window?.selectNode(node.data?.relativePath);
     }
 

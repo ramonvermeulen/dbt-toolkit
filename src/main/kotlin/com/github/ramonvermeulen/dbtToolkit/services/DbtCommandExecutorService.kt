@@ -34,7 +34,7 @@ class DbtCommandExecutorService(private var project: Project) {
         } else {
             loggingService.log("No Python venv found, trying to use a global dbt installation", ConsoleViewContentType.NORMAL_OUTPUT)
         }
-        loggingService.log("\n", ConsoleViewContentType.NORMAL_OUTPUT)
+        loggingService.log("\n\n", ConsoleViewContentType.NORMAL_OUTPUT)
         lateInit = true
     }
 
