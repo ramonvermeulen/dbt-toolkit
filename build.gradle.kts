@@ -1,5 +1,6 @@
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.changelog.markdownToHTML
+import com.github.gradle.node.npm.task.NpmTask
 
 fun properties(key: String) = providers.gradleProperty(key)
 fun environment(key: String) = providers.environmentVariable(key)
@@ -11,10 +12,27 @@ plugins {
     alias(libs.plugins.changelog) // Gradle Changelog Plugin
     alias(libs.plugins.qodana) // Gradle Qodana Plugin
     alias(libs.plugins.kover) // Gradle Kover Plugin
+    id("com.github.node-gradle.node") version "7.0.2"
 }
 
 group = properties("pluginGroup").get()
 version = properties("pluginVersion").get()
+
+node {
+    download = true
+    version = "18.17.1"
+    nodeProjectDir = file("${projectDir}/lineage-panel")
+}
+
+tasks.register("npmBuild", NpmTask::class) {
+    dependsOn("npmInstall")
+    args.set(listOf("run", "build"))
+    workingDir = file("${projectDir}/lineage-panel")
+}
+
+tasks.named("buildPlugin") {
+    dependsOn("npmBuild")
+}
 
 // Configure project's dependencies
 repositories {
