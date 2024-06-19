@@ -1,15 +1,17 @@
-# dbtIdea
+# dbtToolkit
 
 ![Build](https://github.com/ramonvermeulen/dbt-idea/workflows/Build/badge.svg)
 [![Version](https://img.shields.io/jetbrains/plugin/v/PLUGIN_ID.svg)](https://plugins.jetbrains.com/plugin/PLUGIN_ID)
 [![Downloads](https://img.shields.io/jetbrains/plugin/d/PLUGIN_ID.svg)](https://plugins.jetbrains.com/plugin/PLUGIN_ID)
 
 <!-- Plugin description -->
-This Fancy IntelliJ Platform Plugin is going to be your implementation of the brilliant ideas that you have.
-
-This specific section is a source for the [plugin.xml](/src/main/resources/META-INF/plugin.xml) file which will be extracted by the [Gradle](/build.gradle.kts) during the build process.
+With dbtToolkit it is easier to work with dbt projects in JetBrains IDEs. 
+The plugin provides extra functionality to work with dbt projects in the IDE.
 <!-- Plugin description end -->
 
+### Known issues
+* Plugin requires to have the dbt cli installed globally, I am looking for a way to support venv as well. 
+Currently, the plugin uses background processes to execute dbt commands, as of now these processes are executed without a venv activated.
 
 ---
 Plugin based on the [IntelliJ Platform Plugin Template][template].
