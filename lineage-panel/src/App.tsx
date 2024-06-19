@@ -9,9 +9,10 @@ import {
     ReactFlow,
     addEdge,
     useEdgesState,
-    useNodesState
+    useNodesState, ControlButton
 } from 'reactflow';
 
+import { MdRefresh } from 'react-icons/md';
 import { type MouseEvent as ReactMouseEvent, useCallback, useEffect } from 'react';
 
 import 'reactflow/dist/style.css';
@@ -26,6 +27,7 @@ declare global {
     interface Window {
         selectNode: (nodeId: string) => void;
         setLineageInfo?: (info: LineageInfo) => void;
+        refreshLineage: (a: string) => void;
     }
 }
 
@@ -131,7 +133,6 @@ export default function App() {
     }, [setLineageInfo]);
 
     function onNodeClick(_event: ReactMouseEvent, node: Node) : void {
-        // ts-ignore
         const newNodes = nodes.map(n => ({
             ...n,
             data: {
@@ -140,7 +141,11 @@ export default function App() {
             }
         }));
         setNodes(newNodes)
-        window?.selectNode(node.data?.relativePath);
+        window.selectNode(node.data?.relativePath);
+    }
+
+    function onRefreshClick() {
+        window.refreshLineage("refresh");
     }
 
     return (
@@ -160,7 +165,11 @@ export default function App() {
             >
                 <Background color="#E9E3E6"/>
                 <MiniMap/>
-                <Controls/>
+                <Controls>
+                    <ControlButton onClick={onRefreshClick}>
+                        <MdRefresh size={15} />
+                    </ControlButton>
+                </Controls>
             </ReactFlow>
         </div>
     );

@@ -40,12 +40,15 @@ class LineagePanel(private val project: Project, private val toolWindow: ToolWin
                 mainPanel.add(JLabel("Loading..."), BorderLayout.CENTER)
             }
             javaScriptEngineProxy.addHandler { result ->
-                val path = "file://${settings.state.dbtProjectsDir}/${result}"
-                val file = VirtualFileManager.getInstance().findFileByUrl(path)
-                print(file?.path)
-                if (file !== null) {
-                    SwingUtilities.invokeLater {
-                        FileEditorManager.getInstance(project).openFile(file, true)
+                if (result == "refresh") {
+                    refreshLineageInfo(FileEditorManager.getInstance(project).selectedFiles.firstOrNull())
+                } else {
+                    val path = "file://${settings.state.dbtProjectsDir}/${result}"
+                    val file = VirtualFileManager.getInstance().findFileByUrl(path)
+                    if (file !== null) {
+                        SwingUtilities.invokeLater {
+                            FileEditorManager.getInstance(project).openFile(file, true)
+                        }
                     }
                 }
                 null
@@ -87,14 +90,18 @@ class LineagePanel(private val project: Project, private val toolWindow: ToolWin
         ourCefClient.addRequestHandler(myRequestHandler, browser.cefBrowser)
     }
 
+    private fun refreshLineageInfo(file: VirtualFile?) {
+        val lineageInfo = getLineageInfo(file)
+        SwingUtilities.invokeLater {
+            if (lineageInfo != null) {
+                browser.cefBrowser.executeJavaScript("setLineageInfo(${lineageInfo.toJson()})", browser.cefBrowser.url, 0)
+            }
+        }
+    }
+
     override fun activeFileChanged(file: VirtualFile?) {
         ApplicationManager.getApplication().executeOnPooledThread {
-            val lineageInfo = getLineageInfo(file)
-            SwingUtilities.invokeLater {
-                if (lineageInfo != null) {
-                    browser.cefBrowser.executeJavaScript("setLineageInfo(${lineageInfo.toJson()})", browser.cefBrowser.url, 0)
-                }
-            }
+            refreshLineageInfo(file)
         }
     }
 
@@ -111,7 +118,6 @@ class LineagePanel(private val project: Project, private val toolWindow: ToolWin
 
         activeFile?.let { file ->
             nodeTypes.firstOrNull { file.path.matches(it.pattern) }?.let { nodeType ->
-                // TODO this does not work for sources, find a better way? Maybe retrieve from manifest as well?
                  return manifestService.getLineageInfoForNode("${nodeType.type}.$projectName.${file.nameWithoutExtension}")
             }
         }

@@ -5,13 +5,38 @@
 [![Downloads](https://img.shields.io/jetbrains/plugin/d/PLUGIN_ID.svg)](https://plugins.jetbrains.com/plugin/PLUGIN_ID)
 
 <!-- Plugin description -->
-With dbtToolkit it is easier to work with dbt projects in JetBrains IDEs. 
-The plugin provides extra functionality to work with dbt projects in the IDE.
+The dbtToolkit is an early-stage plugin designed to enhance your experience working with dbt 
+projects in JetBrains IDEs. It currently supports lineage rendering and dbt documentation, 
+providing a more streamlined and integrated approach to managing your dbt projects.
 <!-- Plugin description end -->
 
-### Known issues
-* Plugin requires to have the dbt cli installed globally, I am looking for a way to support venv as well. 
-Currently, the plugin uses background processes to execute dbt commands, as of now these processes are executed without a venv activated.
+![](./assets/img/sample.gif)
+
+## Features
+* **Lineage Rendering**: Visualize the dependencies and relationships between your dbt models directly in your IDE. 
+This feature helps you understand the impact of changes and the flow of data in your project.  
+* **dbt Documentation**: Access your dbt documentation within your IDE, eliminating the need to switch between different 
+tools and platforms. This feature supports a more efficient workflow and keeps essential information at your fingertips.
+
+As an early version, I am actively working on expanding the functionalities of dbtToolkit. Stay tuned for more features 
+that will further enhance your dbt project development experience in JetBrains IDEs.
+
+## Prerequisites
+* For IntelliJ users, I recommend to have the [**Python**](https://plugins.jetbrains.com/plugin/631-python) plugin installed
+* I also recommend to have a venv configured and [**dbt-core**](https://pypi.org/project/dbt-core/) installed within the venv <br> 
+*(File > Project Structure > SDK > Select Python > Select New Virtual Environment)*
+
+If there is a venv configured, the plugin will automatically try to use the dbt executable from the venv. 
+If there is no venv configured the plugin will use the globally installed dbt version.
+
+## Installation
+You can download dbtToolkit from the JetBrains plugin marketplace. For more information on how to install JetBrains plugins, 
+please refer to the [**official documentation**](https://www.jetbrains.com/help/idea/managing-plugins.html).
+
+## Feedback and Contributions
+I highly appreciate any feedback and contributions as I am developing and improving dbtToolkit. 
+Feel free to report bugs, issues, or suggest features through the GitHub repository.
+
 
 ---
 Plugin based on the [IntelliJ Platform Plugin Template][template].

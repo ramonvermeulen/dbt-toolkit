@@ -3,6 +3,10 @@ import { Handle, Position } from 'reactflow';
 import { GoDatabase } from 'react-icons/go';
 import { PiCubeDuotone } from 'react-icons/pi';
 import { RiSeedlingLine } from 'react-icons/ri';
+import { MdQueryStats } from "react-icons/md";
+import { TbBoxModel } from "react-icons/tb";
+import { FaChartArea } from "react-icons/fa";
+import { FaRegNoteSticky } from "react-icons/fa6";
 
 import type { NodeProps } from 'reactflow';
 
@@ -27,6 +31,14 @@ export function DbtModelNode({
             return <PiCubeDuotone size={14}/>;
         } else if (type === 'source') {
             return <GoDatabase size={14}/>;
+        } else if (type === 'saved_query') {
+            return <MdQueryStats size={14}/>;
+        } else if (type === 'semantic_model') {
+            return <TbBoxModel size={14}/>
+        } else if (type === 'metric') {
+            return <FaChartArea size={14}/>
+        } else if (type === 'unit_test') {
+            return <FaRegNoteSticky size={14}/>;
         }
         return null;
     };
