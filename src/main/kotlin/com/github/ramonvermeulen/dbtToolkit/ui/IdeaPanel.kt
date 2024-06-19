@@ -1,4 +1,4 @@
-package com.github.ramonvermeulen.dbtidea.ui
+package com.github.ramonvermeulen.dbtToolkit.ui
 
 import com.intellij.openapi.Disposable
 import javax.swing.JComponent

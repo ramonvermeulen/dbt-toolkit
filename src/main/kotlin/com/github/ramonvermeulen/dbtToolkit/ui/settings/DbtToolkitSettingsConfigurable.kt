@@ -1,6 +1,6 @@
-package com.github.ramonvermeulen.dbtidea.ui.settings
+package com.github.ramonvermeulen.dbtToolkit.ui.settings
 
-import com.github.ramonvermeulen.dbtidea.services.DbtIdeaSettingsService
+import com.github.ramonvermeulen.dbtToolkit.services.dbtToolkitSettingsService
 import com.intellij.openapi.components.service
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.project.Project
@@ -14,15 +14,15 @@ import java.awt.BorderLayout
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
 
-class DbtIdeaSettingsConfigurable(project: Project) : Configurable {
-    private var dbtIdeaSettingsService = project.service<DbtIdeaSettingsService>()
+class dbtToolkitSettingsConfigurable(project: Project) : Configurable {
+    private var dbtToolkitSettingsService = project.service<dbtToolkitSettingsService>()
     private var dbtProjectDirField = JBTextField()
     private var dbtTargetDirField = JBTextField()
     private var envVarsTable = JBTable()
     private var settingsPanel = JPanel(BorderLayout(5, 5))
 
     override fun getDisplayName(): String {
-        return "dbtIdea Settings"
+        return "dbtToolkit Settings"
     }
 
     override fun createComponent(): JComponent {
@@ -79,7 +79,7 @@ class DbtIdeaSettingsConfigurable(project: Project) : Configurable {
             add(removeButton)
         }
 
-        dbtIdeaSettingsService.state.settingsEnvVars.forEach { (name, value) ->
+        dbtToolkitSettingsService.state.settingsEnvVars.forEach { (name, value) ->
             (envVarsTable.model as DefaultTableModel).addRow(arrayOf(name, value))
         }
 
@@ -92,8 +92,8 @@ class DbtIdeaSettingsConfigurable(project: Project) : Configurable {
 
 
     override fun reset() {
-        dbtProjectDirField.text = dbtIdeaSettingsService.state.dbtProjectsDir
-        dbtTargetDirField.text = dbtIdeaSettingsService.state.dbtTargetDir
+        dbtProjectDirField.text = dbtToolkitSettingsService.state.dbtProjectsDir
+        dbtTargetDirField.text = dbtToolkitSettingsService.state.dbtTargetDir
 
         while (envVarsTable.model.rowCount > 0) {
             (envVarsTable.model as DefaultTableModel).removeRow(0)
@@ -108,9 +108,9 @@ class DbtIdeaSettingsConfigurable(project: Project) : Configurable {
             envVars[name] = value
         }
 
-        return dbtProjectDirField.text != dbtIdeaSettingsService.state.settingsDbtProjectDir ||
-                dbtTargetDirField.text != dbtIdeaSettingsService.state.settingsDbtTargetDir ||
-                envVars != dbtIdeaSettingsService.state.settingsEnvVars
+        return dbtProjectDirField.text != dbtToolkitSettingsService.state.settingsDbtProjectDir ||
+                dbtTargetDirField.text != dbtToolkitSettingsService.state.settingsDbtTargetDir ||
+                envVars != dbtToolkitSettingsService.state.settingsEnvVars
     }
 
     override fun apply() {
@@ -121,8 +121,8 @@ class DbtIdeaSettingsConfigurable(project: Project) : Configurable {
             envVars[name] = value
         }
 
-        dbtIdeaSettingsService.state.settingsDbtProjectDir = dbtProjectDirField.text
-        dbtIdeaSettingsService.state.settingsDbtTargetDir = dbtTargetDirField.text
-        dbtIdeaSettingsService.state.settingsEnvVars = envVars
+        dbtToolkitSettingsService.state.settingsDbtProjectDir = dbtProjectDirField.text
+        dbtToolkitSettingsService.state.settingsDbtTargetDir = dbtTargetDirField.text
+        dbtToolkitSettingsService.state.settingsEnvVars = envVars
     }
 }

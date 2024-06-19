@@ -1,4 +1,4 @@
-package com.github.ramonvermeulen.dbtidea.actions
+package com.github.ramonvermeulen.dbtToolkit.actions
 
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
@@ -8,7 +8,7 @@ class OpenConsoleAction : AnAction("Open Console") {
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project
         if (project != null) {
-            val toolWindow = ToolWindowManager.getInstance(project).getToolWindow("dbtIdea")
+            val toolWindow = ToolWindowManager.getInstance(project).getToolWindow("dbtToolkit")
             val contentManager = toolWindow?.contentManager
             val content = contentManager?.findContent("console (read-only)") // replace with your tab title
             if (content != null) {

@@ -1,20 +1,14 @@
-package com.github.ramonvermeulen.dbtidea.ui
+package com.github.ramonvermeulen.dbtToolkit.ui
 
-import com.github.ramonvermeulen.dbtidea.services.DbtIdeaSettingsService
-import com.github.ramonvermeulen.dbtidea.services.ManifestService
-import com.github.ramonvermeulen.dbtidea.ui.console.ConsoleOutputPanel
-import com.github.ramonvermeulen.dbtidea.ui.docs.DocsPanel
-import com.github.ramonvermeulen.dbtidea.ui.lineage.LineagePanel
+import com.github.ramonvermeulen.dbtToolkit.services.dbtToolkitSettingsService
+import com.github.ramonvermeulen.dbtToolkit.ui.console.ConsoleOutputPanel
+import com.github.ramonvermeulen.dbtToolkit.ui.docs.DocsPanel
+import com.github.ramonvermeulen.dbtToolkit.ui.lineage.LineagePanel
 import com.intellij.openapi.components.service
-import com.intellij.openapi.progress.ProgressIndicator
-import com.intellij.openapi.progress.ProgressManager
-import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.vcs.changes.ChangeListManager
-import com.intellij.openapi.vcs.changes.VcsDirtyScopeManager
-import com.intellij.openapi.vcs.changes.VcsIgnoreManager
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileVisitor
@@ -26,7 +20,7 @@ import com.intellij.ui.content.ContentManagerListener
 import java.util.function.Supplier
 import javax.swing.JPanel
 
-class DbtIdeaMainToolWindow : ToolWindowFactory, DumbAware {
+class dbtToolkitMainToolWindow : ToolWindowFactory, DumbAware {
     data class PanelInfo(val creator: Supplier<IdeaPanel>, val isLazy: Boolean)
     override fun createToolWindowContent(
         project: Project,
@@ -86,7 +80,7 @@ class DbtIdeaMainToolWindow : ToolWindowFactory, DumbAware {
                         return false
                     }
                     if (file.name == "dbt_project.yml") {
-                        project.service<DbtIdeaSettingsService>().parseDbtProjectFile(file)
+                        project.service<dbtToolkitSettingsService>().parseDbtProjectFile(file)
                         isDbtProject = true
                         return false
                     }

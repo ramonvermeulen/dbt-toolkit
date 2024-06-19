@@ -1,4 +1,4 @@
-package com.github.ramonvermeulen.dbtidea.services
+package com.github.ramonvermeulen.dbtToolkit.services
 
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType

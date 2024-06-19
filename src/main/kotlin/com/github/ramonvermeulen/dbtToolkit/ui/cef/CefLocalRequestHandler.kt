@@ -1,4 +1,4 @@
-package com.github.ramonvermeulen.dbtidea.ui.cef
+package com.github.ramonvermeulen.dbtToolkit.ui.cef
 
 import org.cef.browser.CefBrowser
 import org.cef.browser.CefFrame

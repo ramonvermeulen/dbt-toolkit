@@ -1,9 +1,9 @@
-package com.github.ramonvermeulen.dbtidea.ui.console
+package com.github.ramonvermeulen.dbtToolkit.ui.console
 
-import com.github.ramonvermeulen.dbtidea.services.LoggingEvent
-import com.github.ramonvermeulen.dbtidea.services.LoggingListener
-import com.github.ramonvermeulen.dbtidea.services.LoggingService
-import com.github.ramonvermeulen.dbtidea.ui.IdeaPanel
+import com.github.ramonvermeulen.dbtToolkit.services.LoggingEvent
+import com.github.ramonvermeulen.dbtToolkit.services.LoggingListener
+import com.github.ramonvermeulen.dbtToolkit.services.LoggingService
+import com.github.ramonvermeulen.dbtToolkit.ui.IdeaPanel
 import com.intellij.execution.impl.ConsoleViewImpl
 import com.intellij.execution.ui.ConsoleView
 import com.intellij.openapi.Disposable

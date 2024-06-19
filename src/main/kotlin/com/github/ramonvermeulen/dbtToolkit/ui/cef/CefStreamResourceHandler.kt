@@ -1,6 +1,6 @@
-package com.github.ramonvermeulen.dbtidea.ui.cef
+package com.github.ramonvermeulen.dbtToolkit.ui.cef
 
-import com.github.ramonvermeulen.dbtidea.ui.IdeaPanel
+import com.github.ramonvermeulen.dbtToolkit.ui.IdeaPanel
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.util.Disposer

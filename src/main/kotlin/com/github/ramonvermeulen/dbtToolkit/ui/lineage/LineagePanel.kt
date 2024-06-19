@@ -1,9 +1,9 @@
-package com.github.ramonvermeulen.dbtidea.ui.lineage
+package com.github.ramonvermeulen.dbtToolkit.ui.lineage
 
-import com.github.ramonvermeulen.dbtidea.services.*
-import com.github.ramonvermeulen.dbtidea.ui.IdeaPanel
-import com.github.ramonvermeulen.dbtidea.ui.cef.CefLocalRequestHandler
-import com.github.ramonvermeulen.dbtidea.ui.cef.CefStreamResourceHandler
+import com.github.ramonvermeulen.dbtToolkit.services.*
+import com.github.ramonvermeulen.dbtToolkit.ui.IdeaPanel
+import com.github.ramonvermeulen.dbtToolkit.ui.cef.CefLocalRequestHandler
+import com.github.ramonvermeulen.dbtToolkit.ui.cef.CefStreamResourceHandler
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.service
@@ -25,7 +25,7 @@ import javax.swing.SwingUtilities
 
 class LineagePanel(private val project: Project, private val toolWindow: ToolWindow) : ActiveFileListener, IdeaPanel, Disposable {
     private val manifestService = project.service<ManifestService>()
-    private val settings = project.service<DbtIdeaSettingsService>()
+    private val settings = project.service<dbtToolkitSettingsService>()
     private val ourCefClient = JBCefApp.getInstance().createClient()
     private val isDebug = System.getProperty("idea.plugin.in.sandbox.mode") == "true"
     private val browser: JBCefBrowser = JBCefBrowserBuilder().setClient(ourCefClient).setEnableOpenDevToolsMenuItem(isDebug).build()

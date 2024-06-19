@@ -1,4 +1,4 @@
-package com.github.ramonvermeulen.dbtidea.services
+package com.github.ramonvermeulen.dbtToolkit.services
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
@@ -52,7 +52,7 @@ fun LineageInfo.toJson(): JsonObject {
 
 @Service(Service.Level.PROJECT)
 class ManifestService(private var project: Project) {
-    private var settings = project.service<DbtIdeaSettingsService>()
+    private var settings = project.service<dbtToolkitSettingsService>()
     private val dbtCommandExecutorService = project.service<DbtCommandExecutorService>()
     private var manifest: JsonObject? = null
     private val manifestLock = ReentrantLock()

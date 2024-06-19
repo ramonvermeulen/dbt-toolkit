@@ -1,13 +1,13 @@
-package com.github.ramonvermeulen.dbtidea
+package com.github.ramonvermeulen.dbtToolkit
 
 import com.intellij.DynamicBundle
 import org.jetbrains.annotations.NonNls
 import org.jetbrains.annotations.PropertyKey
 
 @NonNls
-private const val BUNDLE = "messages.DbtIdeaBundle"
+private const val BUNDLE = "messages.dbtToolkitBundle"
 
-object DbtIdeaBundle : DynamicBundle(BUNDLE) {
+object dbtToolkitBundle : DynamicBundle(BUNDLE) {
     @JvmStatic
     fun message(
         @PropertyKey(resourceBundle = BUNDLE) key: String,

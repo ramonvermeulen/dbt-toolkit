@@ -1,10 +1,10 @@
-package com.github.ramonvermeulen.dbtidea.ui.docs
+package com.github.ramonvermeulen.dbtToolkit.ui.docs
 
-import com.github.ramonvermeulen.dbtidea.services.DbtIdeaSettingsService
-import com.github.ramonvermeulen.dbtidea.services.DocsService
-import com.github.ramonvermeulen.dbtidea.ui.IdeaPanel
-import com.github.ramonvermeulen.dbtidea.ui.cef.CefLocalRequestHandler
-import com.github.ramonvermeulen.dbtidea.ui.cef.CefStreamResourceHandler
+import com.github.ramonvermeulen.dbtToolkit.services.dbtToolkitSettingsService
+import com.github.ramonvermeulen.dbtToolkit.services.DocsService
+import com.github.ramonvermeulen.dbtToolkit.ui.IdeaPanel
+import com.github.ramonvermeulen.dbtToolkit.ui.cef.CefLocalRequestHandler
+import com.github.ramonvermeulen.dbtToolkit.ui.cef.CefStreamResourceHandler
 import com.ibm.icu.text.SimpleDateFormat
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
@@ -30,7 +30,7 @@ import javax.swing.SwingUtilities
 
 class DocsPanel(private var project: Project, private var toolWindow: ToolWindow) : IdeaPanel, Disposable {
     private val docsService = project.service<DocsService>()
-    private val settings = project.service<DbtIdeaSettingsService>()
+    private val settings = project.service<dbtToolkitSettingsService>()
     private val ourCefClient = JBCefApp.getInstance().createClient()
     private val isDebug = System.getProperty("idea.plugin.in.sandbox.mode") == "true"
     private val browser: JBCefBrowser = JBCefBrowserBuilder().setClient(ourCefClient).setEnableOpenDevToolsMenuItem(isDebug).build()

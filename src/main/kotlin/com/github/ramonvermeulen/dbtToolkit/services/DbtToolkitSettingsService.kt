@@ -1,4 +1,4 @@
-package com.github.ramonvermeulen.dbtidea.services
+package com.github.ramonvermeulen.dbtToolkit.services
 
 import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.Service
@@ -11,11 +11,11 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 
 @State(
-    name = "DbtIdeaSettings",
-    storages = [Storage("DbtIdeaSettings.xml")],
+    name = "dbtToolkitSettings",
+    storages = [Storage("dbtToolkitSettings.xml")],
 )
 @Service(Service.Level.PROJECT)
-class DbtIdeaSettingsService(private var project: Project) : PersistentStateComponent<DbtIdeaSettingsService.State> {
+class dbtToolkitSettingsService(private var project: Project) : PersistentStateComponent<dbtToolkitSettingsService.State> {
     data class State(
         var settingsDbtProjectDir: String = "",
         var settingsDbtTargetDir: String = "",

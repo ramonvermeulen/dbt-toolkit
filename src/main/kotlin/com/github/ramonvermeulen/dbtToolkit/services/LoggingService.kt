@@ -1,4 +1,4 @@
-package com.github.ramonvermeulen.dbtidea.services
+package com.github.ramonvermeulen.dbtToolkit.services
 
 import com.intellij.execution.ui.ConsoleViewContentType
 import com.intellij.openapi.components.Service
@@ -18,7 +18,7 @@ class LoggingService(private val project: Project) {
 
     init {
         log(
-            "dbtIdea executes dbt commands under the hood for generating artifacts,\n" +
+            "dbtToolkit executes dbt commands under the hood for generating artifacts,\n" +
             "in case something went wrong during background execution you will see the error message printed " +
             "in this console.\n",
             ConsoleViewContentType.NORMAL_OUTPUT
