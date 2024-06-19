@@ -13,7 +13,7 @@ class DbtIdeaFileListener(private val project: Project) : FileEditorManagerListe
     }
 
     override fun selectionChanged(event: FileEditorManagerEvent) {
-        if (SUPPORTED_EXTENSIONS.contains(event.newFile.extension)) {
+        if (SUPPORTED_EXTENSIONS.contains(event.newFile?.extension)) {
             activeFileService.setActiveFile(event.newFile)
         }
     }
