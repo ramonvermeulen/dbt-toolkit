@@ -1,18 +1,38 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
-    <id>com.github.ramonvermeulen.dbtidea</id>
-    <name>dbt-idea</name>
+    <id>com.github.ramonvermeulen.dbtToolkit</id>
+    <name>dbtToolkit</name>
     <vendor>ramonvermeulen</vendor>
 
     <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.python</depends>
 
-    <resource-bundle>messages.MyBundle</resource-bundle>
+    <resource-bundle>messages.DbtToolkitBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow factoryClass="com.github.ramonvermeulen.dbtidea.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
+        <projectConfigurable
+            parentId="tools"
+            instance="com.github.ramonvermeulen.dbtToolkit.ui.settings.DbtToolkitSettingsConfigurable"
+            id="dbtToolkitSettings"
+            displayName="dbtToolkit Settings"
+        />
+        <toolWindow
+                factoryClass="com.github.ramonvermeulen.dbtToolkit.ui.DbtToolkitMainToolWindow"
+                id="dbtToolkit"
+                anchor="bottom"
+                secondary="false"
+                icon="AllIcons.Toolwindows.InfoEvents"
+        />
+        <notificationGroup
+                id="dbtToolkitNotificationGroup"
+                displayType="BALLOON"
+                key="notification.group.name"
+        />
     </extensions>
 
-    <applicationListeners>
-        <listener class="com.github.ramonvermeulen.dbtidea.listeners.MyApplicationActivationListener" topic="com.intellij.openapi.application.ApplicationActivationListener"/>
-    </applicationListeners>
+    <projectListeners>
+        <listener
+                class="com.github.ramonvermeulen.dbtToolkit.listeners.DbtToolkitFileListener"
+                topic="com.intellij.openapi.fileEditor.FileEditorManagerListener"/>
+    </projectListeners>
 </idea-plugin>
