@@ -4,6 +4,7 @@ import com.github.ramonvermeulen.dbtToolkit.services.DbtToolkitSettingsService
 import com.intellij.openapi.components.service
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.project.Project
+import com.intellij.ui.JBIntSpinner
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.table.JBTable
 import com.intellij.util.ui.JBUI
@@ -18,6 +19,7 @@ class DbtToolkitSettingsConfigurable(project: Project) : Configurable {
     private var dbtToolkitSettingsService = project.service<DbtToolkitSettingsService>()
     private var dbtProjectDirField = JBTextField()
     private var dbtTargetDirField = JBTextField()
+    private var dbtCommandTimeoutField = JBIntSpinner(0, 0, 3600)
     private var envVarsTable = JBTable()
     private var settingsPanel = JPanel(BorderLayout(5, 5))
 
@@ -49,6 +51,8 @@ class DbtToolkitSettingsConfigurable(project: Project) : Configurable {
             add(dbtProjectDirField, gbc)
             add(JLabel("dbt target directory:"), gbc)
             add(dbtTargetDirField, gbc)
+            add(JLabel("dbt command timeout (seconds):"), gbc)
+            add(dbtCommandTimeoutField, gbc)
         }
     }
 
@@ -94,6 +98,7 @@ class DbtToolkitSettingsConfigurable(project: Project) : Configurable {
     override fun reset() {
         dbtProjectDirField.text = dbtToolkitSettingsService.state.dbtProjectsDir
         dbtTargetDirField.text = dbtToolkitSettingsService.state.dbtTargetDir
+        dbtCommandTimeoutField.value = dbtToolkitSettingsService.state.settingsDbtCommandTimeout
 
         while (envVarsTable.model.rowCount > 0) {
             (envVarsTable.model as DefaultTableModel).removeRow(0)
@@ -110,6 +115,7 @@ class DbtToolkitSettingsConfigurable(project: Project) : Configurable {
 
         return dbtProjectDirField.text != dbtToolkitSettingsService.state.settingsDbtProjectDir ||
                 dbtTargetDirField.text != dbtToolkitSettingsService.state.settingsDbtTargetDir ||
+                dbtCommandTimeoutField.value != dbtToolkitSettingsService.state.settingsDbtCommandTimeout ||
                 envVars != dbtToolkitSettingsService.state.settingsEnvVars
     }
 
@@ -123,6 +129,7 @@ class DbtToolkitSettingsConfigurable(project: Project) : Configurable {
 
         dbtToolkitSettingsService.state.settingsDbtProjectDir = dbtProjectDirField.text
         dbtToolkitSettingsService.state.settingsDbtTargetDir = dbtTargetDirField.text
+        dbtToolkitSettingsService.state.settingsDbtCommandTimeout = (dbtCommandTimeoutField.value as Int).toLong()
         dbtToolkitSettingsService.state.settingsEnvVars = envVars
     }
 }

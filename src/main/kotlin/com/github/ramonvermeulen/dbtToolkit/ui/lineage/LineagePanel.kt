@@ -111,6 +111,7 @@ class LineagePanel(private val project: Project, private val toolWindow: ToolWin
 
         activeFile?.let { file ->
             nodeTypes.firstOrNull { file.path.matches(it.pattern) }?.let { nodeType ->
+                // TODO this does not work for sources, find a better way? Maybe retrieve from manifest as well?
                  return manifestService.getLineageInfoForNode("${nodeType.type}.$projectName.${file.nameWithoutExtension}")
             }
         }

@@ -20,6 +20,7 @@ class DbtToolkitSettingsService(private var project: Project) : PersistentStateC
         var settingsDbtProjectDir: String = "",
         var settingsDbtTargetDir: String = "",
         var settingsEnvVars: Map<String, String> = mapOf(),
+        var settingsDbtCommandTimeout: Long = 120,
         var dbtProjectsDir: String = "",
         var dbtTargetDir: String = "",
         var dbtProject: Map<String, Any> = mapOf(),

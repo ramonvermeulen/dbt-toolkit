@@ -68,11 +68,12 @@ class ManifestService(private var project: Project) {
         }
     }
 
-    private fun getCompleteLineageForNode(node: String): LineageInfo? {
+    private fun getCompleteLineageForNode(node: String): LineageInfo {
         val visited = mutableSetOf<String>()
         val nodes = mutableListOf<Node>()
         val relationships = mutableListOf<Edge>()
         val manifestNodes = manifest!!.getAsJsonObject("nodes")
+        val manifestSources = manifest!!.getAsJsonObject("sources")
 
         fun depthFirstSearch(node: String, initialNode: Boolean = false) {
             if (node in visited) return
@@ -84,7 +85,11 @@ class ManifestService(private var project: Project) {
             val parents = manifest!!.getAsJsonObject("parent_map").getAsJsonArray(node)
 
             if (manifestNodes.has(node)) {
-                nodePath = manifestNodes.getAsJsonObject(node).get("original_file_path").toString()
+                nodePath = manifestNodes.getAsJsonObject(node).get("original_file_path").asString
+            }
+
+            if ("source" in node) {
+                nodePath = manifestSources.getAsJsonObject(node).get("original_file_path").asString
             }
 
             children?.forEach { child ->
@@ -102,7 +107,7 @@ class ManifestService(private var project: Project) {
 
             nodes.add(Node(node, isSelected = initialNode, tests = tests, relativePath = nodePath))
         }
-
+        print(node)
         depthFirstSearch(node, true)
 
         return LineageInfo(nodes, relationships)

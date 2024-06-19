@@ -18,6 +18,7 @@ export function DbtModelNode({
     const parts = data?.label?.split('.');
     const type = parts?.[0];
     const name = parts?.[2];
+    const source = parts?.[3];
 
     const renderIcon = () => {
         if (type === 'seed') {
@@ -37,7 +38,7 @@ export function DbtModelNode({
                     <div className="icon">{renderIcon()}</div>
                     <div className="type">{type?.toUpperCase().substring(0, 3)}</div>
                 </div>
-                {name && <div className="dbt-model-title">{name}</div>}
+                {name && <div className="dbt-model-title">{name}{(type == 'source') && ': ' + source}</div>}
             </div>
             <Handle type="source" position={Position.Right} />
             <Handle type="target" position={Position.Left} />
