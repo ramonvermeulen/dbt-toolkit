@@ -1,6 +1,6 @@
 package com.github.ramonvermeulen.dbtToolkit.ui
 
-import com.github.ramonvermeulen.dbtToolkit.services.dbtToolkitSettingsService
+import com.github.ramonvermeulen.dbtToolkit.services.DbtToolkitSettingsService
 import com.github.ramonvermeulen.dbtToolkit.ui.console.ConsoleOutputPanel
 import com.github.ramonvermeulen.dbtToolkit.ui.docs.DocsPanel
 import com.github.ramonvermeulen.dbtToolkit.ui.lineage.LineagePanel
@@ -20,7 +20,7 @@ import com.intellij.ui.content.ContentManagerListener
 import java.util.function.Supplier
 import javax.swing.JPanel
 
-class dbtToolkitMainToolWindow : ToolWindowFactory, DumbAware {
+class DbtToolkitMainToolWindow : ToolWindowFactory, DumbAware {
     data class PanelInfo(val creator: Supplier<IdeaPanel>, val isLazy: Boolean)
     override fun createToolWindowContent(
         project: Project,
@@ -69,7 +69,7 @@ class dbtToolkitMainToolWindow : ToolWindowFactory, DumbAware {
 
     override fun shouldBeAvailable(project: Project) = true
 
-    override fun isApplicable(project: Project): Boolean {
+    override suspend fun isApplicableAsync(project: Project): Boolean {
         val changeListManager = ChangeListManager.getInstance(project)
         var isDbtProject = false
 
@@ -80,7 +80,7 @@ class dbtToolkitMainToolWindow : ToolWindowFactory, DumbAware {
                         return false
                     }
                     if (file.name == "dbt_project.yml") {
-                        project.service<dbtToolkitSettingsService>().parseDbtProjectFile(file)
+                        project.service<DbtToolkitSettingsService>().parseDbtProjectFile(file)
                         isDbtProject = true
                         return false
                     }

@@ -25,7 +25,7 @@ import javax.swing.SwingUtilities
 
 class LineagePanel(private val project: Project, private val toolWindow: ToolWindow) : ActiveFileListener, IdeaPanel, Disposable {
     private val manifestService = project.service<ManifestService>()
-    private val settings = project.service<dbtToolkitSettingsService>()
+    private val settings = project.service<DbtToolkitSettingsService>()
     private val ourCefClient = JBCefApp.getInstance().createClient()
     private val isDebug = System.getProperty("idea.plugin.in.sandbox.mode") == "true"
     private val browser: JBCefBrowser = JBCefBrowserBuilder().setClient(ourCefClient).setEnableOpenDevToolsMenuItem(isDebug).build()

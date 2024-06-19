@@ -14,7 +14,7 @@ import com.jetbrains.python.sdk.PythonSdkUtil
 
 @Service(Service.Level.PROJECT)
 class DbtCommandExecutorService(private var project: Project) {
-    private val settings = project.service<dbtToolkitSettingsService>()
+    private val settings = project.service<DbtToolkitSettingsService>()
     private val loggingService = project.service<LoggingService>()
     private val notificationService = project.service<NotificationService>()
 

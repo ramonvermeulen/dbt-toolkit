@@ -52,7 +52,7 @@ fun LineageInfo.toJson(): JsonObject {
 
 @Service(Service.Level.PROJECT)
 class ManifestService(private var project: Project) {
-    private var settings = project.service<dbtToolkitSettingsService>()
+    private var settings = project.service<DbtToolkitSettingsService>()
     private val dbtCommandExecutorService = project.service<DbtCommandExecutorService>()
     private var manifest: JsonObject? = null
     private val manifestLock = ReentrantLock()

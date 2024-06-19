@@ -8,7 +8,7 @@ import java.io.File
 @Service(Service.Level.PROJECT)
 class DocsService(private var project: Project) {
     private val dbtCommandExecutorService = project.service<DbtCommandExecutorService>()
-    private val settings = project.service<dbtToolkitSettingsService>()
+    private val settings = project.service<DbtToolkitSettingsService>()
 
     fun getDocs(forceRegen: Boolean = false): File {
         val docs = File("${settings.state.settingsDbtTargetDir}/${settings.static.DBT_DOCS_FILE}")

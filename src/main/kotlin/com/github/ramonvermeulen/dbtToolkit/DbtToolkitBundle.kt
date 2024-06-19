@@ -5,9 +5,9 @@ import org.jetbrains.annotations.NonNls
 import org.jetbrains.annotations.PropertyKey
 
 @NonNls
-private const val BUNDLE = "messages.dbtToolkitBundle"
+private const val BUNDLE = "messages.DbtToolkitBundle"
 
-object dbtToolkitBundle : DynamicBundle(BUNDLE) {
+object DbtToolkitBundle : DynamicBundle(BUNDLE) {
     @JvmStatic
     fun message(
         @PropertyKey(resourceBundle = BUNDLE) key: String,

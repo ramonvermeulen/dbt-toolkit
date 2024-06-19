@@ -15,7 +15,7 @@ import java.io.InputStreamReader
     storages = [Storage("dbtToolkitSettings.xml")],
 )
 @Service(Service.Level.PROJECT)
-class dbtToolkitSettingsService(private var project: Project) : PersistentStateComponent<dbtToolkitSettingsService.State> {
+class DbtToolkitSettingsService(private var project: Project) : PersistentStateComponent<DbtToolkitSettingsService.State> {
     data class State(
         var settingsDbtProjectDir: String = "",
         var settingsDbtTargetDir: String = "",

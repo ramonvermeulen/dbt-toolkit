@@ -1,6 +1,6 @@
 package com.github.ramonvermeulen.dbtToolkit.ui.settings
 
-import com.github.ramonvermeulen.dbtToolkit.services.dbtToolkitSettingsService
+import com.github.ramonvermeulen.dbtToolkit.services.DbtToolkitSettingsService
 import com.intellij.openapi.components.service
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.project.Project
@@ -14,8 +14,8 @@ import java.awt.BorderLayout
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
 
-class dbtToolkitSettingsConfigurable(project: Project) : Configurable {
-    private var dbtToolkitSettingsService = project.service<dbtToolkitSettingsService>()
+class DbtToolkitSettingsConfigurable(project: Project) : Configurable {
+    private var dbtToolkitSettingsService = project.service<DbtToolkitSettingsService>()
     private var dbtProjectDirField = JBTextField()
     private var dbtTargetDirField = JBTextField()
     private var envVarsTable = JBTable()

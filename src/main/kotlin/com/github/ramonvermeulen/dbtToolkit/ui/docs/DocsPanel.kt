@@ -1,6 +1,6 @@
 package com.github.ramonvermeulen.dbtToolkit.ui.docs
 
-import com.github.ramonvermeulen.dbtToolkit.services.dbtToolkitSettingsService
+import com.github.ramonvermeulen.dbtToolkit.services.DbtToolkitSettingsService
 import com.github.ramonvermeulen.dbtToolkit.services.DocsService
 import com.github.ramonvermeulen.dbtToolkit.ui.IdeaPanel
 import com.github.ramonvermeulen.dbtToolkit.ui.cef.CefLocalRequestHandler
@@ -30,7 +30,7 @@ import javax.swing.SwingUtilities
 
 class DocsPanel(private var project: Project, private var toolWindow: ToolWindow) : IdeaPanel, Disposable {
     private val docsService = project.service<DocsService>()
-    private val settings = project.service<dbtToolkitSettingsService>()
+    private val settings = project.service<DbtToolkitSettingsService>()
     private val ourCefClient = JBCefApp.getInstance().createClient()
     private val isDebug = System.getProperty("idea.plugin.in.sandbox.mode") == "true"
     private val browser: JBCefBrowser = JBCefBrowserBuilder().setClient(ourCefClient).setEnableOpenDevToolsMenuItem(isDebug).build()

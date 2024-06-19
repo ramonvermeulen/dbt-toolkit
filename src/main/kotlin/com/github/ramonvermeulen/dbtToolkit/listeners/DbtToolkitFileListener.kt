@@ -5,8 +5,9 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent
 import com.intellij.openapi.fileEditor.FileEditorManagerListener
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.vfs.VirtualFile
 
-class dbtToolkitFileListener(private val project: Project) : FileEditorManagerListener {
+class DbtToolkitFileListener(private val project: Project) : FileEditorManagerListener {
     private val activeFileService = project.service<ActiveFileService>()
     companion object {
         val SUPPORTED_EXTENSIONS = setOf("sql", "yml", "csv")
@@ -14,7 +15,7 @@ class dbtToolkitFileListener(private val project: Project) : FileEditorManagerLi
 
     override fun selectionChanged(event: FileEditorManagerEvent) {
         if (SUPPORTED_EXTENSIONS.contains(event.newFile?.extension)) {
-            activeFileService.setActiveFile(event.newFile)
+            activeFileService.setActiveFile(event.newFile as VirtualFile)
         }
     }
 }
