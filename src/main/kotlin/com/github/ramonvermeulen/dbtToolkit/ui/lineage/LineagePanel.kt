@@ -93,12 +93,19 @@ class LineagePanel(private val project: Project, private val toolWindow: ToolWin
 
     private fun refreshLineageInfo(file: VirtualFile?) {
         val newLineageInfo = getLineageInfo(file)
-        if (newLineageInfo != lineageInfo ) {
+        if (newLineageInfo != lineageInfo) {
             lineageInfo = newLineageInfo
             SwingUtilities.invokeLater {
                 if (lineageInfo != null) {
                     browser.cefBrowser.executeJavaScript("setLineageInfo(${lineageInfo!!.toJson()})", browser.cefBrowser.url, -1)
                 }
+            }
+            return
+        }
+        SwingUtilities.invokeLater {
+            val activeNode = lineageInfo!!.nodes.find { it.isSelected }
+            if (activeNode != null) {
+                browser.cefBrowser.executeJavaScript("setActiveNode(${activeNode.id})", browser.cefBrowser.url, -1)
             }
         }
 

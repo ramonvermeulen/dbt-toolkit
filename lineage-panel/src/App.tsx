@@ -27,6 +27,7 @@ declare global {
     interface Window {
         selectNode: (nodeId: string) => void;
         setLineageInfo?: (info: LineageInfo) => void;
+        setActiveNode?: (nodeId: string) => void;
         refreshLineage: (a: string) => void;
     }
 }
@@ -37,7 +38,7 @@ dagreGraph.setDefaultEdgeLabel(() => ({}));
 const nodeWidth = 200;
 const nodeHeight = 50;
 
-const getLayoutedElements = (nodes: Node[], edges: Edge[], direction = 'LR') => {
+const getLayoutElements = (nodes: Node[], edges: Edge[], direction = 'LR') => {
     dagreGraph.setGraph({ rankdir: direction });
 
     nodes.forEach((node) => {
@@ -111,7 +112,7 @@ export default function App() {
     const setLineageInfo = useCallback((info: LineageInfo) => {
         const nodes = configureNodes(info);
         const edges = configureEdges(info);
-        const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
+        const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutElements(
             nodes,
             edges
         );
@@ -122,6 +123,7 @@ export default function App() {
     useEffect(() => {
         // making function available from the browser console
         (window as Window).setLineageInfo = setLineageInfo;
+        (window as Window).setActiveNode = setActiveNode;
         if (process.env.NODE_ENV === 'development') {
             fetch('./test-data.json').then(response => response.json()).then(data => {
                 setLineageInfo(data);
@@ -129,18 +131,23 @@ export default function App() {
         }
         return () => {
             (window as Window).setLineageInfo = undefined;
+            (window as Window).setActiveNode = undefined;
         };
     }, [setLineageInfo]);
 
-    function onNodeClick(_event: ReactMouseEvent, node: Node) : void {
+    function setActiveNode(nodeId: string) {
         const newNodes = nodes.map(n => ({
             ...n,
             data: {
                 ...n.data,
-                isSelected: n.id === node.id,
+                isSelected: n.id === nodeId,
             }
         }));
-        setNodes(newNodes)
+        setNodes(newNodes);
+    }
+
+    function onNodeClick(_event: ReactMouseEvent, node: Node) : void {
+        setActiveNode(node.id);
         window.selectNode(node.data?.relativePath);
     }
 
