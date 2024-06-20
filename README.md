@@ -1,16 +1,21 @@
-# dbtToolkit
-
-![Build](https://github.com/ramonvermeulen/dbt-idea/workflows/Build/badge.svg)
-[![Version](https://img.shields.io/jetbrains/plugin/v/PLUGIN_ID.svg)](https://plugins.jetbrains.com/plugin/PLUGIN_ID)
-[![Downloads](https://img.shields.io/jetbrains/plugin/d/PLUGIN_ID.svg)](https://plugins.jetbrains.com/plugin/PLUGIN_ID)
+<div align="center">
+    <img alt="logo" data-is-relative="true" src="./assets/img/logo.png" width="250" height="250"/>
+    <h1>dbtToolkit</h1>
+    <img alt="GitHub Workflow Status" src="https://github.com/ramonvermeulen/dbt-idea/workflows/Build/badge.svg">
+    <a href="https://plugins.jetbrains.com/plugin/PLUGIN_ID">"<img alt="JetBrains Plugin Version" src="https://img.shields.io/jetbrains/plugin/v/PLUGIN_ID"></a>
+    <a href="https://plugins.jetbrains.com/plugin/PLUGIN_ID"><img alt="JetBrains Plugin Downloads" src="https://img.shields.io/jetbrains/plugin/d/PLUGIN_ID"></a>
+    <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/ramonvermeulen/dbt-toolkit">
+</div>
 
 <!-- Plugin description -->
 The dbtToolkit is an early-stage plugin designed to enhance your experience working with dbt 
-projects in JetBrains IDEs. It currently supports lineage rendering and dbt documentation, 
+projects within JetBrains IDEs. It currently supports lineage rendering and dbt documentation, 
 providing a more streamlined and integrated approach to managing your dbt projects.
 <!-- Plugin description end -->
 
-![](./assets/img/sample.gif)
+<div align="center">
+    <img alt="sample" src="./assets/img/sample.gif"/>
+</div>
 
 ## Features
 * **Lineage Rendering**: Visualize the dependencies and relationships between your dbt models directly in your IDE. 
