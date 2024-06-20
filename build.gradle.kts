@@ -137,3 +137,7 @@ tasks {
         channels = properties("pluginVersion").map { listOf(it.substringAfter('-', "").substringBefore('.').ifEmpty { "default" }) }
     }
 }
+
+tasks.named<Jar>("jar") {
+    from("src/main/resources/lineage-panel-dist")
+}

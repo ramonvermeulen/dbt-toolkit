@@ -15,7 +15,29 @@ data class Node(
     val tests: MutableList<String> = mutableListOf(),
     val isSelected: Boolean = false,
     val relativePath: String
-)
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Node
+
+        // isSelected is not considered in the equality check
+        // to prevent unnecessary re-renders of the UI lineage graph
+        if (id != other.id) return false
+        if (tests != other.tests) return false
+        if (relativePath != other.relativePath) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = id.hashCode()
+        result = 31 * result + tests.hashCode()
+        result = 31 * result + relativePath.hashCode()
+        return result
+    }
+}
 
 fun Node.toJson(): JsonObject {
     val json = JsonObject()
@@ -41,7 +63,25 @@ fun Edge.toJson(): JsonObject {
 data class LineageInfo(
     val nodes: MutableList<Node>,
     val edges: MutableList<Edge>,
-)
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as LineageInfo
+
+        if (nodes.toSet() != other.nodes.toSet()) return false
+        if (edges.toSet() != other.edges.toSet()) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = nodes.toSet().hashCode()
+        result = 31 * result + edges.toSet().hashCode()
+        return result
+    }
+}
 
 fun LineageInfo.toJson(): JsonObject {
     val json = JsonObject() // t.b.d.

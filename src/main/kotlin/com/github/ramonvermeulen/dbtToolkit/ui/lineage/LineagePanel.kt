@@ -31,6 +31,7 @@ class LineagePanel(private val project: Project, private val toolWindow: ToolWin
     private val browser: JBCefBrowser = JBCefBrowserBuilder().setClient(ourCefClient).setEnableOpenDevToolsMenuItem(isDebug).build()
     private val javaScriptEngineProxy: JBCefJSQuery = JBCefJSQuery.create(browser as JBCefBrowserBase)
     private val mainPanel = JPanel(BorderLayout())
+    private var lineageInfo: LineageInfo? = null
 
     init {
         project.messageBus.connect().subscribe(ActiveFileService.TOPIC, this)
@@ -91,12 +92,16 @@ class LineagePanel(private val project: Project, private val toolWindow: ToolWin
     }
 
     private fun refreshLineageInfo(file: VirtualFile?) {
-        val lineageInfo = getLineageInfo(file)
-        SwingUtilities.invokeLater {
-            if (lineageInfo != null) {
-                browser.cefBrowser.executeJavaScript("setLineageInfo(${lineageInfo.toJson()})", browser.cefBrowser.url, 0)
+        val newLineageInfo = getLineageInfo(file)
+        if (newLineageInfo != lineageInfo ) {
+            lineageInfo = newLineageInfo
+            SwingUtilities.invokeLater {
+                if (lineageInfo != null) {
+                    browser.cefBrowser.executeJavaScript("setLineageInfo(${lineageInfo!!.toJson()})", browser.cefBrowser.url, -1)
+                }
             }
         }
+
     }
 
     override fun activeFileChanged(file: VirtualFile?) {
@@ -121,7 +126,7 @@ class LineagePanel(private val project: Project, private val toolWindow: ToolWin
                  return manifestService.getLineageInfoForNode("${nodeType.type}.$projectName.${file.nameWithoutExtension}")
             }
         }
-        return null
+        return lineageInfo
     }
 
     override fun getContent(): JComponent {
