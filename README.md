@@ -7,11 +7,13 @@
     <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/ramonvermeulen/dbt-toolkit">
 </div>
 
+<br>
 <!-- Plugin description -->
 The dbtToolkit is an early-stage plugin designed to enhance your experience working with dbt 
 projects within JetBrains IDEs. It currently supports lineage rendering and dbt documentation, 
 providing a more streamlined and integrated approach to managing your dbt projects.
 <!-- Plugin description end -->
+<br>
 
 <div align="center">
     <img alt="sample" src="./assets/img/sample.gif"/>
