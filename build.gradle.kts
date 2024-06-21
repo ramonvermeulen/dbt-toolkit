@@ -28,6 +28,7 @@ tasks.register("npmBuild", NpmTask::class) {
     dependsOn("npmInstall")
     args.set(listOf("run", "build"))
     workingDir = file("${projectDir}/lineage-panel")
+    environment.put("VITE_OUT_DIR", "${projectDir}/src/main/resources/lineage-panel-dist")
 }
 
 tasks.named("buildPlugin") {

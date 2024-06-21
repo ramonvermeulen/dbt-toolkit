@@ -6,7 +6,8 @@ export default defineConfig({
   plugins: [react()],
   build: {
     // to build the React app into the resources folder of the IntelliJ plugin //
-    outDir: '../src/main/resources/lineage-panel-dist',
+    outDir: process.env.VITE_OUTPUT_DIR || '../src/main/resources/lineage-panel-dist',
+    emptyOutDir: true,
     rollupOptions: {
       output: {
         // fixed names without hashes to easily add request handlers in Cef //
