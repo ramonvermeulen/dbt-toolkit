@@ -12,7 +12,7 @@
 The dbtToolkit is an early-stage plugin designed to enhance your experience working with dbt 
 projects within JetBrains IDEs. It currently supports lineage rendering and dbt documentation, 
 providing a more streamlined and integrated approach to managing your dbt projects.
-<!-- Plugin description end -->
+&nbsp;&nbsp;&nbsp;
 
 ![Lineage Example](./assets/img/sample.gif)
 
@@ -32,6 +32,7 @@ the fly.
 * **Preview data**: Preview the output data of a dbt model directly in your IDE.
 * **... More**: I am open to suggestions and feedback, so feel free to reach out to me with your ideas!
 
+<!-- Plugin description end -->
 ## Prerequisites
 * For IntelliJ users, I recommend to have the [**Python**](https://plugins.jetbrains.com/plugin/631-python) plugin installed so that you can configure a venv.
 * I also recommend to have a venv configured and [**dbt-core**](https://pypi.org/project/dbt-core/) installed within the venv: <br>
