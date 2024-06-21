@@ -8,13 +8,14 @@
 </div>
 
 <br>
+
+![Lineage Example](./assets/img/sample.gif)
+
 <!-- Plugin description -->
 The dbtToolkit is an early-stage plugin designed to enhance your experience working with dbt 
 projects within JetBrains IDEs. It currently supports lineage rendering and dbt documentation, 
 providing a more streamlined and integrated approach to managing your dbt projects.
-<br><br>
 
-![Lineage Example](./assets/img/sample.gif)
 
 ## Features
 * **Lineage Rendering**: Visualize the dependencies and relationships between your dbt models directly in your IDE. 
