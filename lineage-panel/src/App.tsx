@@ -120,6 +120,18 @@ export default function App() {
         layoutedEdges.forEach(layoutEdge => setEdges((edges) => addEdge(layoutEdge, edges)));
     }, [configureNodes, configureEdges, setEdges, setNodes]);
 
+    const setActiveNode = useCallback((nodeId: string) => {
+        console.log("setActiveNode", nodeId);
+        const newNodes = nodes.map(n => ({
+            ...n,
+            data: {
+                ...n.data,
+                isSelected: n.id === nodeId,
+            }
+        }));
+        setNodes(newNodes);
+    }, [nodes, setNodes])
+
     useEffect(() => {
         // making function available from the browser console
         (window as Window).setLineageInfo = setLineageInfo;
@@ -133,20 +145,10 @@ export default function App() {
             (window as Window).setLineageInfo = undefined;
             (window as Window).setActiveNode = undefined;
         };
-    }, [setLineageInfo]);
-
-    function setActiveNode(nodeId: string) {
-        const newNodes = nodes.map(n => ({
-            ...n,
-            data: {
-                ...n.data,
-                isSelected: n.id === nodeId,
-            }
-        }));
-        setNodes(newNodes);
-    }
+    }, [setLineageInfo, setActiveNode]);
 
     function onNodeClick(_event: ReactMouseEvent, node: Node) : void {
+        console.log("onNodeClick", node);
         setActiveNode(node.id);
         window.selectNode(node.data?.relativePath);
     }

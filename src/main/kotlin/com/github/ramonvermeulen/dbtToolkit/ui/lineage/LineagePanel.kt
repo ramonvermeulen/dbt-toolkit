@@ -1,14 +1,17 @@
 package com.github.ramonvermeulen.dbtToolkit.ui.lineage
 
+import com.github.ramonvermeulen.dbtToolkit.JS_TRIGGERED_KEY
 import com.github.ramonvermeulen.dbtToolkit.services.*
 import com.github.ramonvermeulen.dbtToolkit.ui.IdeaPanel
 import com.github.ramonvermeulen.dbtToolkit.ui.cef.CefLocalRequestHandler
 import com.github.ramonvermeulen.dbtToolkit.ui.cef.CefStreamResourceHandler
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.components.service
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.removeUserData
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.wm.ToolWindow
@@ -40,35 +43,45 @@ class LineagePanel(private val project: Project, private val toolWindow: ToolWin
             SwingUtilities.invokeLater{
                 mainPanel.add(JLabel("Loading..."), BorderLayout.CENTER)
             }
-            javaScriptEngineProxy.addHandler { result ->
-                if (result == "refresh") {
-                    refreshLineageInfo(FileEditorManager.getInstance(project).selectedFiles.firstOrNull())
-                } else {
-                    val path = "file://${settings.state.dbtProjectsDir}/${result}"
-                    val file = VirtualFileManager.getInstance().findFileByUrl(path)
-                    if (file !== null) {
-                        SwingUtilities.invokeLater {
-                            FileEditorManager.getInstance(project).openFile(file, true)
-                        }
-                    }
-                }
-                null
-            }
-            browser.jbCefClient.addLoadHandler(object : CefLoadHandlerAdapter() {
-                override fun onLoadEnd(browser: CefBrowser?, frame: CefFrame?, httpStatusCode: Int) {
-                    browser?.executeJavaScript(
-                        "window.selectNode = function(node) { ${javaScriptEngineProxy.inject("node")} };",
-                        browser.url,
-                        0
-                    )
-                }
-            }, browser.cefBrowser)
+            javaScriptEngineProxy.addHandler(::handleJavaScriptCallback)
+            setupJavascriptCallback()
             SwingUtilities.invokeLater {
                 mainPanel.removeAll()
                 mainPanel.add(browser.component, BorderLayout.CENTER)
                 browser.loadURL("lineage-panel-dist/${settings.static.LINEAGE_PANEL_INDEX}")
             }
         }
+    }
+
+    private fun handleJavaScriptCallback(result: String): JBCefJSQuery.Response? {
+        if (result == "refresh") {
+            val file = FileEditorManager.getInstance(project).selectedFiles.firstOrNull()
+            if (file != null) {
+                refreshLineageInfo(file)
+            }
+        } else {
+            val path = "file://${settings.state.dbtProjectsDir}/${result}"
+            val file = VirtualFileManager.getInstance().findFileByUrl(path)
+            if (file !== null) {
+                ApplicationManager.getApplication().invokeLater({
+                    file.putUserData(JS_TRIGGERED_KEY, true)
+                    FileEditorManager.getInstance(project).openFile(file, true)
+                }, ModalityState.defaultModalityState())
+            }
+        }
+        return null
+    }
+
+    private fun setupJavascriptCallback() {
+        browser.jbCefClient.addLoadHandler(object : CefLoadHandlerAdapter() {
+            override fun onLoadEnd(browser: CefBrowser?, frame: CefFrame?, httpStatusCode: Int) {
+                browser?.executeJavaScript(
+                    "window.selectNode = function(node) { ${javaScriptEngineProxy.inject("node")} };",
+                    browser.url,
+                    0
+                )
+            }
+        }, browser.cefBrowser)
     }
 
     private fun initiateCefRequestHandler() {
@@ -91,29 +104,44 @@ class LineagePanel(private val project: Project, private val toolWindow: ToolWin
         ourCefClient.addRequestHandler(myRequestHandler, browser.cefBrowser)
     }
 
-    private fun refreshLineageInfo(file: VirtualFile?) {
+    private fun refreshLineageInfo(file: VirtualFile) {
         val newLineageInfo = getLineageInfo(file)
+        // equals of LineageInfo is overwritten to skip node.isSelected in the check
+        // basically only going into this block if it is a different lineage graph
         if (newLineageInfo != lineageInfo) {
-            lineageInfo = newLineageInfo
+            print("nieuwe graaf")
             SwingUtilities.invokeLater {
                 if (lineageInfo != null) {
                     browser.cefBrowser.executeJavaScript("setLineageInfo(${lineageInfo!!.toJson()})", browser.cefBrowser.url, -1)
                 }
             }
+            lineageInfo = newLineageInfo
             return
-        }
-        SwingUtilities.invokeLater {
-            val activeNode = lineageInfo!!.nodes.find { it.isSelected }
-            if (activeNode != null) {
-                browser.cefBrowser.executeJavaScript("setActiveNode(${activeNode.id})", browser.cefBrowser.url, -1)
+        } else {
+            val fileChangeIsJsTriggered = file.getUserData(JS_TRIGGERED_KEY)
+            file.removeUserData(JS_TRIGGERED_KEY)
+
+            if (fileChangeIsJsTriggered == true) {
+                lineageInfo = newLineageInfo
+                return
+            }
+
+            SwingUtilities.invokeLater {
+                val oldActiveNode = lineageInfo?.nodes?.find { it.isSelected }
+                val newActiveNode = newLineageInfo!!.nodes.find { it.isSelected }
+                if (newActiveNode?.id != oldActiveNode?.id) {
+                    browser.cefBrowser.executeJavaScript("setActiveNode('${newActiveNode?.id}')", browser.cefBrowser.url, -1)
+                }
+                lineageInfo = newLineageInfo
             }
         }
-
     }
 
     override fun activeFileChanged(file: VirtualFile?) {
         ApplicationManager.getApplication().executeOnPooledThread {
-            refreshLineageInfo(file)
+            if (file != null) {
+                refreshLineageInfo(file)
+            }
         }
     }
 
@@ -130,7 +158,8 @@ class LineagePanel(private val project: Project, private val toolWindow: ToolWin
 
         activeFile?.let { file ->
             nodeTypes.firstOrNull { file.path.matches(it.pattern) }?.let { nodeType ->
-                 return manifestService.getLineageInfoForNode("${nodeType.type}.$projectName.${file.nameWithoutExtension}")
+                val nodeId = "${nodeType.type}.$projectName.${file.nameWithoutExtension}"
+                return manifestService.getLineageInfoForNode(nodeId)
             }
         }
         return lineageInfo

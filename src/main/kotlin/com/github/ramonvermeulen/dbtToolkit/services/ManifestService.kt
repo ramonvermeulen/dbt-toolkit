@@ -147,7 +147,7 @@ class ManifestService(private var project: Project) {
 
             nodes.add(Node(node, isSelected = initialNode, tests = tests, relativePath = nodePath))
         }
-        print(node)
+
         depthFirstSearch(node, true)
 
         return LineageInfo(nodes, relationships)
