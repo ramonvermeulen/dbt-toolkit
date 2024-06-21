@@ -2,8 +2,8 @@
     <img alt="logo" data-is-relative="true" src="./assets/img/logo.png" width="250" height="250"/>
     <h1>dbtToolkit 🧰</h1>
     <img alt="GitHub Workflow Status" src="https://github.com/ramonvermeulen/dbt-idea/workflows/Build/badge.svg">
-    <a href="https://plugins.jetbrains.com/plugin/PLUGIN_ID"><img alt="JetBrains Plugin Version" src="https://img.shields.io/jetbrains/plugin/v/PLUGIN_ID"></a>
-    <a href="https://plugins.jetbrains.com/plugin/PLUGIN_ID"><img alt="JetBrains Plugin Downloads" src="https://img.shields.io/jetbrains/plugin/d/PLUGIN_ID"></a>
+    <a href="https://plugins.jetbrains.com/plugin/24666-dbttoolkit"><img alt="JetBrains Plugin Version" src="https://img.shields.io/jetbrains/plugin/v/24666-dbttoolkit"></a>
+    <a href="https://plugins.jetbrains.com/plugin/24666-dbttoolkit"><img alt="JetBrains Plugin Downloads" src="https://img.shields.io/jetbrains/plugin/d/24666-dbttoolkit"></a>
     <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/ramonvermeulen/dbt-toolkit">
 </div>
 
