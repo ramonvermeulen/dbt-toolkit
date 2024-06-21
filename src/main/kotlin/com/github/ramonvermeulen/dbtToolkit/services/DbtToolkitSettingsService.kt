@@ -30,16 +30,6 @@ class DbtToolkitSettingsService(private var project: Project) : PersistentStateC
         var dbtMacroPaths: List<String> = listOf(),
         var dbtProjectName: String = "",
     )
-    // todo: refactor towards Constants.kt
-    companion object {
-        const val DBT_DOCS_FILE = "index.html"
-        const val DBT_MANIFEST_FILE = "manifest.json"
-        const val DBT_CATALOG_FILE = "catalog.json"
-        const val LINEAGE_PANEL_INDEX = "index.html"
-        const val LINEAGE_PANEL_CSS = "index.css"
-        const val LINEAGE_PANEL_JS = "index.js"
-    }
-    var static = Companion
     private var state = State()
 
     override fun getState(): State = state

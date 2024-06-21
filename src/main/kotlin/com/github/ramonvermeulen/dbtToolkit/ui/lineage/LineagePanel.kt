@@ -1,6 +1,6 @@
 package com.github.ramonvermeulen.dbtToolkit.ui.lineage
 
-import com.github.ramonvermeulen.dbtToolkit.JS_TRIGGERED_KEY
+import com.github.ramonvermeulen.dbtToolkit.*
 import com.github.ramonvermeulen.dbtToolkit.services.*
 import com.github.ramonvermeulen.dbtToolkit.ui.IdeaPanel
 import com.github.ramonvermeulen.dbtToolkit.ui.cef.CefLocalRequestHandler
@@ -48,7 +48,7 @@ class LineagePanel(private val project: Project, private val toolWindow: ToolWin
             SwingUtilities.invokeLater {
                 mainPanel.removeAll()
                 mainPanel.add(browser.component, BorderLayout.CENTER)
-                browser.loadURL("lineage-panel-dist/${settings.static.LINEAGE_PANEL_INDEX}")
+                browser.loadURL("lineage-panel-dist/${LINEAGE_PANEL_INDEX}")
             }
         }
     }
@@ -86,18 +86,18 @@ class LineagePanel(private val project: Project, private val toolWindow: ToolWin
 
     private fun initiateCefRequestHandler() {
         val myRequestHandler = CefLocalRequestHandler()
-        myRequestHandler.addResource(settings.static.LINEAGE_PANEL_INDEX) {
-            javaClass.classLoader.getResourceAsStream("lineage-panel-dist/${settings.static.LINEAGE_PANEL_INDEX}")?.let {
+        myRequestHandler.addResource(LINEAGE_PANEL_INDEX) {
+            javaClass.classLoader.getResourceAsStream("${LINEAGE_PANEL_APP_DIR_NAME}/${LINEAGE_PANEL_INDEX}")?.let {
                 CefStreamResourceHandler(it, "text/html", this@LineagePanel)
             }
         }
-        myRequestHandler.addResource(settings.static.LINEAGE_PANEL_JS) {
-            javaClass.classLoader.getResourceAsStream("lineage-panel-dist/${settings.static.LINEAGE_PANEL_JS}")?.let {
+        myRequestHandler.addResource(LINEAGE_PANEL_JS) {
+            javaClass.classLoader.getResourceAsStream("${LINEAGE_PANEL_APP_DIR_NAME}/${LINEAGE_PANEL_JS}")?.let {
                 CefStreamResourceHandler(it, "text/javascript", this)
             }
         }
-        myRequestHandler.addResource(settings.static.LINEAGE_PANEL_CSS) {
-            javaClass.classLoader.getResourceAsStream("lineage-panel-dist/${settings.static.LINEAGE_PANEL_CSS}")?.let {
+        myRequestHandler.addResource(LINEAGE_PANEL_CSS) {
+            javaClass.classLoader.getResourceAsStream("${LINEAGE_PANEL_APP_DIR_NAME}/${LINEAGE_PANEL_CSS}")?.let {
                 CefStreamResourceHandler(it, "text/css", this)
             }
         }
@@ -106,34 +106,37 @@ class LineagePanel(private val project: Project, private val toolWindow: ToolWin
 
     private fun refreshLineageInfo(file: VirtualFile) {
         val newLineageInfo = getLineageInfo(file)
-        // equals of LineageInfo is overwritten to skip node.isSelected in the check
-        // basically only going into this block if it is a different lineage graph
-        if (newLineageInfo != lineageInfo) {
-            print("nieuwe graaf")
-            SwingUtilities.invokeLater {
-                if (lineageInfo != null) {
-                    browser.cefBrowser.executeJavaScript("setLineageInfo(${lineageInfo!!.toJson()})", browser.cefBrowser.url, -1)
-                }
+
+        if (newLineageInfo == lineageInfo) {
+            handleSameNodesAndEdges(file, newLineageInfo)
+            return
+        }
+
+        SwingUtilities.invokeLater {
+            lineageInfo?.let {
+                browser.cefBrowser.executeJavaScript("setLineageInfo(${it.toJson()})", browser.cefBrowser.url, -1)
             }
+        }
+        lineageInfo = newLineageInfo
+    }
+
+    private fun handleSameNodesAndEdges(file: VirtualFile, newLineageInfo: LineageInfo?) {
+        val fileChangeIsJsTriggered = file.getUserData(JS_TRIGGERED_KEY)
+        file.removeUserData(JS_TRIGGERED_KEY)
+
+        if (fileChangeIsJsTriggered == true) {
+            // if it is JS triggered, the UI is already updated, so we only have to set the new state
             lineageInfo = newLineageInfo
             return
-        } else {
-            val fileChangeIsJsTriggered = file.getUserData(JS_TRIGGERED_KEY)
-            file.removeUserData(JS_TRIGGERED_KEY)
+        }
 
-            if (fileChangeIsJsTriggered == true) {
-                lineageInfo = newLineageInfo
-                return
+        SwingUtilities.invokeLater {
+            val oldActiveNode = lineageInfo?.nodes?.find { it.isSelected }
+            val newActiveNode = newLineageInfo!!.nodes.find { it.isSelected }
+            if (newActiveNode?.id != oldActiveNode?.id) {
+                browser.cefBrowser.executeJavaScript("setActiveNode('${newActiveNode?.id}')", browser.cefBrowser.url, -1)
             }
-
-            SwingUtilities.invokeLater {
-                val oldActiveNode = lineageInfo?.nodes?.find { it.isSelected }
-                val newActiveNode = newLineageInfo!!.nodes.find { it.isSelected }
-                if (newActiveNode?.id != oldActiveNode?.id) {
-                    browser.cefBrowser.executeJavaScript("setActiveNode('${newActiveNode?.id}')", browser.cefBrowser.url, -1)
-                }
-                lineageInfo = newLineageInfo
-            }
+            lineageInfo = newLineageInfo
         }
     }
 

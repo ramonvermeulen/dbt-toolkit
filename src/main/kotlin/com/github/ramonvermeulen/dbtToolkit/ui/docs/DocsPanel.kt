@@ -1,5 +1,8 @@
 package com.github.ramonvermeulen.dbtToolkit.ui.docs
 
+import com.github.ramonvermeulen.dbtToolkit.DBT_CATALOG_FILE
+import com.github.ramonvermeulen.dbtToolkit.DBT_DOCS_FILE
+import com.github.ramonvermeulen.dbtToolkit.DBT_MANIFEST_FILE
 import com.github.ramonvermeulen.dbtToolkit.services.DbtToolkitSettingsService
 import com.github.ramonvermeulen.dbtToolkit.services.DocsService
 import com.github.ramonvermeulen.dbtToolkit.ui.IdeaPanel
@@ -73,7 +76,7 @@ class DocsPanel(private var project: Project, private var toolWindow: ToolWindow
                 SwingUtilities.invokeLater {
                     regenerateButton.isEnabled = true
                     regenerateButton.text = "Regenerate Docs"
-                    browser.loadURL("${settings.state.settingsDbtTargetDir}/${settings.static.DBT_DOCS_FILE}")
+                    browser.loadURL("${settings.state.settingsDbtTargetDir}/${DBT_DOCS_FILE}")
                 }
             }
             SwingUtilities.invokeLater {
@@ -95,22 +98,22 @@ class DocsPanel(private var project: Project, private var toolWindow: ToolWindow
             val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
             lastModifiedLabel.text = "Last modified: ${sdf.format(it)}"
         }
-        val manifest = File("${settings.state.settingsDbtTargetDir}/${settings.static.DBT_MANIFEST_FILE}")
-        val catalog = File("${settings.state.settingsDbtTargetDir}/${settings.static.DBT_CATALOG_FILE}")
+        val manifest = File("${settings.state.settingsDbtTargetDir}/${DBT_MANIFEST_FILE}")
+        val catalog = File("${settings.state.settingsDbtTargetDir}/${DBT_CATALOG_FILE}")
         if (docs.exists() && manifest.exists() && catalog.exists()) {
-            myRequestHandler.addResource(settings.static.DBT_DOCS_FILE) {
+            myRequestHandler.addResource(DBT_DOCS_FILE) {
                 docs.bufferedReader().use {
                     val inputStream = IOUtils.toInputStream(IOUtils.toString(it), StandardCharsets.UTF_8)
                     CefStreamResourceHandler(inputStream, "text/html", this@DocsPanel)
                 }
             }
-            myRequestHandler.addResource(settings.static.DBT_MANIFEST_FILE) {
+            myRequestHandler.addResource(DBT_MANIFEST_FILE) {
                 manifest.bufferedReader().use {
                     val inputStream = IOUtils.toInputStream(IOUtils.toString(it), StandardCharsets.UTF_8)
                     CefStreamResourceHandler(inputStream, "application/json", this)
                 }
             }
-            myRequestHandler.addResource(settings.static.DBT_CATALOG_FILE) {
+            myRequestHandler.addResource(DBT_CATALOG_FILE) {
                 catalog.bufferedReader().use {
                     val inputStream = IOUtils.toInputStream(IOUtils.toString(it), StandardCharsets.UTF_8)
                     CefStreamResourceHandler(inputStream, "application/json", this)
