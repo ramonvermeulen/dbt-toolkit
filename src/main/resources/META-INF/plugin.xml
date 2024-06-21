@@ -21,7 +21,7 @@
                 id="dbtToolkit"
                 anchor="bottom"
                 secondary="false"
-                icon="AllIcons.Toolwindows.InfoEvents"
+                icon="icons/toolwindowIcon.svg"
         />
         <notificationGroup
                 id="dbtToolkitNotificationGroup"
