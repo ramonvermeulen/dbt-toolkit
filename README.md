@@ -1,6 +1,6 @@
 <div align="center">
     <img alt="logo" data-is-relative="true" src="./assets/img/logo.png" width="250" height="250"/>
-    <h1>dbtToolkit</h1>
+    <h1>dbtToolkit 🧰</h1>
     <img alt="GitHub Workflow Status" src="https://github.com/ramonvermeulen/dbt-idea/workflows/Build/badge.svg">
     <a href="https://plugins.jetbrains.com/plugin/PLUGIN_ID"><img alt="JetBrains Plugin Version" src="https://img.shields.io/jetbrains/plugin/v/PLUGIN_ID"></a>
     <a href="https://plugins.jetbrains.com/plugin/PLUGIN_ID"><img alt="JetBrains Plugin Downloads" src="https://img.shields.io/jetbrains/plugin/d/PLUGIN_ID"></a>
@@ -13,29 +13,31 @@ The dbtToolkit is an early-stage plugin designed to enhance your experience work
 projects within JetBrains IDEs. It currently supports lineage rendering and dbt documentation, 
 providing a more streamlined and integrated approach to managing your dbt projects.
 <!-- Plugin description end -->
-<br><br>
 
-<div align="center">
-    <img alt="sample" src="./assets/img/sample.gif"/>
-</div>
-
-<br>
+![Lineage Example](./assets/img/sample.gif)
 
 ## Features
 * **Lineage Rendering**: Visualize the dependencies and relationships between your dbt models directly in your IDE. 
-This feature helps you understand the impact of changes and the flow of data in your project.  
+This feature helps you understand the impact of changes and the flow of data in your project. Besides that it offers a 
+quicker way to navigate through your dbt project.
 * **dbt Documentation**: Access your dbt documentation within your IDE, eliminating the need to switch between different 
 tools and platforms. This feature supports a more efficient workflow and keeps essential information at your fingertips.
 
-As an early version, I am actively working on expanding the functionalities of dbtToolkit. Stay tuned for more features 
-that will further enhance your dbt project development experience in JetBrains IDEs.
+## Upcoming Features
+*These are features I am planning to implement in the future, however this list might change overtime*
+* **Full Jinja support in SQL files**: Highlight Jinja syntax in SQL files and navigate through files by clicking
+through `{{ ref() }}` and `{{ source() }}` tags.
+* **Preview compiled SQL**: Preview the compiled SQL of a dbt model quickly in your IDE, and recompile a single model on 
+the fly.
+* **Preview data**: Preview the output data of a dbt model directly in your IDE.
+* **... More**: I am open to suggestions and feedback, so feel free to reach out to me with your ideas!
 
 ## Prerequisites
-* For IntelliJ users, I recommend to have the [**Python**](https://plugins.jetbrains.com/plugin/631-python) plugin installed
-* I also recommend to have a venv configured and [**dbt-core**](https://pypi.org/project/dbt-core/) installed within the venv <br> 
-*(File > Project Structure > SDK > Select Python > Select New Virtual Environment)*
+* For IntelliJ users, I recommend to have the [**Python**](https://plugins.jetbrains.com/plugin/631-python) plugin installed so that you can configure a venv.
+* I also recommend to have a venv configured and [**dbt-core**](https://pypi.org/project/dbt-core/) installed within the venv: <br>
+`File` > `Project Structure` > `SDK` > `Select Python` > `Select New Virtual Environment`
 
-If there is a venv configured, the plugin will automatically try to use the dbt executable from the venv. 
+If there is a venv configured within the IDE, the plugin will automatically try to use the dbt executable from the venv. 
 If there is no venv configured the plugin will use the globally installed dbt version.
 
 ## Installation
