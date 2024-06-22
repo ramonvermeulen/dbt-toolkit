@@ -1,73 +1,35 @@
+import { type MouseEvent as ReactMouseEvent, useCallback, useEffect } from 'react';
+import { MdRefresh } from 'react-icons/md';
 import {
     Background,
+    ControlButton,
     Controls,
-    Edge,
-    MarkerType,
     MiniMap,
     Node,
-    Position,
     ReactFlow,
     addEdge,
     useEdgesState,
-    useNodesState, ControlButton
+    useNodesState
 } from 'reactflow';
 
-import { MdRefresh } from 'react-icons/md';
-import { type MouseEvent as ReactMouseEvent, useCallback, useEffect } from 'react';
+import { isDevMode } from './constants.ts';
+import { edgeTypes } from './edges';
+import { useLineageLayout } from './hooks/useLineageLayout.ts';
+import { DbtModelNode } from './nodes/DbtModelNode.tsx';
+import { LineageInfo } from './types.ts';
 
 import 'reactflow/dist/style.css';
 
-import { DbtModelNode } from './nodes/DbtModelNode.tsx';
-import dagre from 'dagre';
-import { edgeTypes } from './edges';
-
-import { LineageInfo } from './nodes';
-
 declare global {
     interface Window {
+        // javascript -> kotlin bridge functions (set by the kotlin code)
         selectNode: (nodeId: string) => void;
+        refreshLineage: (a: string) => void;
+        // kotlin -> javascript bridge functions (set by the JavaScript code)
         setLineageInfo?: (info: LineageInfo) => void;
         setActiveNode?: (nodeId: string) => void;
-        refreshLineage: (a: string) => void;
     }
 }
-
-const dagreGraph = new dagre.graphlib.Graph();
-dagreGraph.setDefaultEdgeLabel(() => ({}));
-
-const nodeWidth = 200;
-const nodeHeight = 50;
-
-const getLayoutElements = (nodes: Node[], edges: Edge[], direction = 'LR') => {
-    dagreGraph.setGraph({ rankdir: direction });
-
-    nodes.forEach((node) => {
-        dagreGraph.setNode(node.id, { width: nodeWidth, height: nodeHeight });
-    });
-
-    edges.forEach((edge) => {
-        dagreGraph.setEdge(edge.source, edge.target);
-    });
-
-    dagre.layout(dagreGraph);
-
-    nodes.forEach((node) => {
-        const nodeWithPosition = dagreGraph.node(node.id);
-        node.targetPosition = Position.Left;
-        node.sourcePosition = Position.Right;
-
-        // We are shifting the dagre node position (anchor=center center) to the top left
-        // so it matches the React Flow node anchor point (top left).
-        node.position = {
-            x: nodeWithPosition.x - nodeWidth / 2,
-            y: nodeWithPosition.y - nodeHeight / 2,
-        };
-
-        return node;
-    });
-
-    return { nodes, edges };
-};
 
 const nodeTypes = {
     dbtModel: DbtModelNode
@@ -76,52 +38,9 @@ const nodeTypes = {
 export default function App() {
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-
-    const configureNodes = useCallback((info: LineageInfo): Node[] => {
-        const newNodes: Node[] = [];
-
-        info.nodes.forEach((node) => {
-            newNodes.push({
-                id: node.id,
-                position: { x: 0, y: 0 },
-                data: {
-                    label: node.id,
-                    isSelected: node.isSelected,
-                    relativePath: node.relativePath,
-                },
-                type: 'dbtModel',
-            });
-        });
-
-        return newNodes;
-    }, []);
-
-    const configureEdges = useCallback((info: LineageInfo): Edge[] => {
-        return info.edges.map((e) => {
-            return {
-                id: `${e.parent}-${e.child}`,
-                source: e.parent,
-                target: e.child,
-                markerEnd: {
-                    type: MarkerType.ArrowClosed,
-                },
-            };
-        });
-    }, []);
-
-    const setLineageInfo = useCallback((info: LineageInfo) => {
-        const nodes = configureNodes(info);
-        const edges = configureEdges(info);
-        const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutElements(
-            nodes,
-            edges
-        );
-        setNodes(layoutedNodes);
-        layoutedEdges.forEach(layoutEdge => setEdges((edges) => addEdge(layoutEdge, edges)));
-    }, [configureNodes, configureEdges, setEdges, setNodes]);
+    const { setLineageInfo } = useLineageLayout({ setNodes, setEdges, addEdge });
 
     const setActiveNode = useCallback((nodeId: string) => {
-        console.log("setActiveNode", nodeId);
         const newNodes = nodes.map(n => ({
             ...n,
             data: {
@@ -130,32 +49,39 @@ export default function App() {
             }
         }));
         setNodes(newNodes);
-    }, [nodes, setNodes])
+    }, [nodes, setNodes]);
+
+    function onNodeClick(_event: ReactMouseEvent, node: Node) : void {
+        setActiveNode(node.id);
+        if (isDevMode) {
+            return;
+        }
+        window.selectNode(node.data?.relativePath);
+    }
+
+    function onRefreshClick() {
+        if (isDevMode) {
+            return;
+        }
+        window.refreshLineage('refresh');
+    }
 
     useEffect(() => {
-        // making function available from the browser console
-        (window as Window).setLineageInfo = setLineageInfo;
-        (window as Window).setActiveNode = setActiveNode;
-        if (process.env.NODE_ENV === 'development') {
+        if (isDevMode && nodes.length === 0) {
             fetch('./test-data.json').then(response => response.json()).then(data => {
                 setLineageInfo(data);
             });
+        }
+
+        if (!window.setLineageInfo || !window.setActiveNode) {
+            (window as Window).setLineageInfo = setLineageInfo;
+            (window as Window).setActiveNode = setActiveNode;
         }
         return () => {
             (window as Window).setLineageInfo = undefined;
             (window as Window).setActiveNode = undefined;
         };
-    }, [setLineageInfo, setActiveNode]);
-
-    function onNodeClick(_event: ReactMouseEvent, node: Node) : void {
-        console.log("onNodeClick", node);
-        setActiveNode(node.id);
-        window.selectNode(node.data?.relativePath);
-    }
-
-    function onRefreshClick() {
-        window.refreshLineage("refresh");
-    }
+    });
 
     return (
         <div style={{ height: '100vh', width: '100vw' }}>
