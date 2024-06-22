@@ -36,6 +36,13 @@ tasks.named("buildPlugin") {
     dependsOn("npmBuild")
 }
 
+tasks.all {
+    // trick to ensure that the react application is always built before the plugin
+    if (name != "npmBuild" && name != "nodeSetup" && name != "npmInstall" && name != "npmSetup") {
+        mustRunAfter("npmBuild")
+    }
+}
+
 // Configure project's dependencies
 repositories {
     mavenCentral()
@@ -138,8 +145,4 @@ tasks {
         // https://plugins.jetbrains.com/docs/intellij/deployment.html#specifying-a-release-channel
         channels = properties("pluginVersion").map { listOf(it.substringAfter('-', "").substringBefore('.').ifEmpty { "default" }) }
     }
-}
-
-tasks.named<Jar>("jar") {
-    from(lineagePanelBuildPath)
 }
