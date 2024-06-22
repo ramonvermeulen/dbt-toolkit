@@ -155,6 +155,8 @@ class ManifestService(private var project: Project) {
 
     fun getLineageInfoForNode(node: String): LineageInfo? {
         manifestLock.withLock {
+            // todo(find a way to reparse the manifest if the node cannot be found)
+            // e.g. this happens when someone during the project lifecycle creates a new SQL model
             if (manifest == null) {
                 parseManifest()
             }
