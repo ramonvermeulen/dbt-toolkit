@@ -4,6 +4,7 @@ import com.github.gradle.node.npm.task.NpmTask
 
 fun properties(key: String) = providers.gradleProperty(key)
 fun environment(key: String) = providers.environmentVariable(key)
+val lineagePanelBuildPath = "${projectDir}/src/main/resources/lineage-panel-dist"
 
 plugins {
     id("java") // Java support
@@ -28,7 +29,7 @@ tasks.register("npmBuild", NpmTask::class) {
     dependsOn("npmInstall")
     args.set(listOf("run", "build"))
     workingDir = file("${projectDir}/lineage-panel")
-    environment.put("VITE_OUTPUT_DIR", "${projectDir}/src/main/resources/lineage-panel-dist")
+    environment.put("VITE_OUTPUT_DIR", lineagePanelBuildPath)
 }
 
 tasks.named("buildPlugin") {
@@ -140,5 +141,5 @@ tasks {
 }
 
 tasks.named<Jar>("jar") {
-    from("src/main/resources/lineage-panel-dist")
+    from(lineagePanelBuildPath)
 }
