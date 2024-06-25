@@ -3,6 +3,7 @@
 # dbt-jetbrains Changelog
 
 ## [Unreleased]
+- Added improvements to support venv detection in Windows as well as Unix-based systems.
 
 ## [0.0.1-alpha] - 2024-06-22
 
