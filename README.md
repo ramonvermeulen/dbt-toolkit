@@ -4,7 +4,7 @@
     <img alt="GitHub Workflow Status" src="https://github.com/ramonvermeulen/dbt-idea/workflows/Build/badge.svg">
     <a href="https://plugins.jetbrains.com/plugin/24666-dbttoolkit"><img alt="JetBrains Plugin Version" src="https://img.shields.io/jetbrains/plugin/v/24666-dbttoolkit"></a>
     <a href="https://plugins.jetbrains.com/plugin/24666-dbttoolkit"><img alt="JetBrains Plugin Downloads" src="https://img.shields.io/jetbrains/plugin/d/24666-dbttoolkit"></a>
-    <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/ramonvermeulen/dbt-toolkit">
+    <a href="https://github.com/ramonvermeulen/dbt-toolkit"><img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/ramonvermeulen/dbt-toolkit"></a>
 </div>
 
 <br>
