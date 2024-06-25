@@ -7,28 +7,42 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.roots.ProjectRootManager
 import com.jetbrains.python.sdk.PythonSdkUtil
-import java.io.File
+import org.apache.commons.lang3.SystemUtils
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
 
 @Service(Service.Level.PROJECT)
 class VenvInitializerService(private var project: Project) {
     private val loggingService = project.service<LoggingService>()
     private var venvDbtPath: String? = null
 
+    private fun getDbtPath(interpreterDir: Path): Path {
+        return if (SystemUtils.IS_OS_WINDOWS) {
+            interpreterDir.resolve("Scripts/dbt.exe")
+        } else {
+            interpreterDir.resolve("dbt")
+        }
+    }
+
     fun initializeEnvironment() {
         val interpreterPath = getPythonInterpreterPath(project)
-        if (interpreterPath != null) {
-            loggingService.log("Python venv found at: $interpreterPath\n", ConsoleViewContentType.NORMAL_OUTPUT)
-            val interpreterFile = File(interpreterPath)
-            if (File("${interpreterFile.parent}/dbt").exists()) {
-                venvDbtPath = "${interpreterFile.parent}/dbt"
-                loggingService.log("dbt installation found within venv at: $venvDbtPath\n", ConsoleViewContentType.NORMAL_OUTPUT)
-            } else {
-                loggingService.log("No dbt installation found within venv.. please install dbt and restart your IDE", ConsoleViewContentType.NORMAL_OUTPUT)
-            }
-        } else {
-            loggingService.log("No Python venv found, trying to use a global dbt installation", ConsoleViewContentType.NORMAL_OUTPUT)
+        if (interpreterPath == null) {
+            loggingService.log("No Python venv found, trying to use a global dbt installation\n\n", ConsoleViewContentType.ERROR_OUTPUT)
+            return
         }
-        loggingService.log("\n\n", ConsoleViewContentType.NORMAL_OUTPUT)
+
+        loggingService.log("Python venv found at: $interpreterPath\n", ConsoleViewContentType.NORMAL_OUTPUT)
+        val interpreterDir = Paths.get(interpreterPath).parent
+        val dbtPath = getDbtPath(interpreterDir)
+
+        if (!Files.exists(dbtPath)) {
+            loggingService.log("No dbt installation found within venv.. please install dbt and restart your IDE\n\n", ConsoleViewContentType.ERROR_OUTPUT)
+            return
+        }
+
+        venvDbtPath = dbtPath.toString()
+        loggingService.log("dbt installation found within venv at: $venvDbtPath\n\n", ConsoleViewContentType.NORMAL_OUTPUT)
     }
 
     private fun getPythonInterpreterPath(project: Project): String? {
