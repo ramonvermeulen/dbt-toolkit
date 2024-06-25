@@ -28,21 +28,21 @@ class VenvInitializerService(private var project: Project) {
     fun initializeEnvironment() {
         val interpreterPath = getPythonInterpreterPath(project)
         if (interpreterPath == null) {
-            loggingService.log("No Python venv found, trying to use a global dbt installation\n\n", ConsoleViewContentType.ERROR_OUTPUT)
+            loggingService.log("Python virtual environment not detected. Attempting to use a global dbt installation.\n\n", ConsoleViewContentType.ERROR_OUTPUT)
             return
         }
 
-        loggingService.log("Python venv found at: $interpreterPath\n", ConsoleViewContentType.NORMAL_OUTPUT)
+        loggingService.log("Detected Python virtual environment at: $interpreterPath\n", ConsoleViewContentType.NORMAL_OUTPUT)
         val interpreterDir = Paths.get(interpreterPath).parent
         val dbtPath = getDbtPath(interpreterDir)
 
         if (!Files.exists(dbtPath)) {
-            loggingService.log("No dbt installation found within venv.. please install dbt and restart your IDE\n\n", ConsoleViewContentType.ERROR_OUTPUT)
+            loggingService.log("dbt installation not found within the virtual environment. Please install dbt and restart your IDE.\n\n", ConsoleViewContentType.ERROR_OUTPUT)
             return
         }
 
         venvDbtPath = dbtPath.toString()
-        loggingService.log("dbt installation found within venv at: $venvDbtPath\n\n", ConsoleViewContentType.NORMAL_OUTPUT)
+        loggingService.log("Located dbt installation within the virtual environment at: $venvDbtPath\n\n", ConsoleViewContentType.NORMAL_OUTPUT)
     }
 
     private fun getPythonInterpreterPath(project: Project): String? {
