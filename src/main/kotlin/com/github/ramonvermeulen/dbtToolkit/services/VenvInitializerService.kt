@@ -33,7 +33,7 @@ class VenvInitializerService(private var project: Project) {
 
     private fun getPythonInterpreterPath(project: Project): String? {
         val projectSdk: Sdk? = ProjectRootManager.getInstance(project).projectSdk
-        if (projectSdk != null && PythonSdkUtil.isPythonSdk(projectSdk)) {
+        if (projectSdk != null && PythonSdkUtil.isVirtualEnv(projectSdk)) {
             return projectSdk.homePath?.let { PythonSdkUtil.getPythonExecutable(it) }
         }
         return null
