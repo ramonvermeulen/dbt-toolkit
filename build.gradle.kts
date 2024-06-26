@@ -38,7 +38,7 @@ tasks.named("buildPlugin") {
 
 tasks.all {
     // trick to ensure that the react application is always built before the plugin
-    if (name == "buildPlugin") {
+    if (name == "processResources") {
         mustRunAfter("npmBuild")
     }
 }
