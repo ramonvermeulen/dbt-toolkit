@@ -12,9 +12,6 @@ import com.ibm.icu.text.SimpleDateFormat
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.service
-import com.intellij.openapi.progress.ProgressIndicator
-import com.intellij.openapi.progress.ProgressManager
-import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.ui.jcef.JBCefApp
@@ -24,6 +21,8 @@ import org.apache.commons.io.IOUtils
 import java.awt.FlowLayout
 import java.io.File
 import java.nio.charset.StandardCharsets
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.Executors
 import javax.swing.BoxLayout
 import javax.swing.JButton
 import javax.swing.JComponent
@@ -48,19 +47,17 @@ class DocsPanel(private var project: Project, private var toolWindow: ToolWindow
                         text = "Loading..."
                     }
                     ApplicationManager.getApplication().executeOnPooledThread {
-                        showLoadingIndicator("Executing dbt docs generate...") {
-                            try {
-                                val docs = docsService.getDocs(forceRegen=true)
-                                docs.lastModified().let {
-                                    val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-                                    lastModifiedLabel.text = "Last modified: ${sdf.format(it)}"
-                                }
-                                browser.loadURL(docs.absolutePath)
-                            } finally {
-                                SwingUtilities.invokeLater {
-                                    isEnabled = true
-                                    text = "Regenerate Docs"
-                                }
+                        try {
+                            val docs = docsService.getDocs(forceRegen = true)
+                            docs.lastModified().let {
+                                val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+                                lastModifiedLabel.text = "Last modified: ${sdf.format(it)}"
+                            }
+                            browser.loadURL(docs.absolutePath)
+                        } finally {
+                            SwingUtilities.invokeLater {
+                                isEnabled = true
+                                text = "Regenerate Docs"
                             }
                         }
                     }
@@ -70,24 +67,34 @@ class DocsPanel(private var project: Project, private var toolWindow: ToolWindow
     private val lastModifiedLabel = JLabel()
 
     init {
-        ApplicationManager.getApplication().executeOnPooledThread {
-            showLoadingIndicator("Executing dbt docs generate...") {
-                initiateCefRequestHandler()
-                SwingUtilities.invokeLater {
-                    regenerateButton.isEnabled = true
-                    regenerateButton.text = "Regenerate Docs"
-                    browser.loadURL("${settings.state.settingsDbtTargetDir}/${DBT_DOCS_FILE}")
-                }
-            }
+        val executor = Executors.newSingleThreadExecutor()
+        val future =
+            CompletableFuture.runAsync(
+                Runnable {
+                    initiateCefRequestHandler()
+                },
+                executor,
+            )
+
+        future.thenRun {
             SwingUtilities.invokeLater {
-                mainPanel.layout = BoxLayout(mainPanel, BoxLayout.Y_AXIS)
-                regenerateButton.isEnabled = false
-                regenerateButton.text = "Loading..."
-                buttonPanel.add(regenerateButton)
-                buttonPanel.add(lastModifiedLabel)
-                mainPanel.add(buttonPanel)
-                mainPanel.add(browser.component)
+                regenerateButton.isEnabled = true
+                regenerateButton.text = "Regenerate Docs"
+                browser.loadURL("${settings.state.settingsDbtTargetDir}/${DBT_DOCS_FILE}")
             }
+        }.exceptionally { throwable ->
+            throwable.printStackTrace()
+            null
+        }
+
+        SwingUtilities.invokeLater {
+            mainPanel.layout = BoxLayout(mainPanel, BoxLayout.Y_AXIS)
+            regenerateButton.isEnabled = false
+            regenerateButton.text = "Loading..."
+            buttonPanel.add(regenerateButton)
+            buttonPanel.add(lastModifiedLabel)
+            mainPanel.add(buttonPanel)
+            mainPanel.add(browser.component)
         }
     }
 
@@ -125,20 +132,6 @@ class DocsPanel(private var project: Project, private var toolWindow: ToolWindow
 
     override fun getContent(): JComponent {
         return mainPanel
-    }
-
-    fun showLoadingIndicator(
-        title: String,
-        task: () -> Unit,
-    ) {
-        val backgroundTask =
-            object : Task.Backgroundable(project, title, false) {
-                override fun run(indicator: ProgressIndicator) {
-                    indicator.isIndeterminate = true
-                    task.invoke()
-                }
-            }
-        ProgressManager.getInstance().run(backgroundTask)
     }
 
     override fun dispose() {

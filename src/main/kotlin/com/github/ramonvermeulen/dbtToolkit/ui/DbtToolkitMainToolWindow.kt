@@ -22,17 +22,19 @@ import javax.swing.JPanel
 
 class DbtToolkitMainToolWindow : ToolWindowFactory, DumbAware {
     data class PanelInfo(val creator: Supplier<IdeaPanel>, val isLazy: Boolean)
+
     override fun createToolWindowContent(
         project: Project,
         toolWindow: ToolWindow,
     ) {
         val contentFactory = ContentFactory.getInstance()
 
-        val panelCreators = mapOf(
-            "dbt lineage" to PanelInfo(Supplier { LineagePanel(project, toolWindow) }, false),
-            "dbt docs" to PanelInfo(Supplier { DocsPanel(project, toolWindow) }, true),
-            "console (read-only)" to PanelInfo(Supplier { ConsoleOutputPanel(project, toolWindow) }, false),
-        )
+        val panelCreators =
+            mapOf(
+                "dbt lineage" to PanelInfo(Supplier { LineagePanel(project, toolWindow) }, false),
+                "dbt docs" to PanelInfo(Supplier { DocsPanel(project, toolWindow) }, true),
+                "console (read-only)" to PanelInfo(Supplier { ConsoleOutputPanel(project, toolWindow) }, false),
+            )
 
         val panels = mutableMapOf<String, IdeaPanel>()
 
@@ -74,19 +76,22 @@ class DbtToolkitMainToolWindow : ToolWindowFactory, DumbAware {
         var isDbtProject = false
 
         project.guessProjectDir()?.let {
-            VfsUtil.visitChildrenRecursively(it, object : VirtualFileVisitor<Any>() {
-                override fun visitFile(file: VirtualFile): Boolean {
-                    if (changeListManager.isIgnoredFile(file) || file.path.matches(Regex(".*/(target|dbt_packages)/.*"))) {
-                        return false
+            VfsUtil.visitChildrenRecursively(
+                it,
+                object : VirtualFileVisitor<Any>() {
+                    override fun visitFile(file: VirtualFile): Boolean {
+                        if (changeListManager.isIgnoredFile(file) || file.path.matches(Regex(".*/(target|dbt_packages)/.*"))) {
+                            return false
+                        }
+                        if (file.name == "dbt_project.yml") {
+                            project.service<DbtToolkitSettingsService>().parseDbtProjectFile(file)
+                            isDbtProject = true
+                            return false
+                        }
+                        return true
                     }
-                    if (file.name == "dbt_project.yml") {
-                        project.service<DbtToolkitSettingsService>().parseDbtProjectFile(file)
-                        isDbtProject = true
-                        return false
-                    }
-                    return true
-                }
-            })
+                },
+            )
         }
         return isDbtProject
     }

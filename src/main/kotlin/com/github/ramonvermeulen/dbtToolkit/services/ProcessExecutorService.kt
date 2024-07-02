@@ -22,7 +22,7 @@ class ProcessExecutorService(private var project: Project) {
     private fun getDbtProcessBuilder(command: List<String>): ProcessBuilder {
         val processBuilder = ProcessBuilder()
         val env = processBuilder.environment()
-        settings.state.settingsEnvVars.forEach{ (k, v) -> env[k] = v }
+        settings.state.settingsEnvVars.forEach { (k, v) -> env[k] = v }
         val venvDbtPath = venvInitializerService.getDbtPath()
         if (venvDbtPath != null) {
             // venv

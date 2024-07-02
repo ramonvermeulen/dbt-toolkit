@@ -14,7 +14,7 @@ data class Node(
     val id: String,
     val tests: MutableList<String> = mutableListOf(),
     val isSelected: Boolean = false,
-    val relativePath: String
+    val relativePath: String,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -61,8 +61,8 @@ fun Edge.toJson(): JsonObject {
 }
 
 data class LineageInfo(
-    val nodes: MutableList<Node>,
-    val edges: MutableList<Edge>,
+    val nodes: MutableSet<Node>,
+    val edges: MutableSet<Edge>,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -70,15 +70,15 @@ data class LineageInfo(
 
         other as LineageInfo
 
-        if (nodes.toSet() != other.nodes.toSet()) return false
-        if (edges.toSet() != other.edges.toSet()) return false
+        if (nodes != other.nodes) return false
+        if (edges != other.edges) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        var result = nodes.toSet().hashCode()
-        result = 31 * result + edges.toSet().hashCode()
+        var result = nodes.hashCode()
+        result = 31 * result + edges.hashCode()
         return result
     }
 }
@@ -97,8 +97,9 @@ class ManifestService(private var project: Project) {
     private var manifest: JsonObject? = null
     private val manifestLock = ReentrantLock()
 
+    @Synchronized
     private fun parseManifest() {
-        dbtCommandExecutorService.executeCommand(listOf("parse"))
+        dbtCommandExecutorService.executeCommand(listOf("parse", "--no-partial-parse"))
         val file = File("${settings.state.settingsDbtTargetDir}/manifest.json")
         if (file.exists()) {
             manifest = JsonParser.parseString(file.readText()).asJsonObject
@@ -110,12 +111,15 @@ class ManifestService(private var project: Project) {
 
     private fun getCompleteLineageForNode(node: String): LineageInfo {
         val visited = mutableSetOf<String>()
-        val nodes = mutableListOf<Node>()
-        val relationships = mutableListOf<Edge>()
+        val nodes = mutableSetOf<Node>()
+        val relationships = mutableSetOf<Edge>()
         val manifestNodes = manifest!!.getAsJsonObject("nodes")
         val manifestSources = manifest!!.getAsJsonObject("sources")
 
-        fun depthFirstSearch(node: String, initialNode: Boolean = false) {
+        fun depthFirstSearch(
+            node: String,
+            initialNode: Boolean = false,
+        ) {
             if (node in visited) return
             val tests = mutableListOf<String>()
             visited.add(node)
@@ -153,11 +157,14 @@ class ManifestService(private var project: Project) {
         return LineageInfo(nodes, relationships)
     }
 
-    fun getLineageInfoForNode(node: String): LineageInfo? {
+    fun getLineageInfoForNode(
+        node: String,
+        enforceReparse: Boolean,
+    ): LineageInfo {
         manifestLock.withLock {
-            // todo(find a way to reparse the manifest if the node cannot be found)
-            // e.g. this happens when someone during the project lifecycle creates a new SQL mode
-            if (manifest == null) {
+            if (enforceReparse || manifest == null ||
+                !(manifest!!.getAsJsonObject("nodes").has(node) || manifest!!.getAsJsonObject("sources").has(node))
+            ) {
                 parseManifest()
             }
             return getCompleteLineageForNode(node)

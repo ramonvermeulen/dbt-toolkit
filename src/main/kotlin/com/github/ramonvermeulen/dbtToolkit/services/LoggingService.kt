@@ -9,6 +9,7 @@ data class LoggingEvent(val message: String, val type: ConsoleViewContentType)
 
 interface LoggingListener {
     fun logEvent(event: LoggingEvent)
+
     fun flush() { /* optional */ }
 }
 
@@ -19,13 +20,16 @@ class LoggingService(private val project: Project) {
     init {
         log(
             "dbtToolkit executes dbt commands under the hood for generating artifacts,\n" +
-            "in case something went wrong during background execution you will see the error message printed " +
-            "in this console.\n",
-            ConsoleViewContentType.NORMAL_OUTPUT
+                "in case something went wrong during background execution you will see the error message printed " +
+                "in this console.\n",
+            ConsoleViewContentType.NORMAL_OUTPUT,
         )
     }
 
-    fun log(message: String, type: ConsoleViewContentType) {
+    fun log(
+        message: String,
+        type: ConsoleViewContentType,
+    ) {
         publisher.logEvent(LoggingEvent(message, type))
     }
 

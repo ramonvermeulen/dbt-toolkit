@@ -8,12 +8,19 @@ import com.intellij.ui.JBIntSpinner
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.table.JBTable
 import com.intellij.util.ui.JBUI
-import java.awt.Dimension
-import javax.swing.*
-import javax.swing.table.DefaultTableModel
 import java.awt.BorderLayout
+import java.awt.Dimension
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
+import javax.swing.Box
+import javax.swing.BoxLayout
+import javax.swing.JButton
+import javax.swing.JComponent
+import javax.swing.JLabel
+import javax.swing.JPanel
+import javax.swing.JScrollPane
+import javax.swing.SwingUtilities
+import javax.swing.table.DefaultTableModel
 
 class DbtToolkitSettingsConfigurable(project: Project) : Configurable {
     private var dbtToolkitSettingsService = project.service<DbtToolkitSettingsService>()
@@ -40,13 +47,14 @@ class DbtToolkitSettingsConfigurable(project: Project) : Configurable {
 
     private fun createFieldsPanel(): JPanel {
         return JPanel(GridBagLayout()).apply {
-            val gbc = GridBagConstraints().apply {
-                anchor = GridBagConstraints.WEST
-                weightx = 1.0
-                gridwidth = GridBagConstraints.REMAINDER
-                fill = GridBagConstraints.HORIZONTAL
-                insets = JBUI.insets(5, 0)
-            }
+            val gbc =
+                GridBagConstraints().apply {
+                    anchor = GridBagConstraints.WEST
+                    weightx = 1.0
+                    gridwidth = GridBagConstraints.REMAINDER
+                    fill = GridBagConstraints.HORIZONTAL
+                    insets = JBUI.insets(5, 0)
+                }
             add(JLabel("dbt project root:"), gbc)
             add(dbtProjectDirField, gbc)
             add(JLabel("dbt target directory:"), gbc)
@@ -61,27 +69,30 @@ class DbtToolkitSettingsConfigurable(project: Project) : Configurable {
         envVarsTable.model = model
 
         // Add "+" button to add a row to the table
-        val addButton = JButton("+").apply {
-            addActionListener {
-                model.addRow(arrayOf("", ""))
-            }
-        }
-
-        val removeButton = JButton("-").apply {
-            addActionListener {
-                val selectedRow = envVarsTable.selectedRow
-                if (selectedRow != -1) {
-                    model.removeRow(selectedRow)
+        val addButton =
+            JButton("+").apply {
+                addActionListener {
+                    model.addRow(arrayOf("", ""))
                 }
             }
-        }
 
-        val buttonsPanel = JPanel().apply {
-            layout = BoxLayout(this, BoxLayout.X_AXIS)
-            add(addButton)
-            add(Box.createRigidArea(Dimension(5, 0)))
-            add(removeButton)
-        }
+        val removeButton =
+            JButton("-").apply {
+                addActionListener {
+                    val selectedRow = envVarsTable.selectedRow
+                    if (selectedRow != -1) {
+                        model.removeRow(selectedRow)
+                    }
+                }
+            }
+
+        val buttonsPanel =
+            JPanel().apply {
+                layout = BoxLayout(this, BoxLayout.X_AXIS)
+                add(addButton)
+                add(Box.createRigidArea(Dimension(5, 0)))
+                add(removeButton)
+            }
 
         dbtToolkitSettingsService.state.settingsEnvVars.forEach { (name, value) ->
             (envVarsTable.model as DefaultTableModel).addRow(arrayOf(name, value))
@@ -93,7 +104,6 @@ class DbtToolkitSettingsConfigurable(project: Project) : Configurable {
             add(buttonsPanel, BorderLayout.SOUTH)
         }
     }
-
 
     override fun reset() {
         dbtProjectDirField.text = dbtToolkitSettingsService.state.dbtProjectsDir
@@ -114,9 +124,9 @@ class DbtToolkitSettingsConfigurable(project: Project) : Configurable {
         }
 
         return dbtProjectDirField.text != dbtToolkitSettingsService.state.settingsDbtProjectDir ||
-                dbtTargetDirField.text != dbtToolkitSettingsService.state.settingsDbtTargetDir ||
-                dbtCommandTimeoutField.value != dbtToolkitSettingsService.state.settingsDbtCommandTimeout ||
-                envVars != dbtToolkitSettingsService.state.settingsEnvVars
+            dbtTargetDirField.text != dbtToolkitSettingsService.state.settingsDbtTargetDir ||
+            dbtCommandTimeoutField.value != dbtToolkitSettingsService.state.settingsDbtCommandTimeout ||
+            envVars != dbtToolkitSettingsService.state.settingsEnvVars
     }
 
     override fun apply() {

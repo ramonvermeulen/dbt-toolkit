@@ -30,6 +30,7 @@ class DbtToolkitSettingsService(private var project: Project) : PersistentStateC
         var dbtMacroPaths: List<String> = listOf(),
         var dbtProjectName: String = "",
     )
+
     private var state = State()
 
     override fun getState(): State = state
