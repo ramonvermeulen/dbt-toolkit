@@ -9,6 +9,7 @@ import com.intellij.openapi.vfs.VirtualFile
 
 class DbtToolkitFileListener(private val project: Project) : FileEditorManagerListener {
     private val activeFileService = project.service<ActiveFileService>()
+
     companion object {
         val SUPPORTED_EXTENSIONS = setOf("sql", "csv")
     }

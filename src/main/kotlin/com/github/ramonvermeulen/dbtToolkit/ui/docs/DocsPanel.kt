@@ -50,7 +50,7 @@ class DocsPanel(private var project: Project, private var toolWindow: ToolWindow
                     ApplicationManager.getApplication().executeOnPooledThread {
                         showLoadingIndicator("Executing dbt docs generate...") {
                             try {
-                                val docs = docsService.getDocs(forceRegen=true)
+                                val docs = docsService.getDocs(forceRegen = true)
                                 docs.lastModified().let {
                                     val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
                                     lastModifiedLabel.text = "Last modified: ${sdf.format(it)}"

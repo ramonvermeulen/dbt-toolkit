@@ -47,4 +47,3 @@ class ConsoleOutputPanel(private val project: Project, private val toolWindow: T
         }
     }
 }
-

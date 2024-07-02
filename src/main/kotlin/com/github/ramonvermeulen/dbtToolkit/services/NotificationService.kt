@@ -16,21 +16,23 @@ class NotificationService(private val project: Project) {
         action: AnAction? = null,
         closeOnAction: Boolean = true,
     ) {
-        val notification = NotificationGroupManager.getInstance()
-            .getNotificationGroup(groupId)
-            .createNotification(content, notificationType)
+        val notification =
+            NotificationGroupManager.getInstance()
+                .getNotificationGroup(groupId)
+                .createNotification(content, notificationType)
 
         action?.let {
-            val wrappedAction = if (closeOnAction) {
-                object : AnAction(it.templatePresentation.text) {
-                    override fun actionPerformed(e: AnActionEvent) {
-                        it.actionPerformed(e)
-                        notification.expire()
+            val wrappedAction =
+                if (closeOnAction) {
+                    object : AnAction(it.templatePresentation.text) {
+                        override fun actionPerformed(e: AnActionEvent) {
+                            it.actionPerformed(e)
+                            notification.expire()
+                        }
                     }
+                } else {
+                    it
                 }
-            } else {
-                it
-            }
             notification.addAction(wrappedAction)
         }
 

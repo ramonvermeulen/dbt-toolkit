@@ -1,7 +1,16 @@
 package com.github.ramonvermeulen.dbtToolkit.ui.lineage
 
-import com.github.ramonvermeulen.dbtToolkit.*
-import com.github.ramonvermeulen.dbtToolkit.services.*
+import com.github.ramonvermeulen.dbtToolkit.JS_TRIGGERED_KEY
+import com.github.ramonvermeulen.dbtToolkit.LINEAGE_PANEL_APP_DIR_NAME
+import com.github.ramonvermeulen.dbtToolkit.LINEAGE_PANEL_CSS
+import com.github.ramonvermeulen.dbtToolkit.LINEAGE_PANEL_INDEX
+import com.github.ramonvermeulen.dbtToolkit.LINEAGE_PANEL_JS
+import com.github.ramonvermeulen.dbtToolkit.services.ActiveFileListener
+import com.github.ramonvermeulen.dbtToolkit.services.ActiveFileService
+import com.github.ramonvermeulen.dbtToolkit.services.DbtToolkitSettingsService
+import com.github.ramonvermeulen.dbtToolkit.services.LineageInfo
+import com.github.ramonvermeulen.dbtToolkit.services.ManifestService
+import com.github.ramonvermeulen.dbtToolkit.services.toJson
 import com.github.ramonvermeulen.dbtToolkit.ui.IdeaPanel
 import com.github.ramonvermeulen.dbtToolkit.ui.cef.CefLocalRequestHandler
 import com.github.ramonvermeulen.dbtToolkit.ui.cef.CefStreamResourceHandler
@@ -15,7 +24,11 @@ import com.intellij.openapi.util.removeUserData
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.wm.ToolWindow
-import com.intellij.ui.jcef.*
+import com.intellij.ui.jcef.JBCefApp
+import com.intellij.ui.jcef.JBCefBrowser
+import com.intellij.ui.jcef.JBCefBrowserBase
+import com.intellij.ui.jcef.JBCefBrowserBuilder
+import com.intellij.ui.jcef.JBCefJSQuery
 import org.cef.browser.CefBrowser
 import org.cef.browser.CefFrame
 import org.cef.handler.CefLoadHandlerAdapter
@@ -24,7 +37,6 @@ import javax.swing.JComponent
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.SwingUtilities
-
 
 class LineagePanel(private val project: Project, private val toolWindow: ToolWindow) : ActiveFileListener, IdeaPanel, Disposable {
     private val manifestService = project.service<ManifestService>()
@@ -40,7 +52,7 @@ class LineagePanel(private val project: Project, private val toolWindow: ToolWin
         project.messageBus.connect().subscribe(ActiveFileService.TOPIC, this)
         ApplicationManager.getApplication().executeOnPooledThread {
             initiateCefRequestHandler()
-            SwingUtilities.invokeLater{
+            SwingUtilities.invokeLater {
                 mainPanel.add(JLabel("Loading..."), BorderLayout.CENTER)
             }
             javaScriptEngineProxy.addHandler(::handleJavaScriptCallback)
@@ -57,10 +69,10 @@ class LineagePanel(private val project: Project, private val toolWindow: ToolWin
         if (result == "refresh") {
             val file = FileEditorManager.getInstance(project).selectedFiles.firstOrNull()
             if (file != null) {
-                refreshLineageInfo(file)
+                refreshLineageInfo(file, true)
             }
         } else {
-            val path = "file://${settings.state.dbtProjectsDir}/${result}"
+            val path = "file://${settings.state.dbtProjectsDir}/$result"
             val file = VirtualFileManager.getInstance().findFileByUrl(path)
             if (file !== null) {
                 ApplicationManager.getApplication().invokeLater({
@@ -73,15 +85,22 @@ class LineagePanel(private val project: Project, private val toolWindow: ToolWin
     }
 
     private fun setupJavascriptCallback() {
-        browser.jbCefClient.addLoadHandler(object : CefLoadHandlerAdapter() {
-            override fun onLoadEnd(browser: CefBrowser?, frame: CefFrame?, httpStatusCode: Int) {
-                browser?.executeJavaScript(
-                    "window.selectNode = function(node) { ${javaScriptEngineProxy.inject("node")} };",
-                    browser.url,
-                    0
-                )
-            }
-        }, browser.cefBrowser)
+        browser.jbCefClient.addLoadHandler(
+            object : CefLoadHandlerAdapter() {
+                override fun onLoadEnd(
+                    browser: CefBrowser?,
+                    frame: CefFrame?,
+                    httpStatusCode: Int,
+                ) {
+                    browser?.executeJavaScript(
+                        "window.kotlinCallback = function(value) { ${javaScriptEngineProxy.inject("value")} };",
+                        browser.url,
+                        0,
+                    )
+                }
+            },
+            browser.cefBrowser,
+        )
     }
 
     private fun initiateCefRequestHandler() {
@@ -104,8 +123,11 @@ class LineagePanel(private val project: Project, private val toolWindow: ToolWin
         ourCefClient.addRequestHandler(myRequestHandler, browser.cefBrowser)
     }
 
-    private fun refreshLineageInfo(file: VirtualFile) {
-        val newLineageInfo = getLineageInfo(file)
+    private fun refreshLineageInfo(
+        file: VirtualFile,
+        enforceReparse: Boolean,
+    ) {
+        val newLineageInfo = getLineageInfo(file, enforceReparse)
 
         if (newLineageInfo == lineageInfo) {
             handleSameNodesAndEdges(file, newLineageInfo)
@@ -120,7 +142,10 @@ class LineagePanel(private val project: Project, private val toolWindow: ToolWin
         lineageInfo = newLineageInfo
     }
 
-    private fun handleSameNodesAndEdges(file: VirtualFile, newLineageInfo: LineageInfo?) {
+    private fun handleSameNodesAndEdges(
+        file: VirtualFile,
+        newLineageInfo: LineageInfo?,
+    ) {
         val fileChangeIsJsTriggered = file.getUserData(JS_TRIGGERED_KEY)
         file.removeUserData(JS_TRIGGERED_KEY)
 
@@ -143,26 +168,43 @@ class LineagePanel(private val project: Project, private val toolWindow: ToolWin
     override fun activeFileChanged(file: VirtualFile?) {
         ApplicationManager.getApplication().executeOnPooledThread {
             if (file != null) {
-                refreshLineageInfo(file)
+                refreshLineageInfo(file, false)
             }
         }
     }
 
-    private fun getLineageInfo(activeFile: VirtualFile?): LineageInfo? {
+    private fun getLineageInfo(
+        activeFile: VirtualFile?,
+        enforceReparse: Boolean,
+    ): LineageInfo? {
         val projectName = settings.state.dbtProjectName
+
         data class NodeType(val pattern: Regex, val type: String)
 
-        val nodeTypes = listOf(
-            NodeType(Regex(settings.state.dbtModelPaths.joinToString("|", prefix = ".*/(", postfix = ")/.*") { Regex.escape(it) }), "model"),
-            NodeType(Regex(settings.state.dbtTestPaths.joinToString("|", prefix = ".*/(", postfix = ")/.*") { Regex.escape(it) }), "test"),
-            NodeType(Regex(settings.state.dbtSeedPaths.joinToString("|", prefix = ".*/(", postfix = ")/.*") { Regex.escape(it) }), "seed"),
-            NodeType(Regex(settings.state.dbtMacroPaths.joinToString("|", prefix = ".*/(", postfix = ")/.*") { Regex.escape(it) }), "macro")
-        )
+        val nodeTypes =
+            listOf(
+                NodeType(
+                    Regex(settings.state.dbtModelPaths.joinToString("|", prefix = ".*/(", postfix = ")/.*") { Regex.escape(it) }),
+                    "model",
+                ),
+                NodeType(
+                    Regex(settings.state.dbtTestPaths.joinToString("|", prefix = ".*/(", postfix = ")/.*") { Regex.escape(it) }),
+                    "test",
+                ),
+                NodeType(
+                    Regex(settings.state.dbtSeedPaths.joinToString("|", prefix = ".*/(", postfix = ")/.*") { Regex.escape(it) }),
+                    "seed",
+                ),
+                NodeType(
+                    Regex(settings.state.dbtMacroPaths.joinToString("|", prefix = ".*/(", postfix = ")/.*") { Regex.escape(it) }),
+                    "macro",
+                ),
+            )
 
         activeFile?.let { file ->
             nodeTypes.firstOrNull { file.path.matches(it.pattern) }?.let { nodeType ->
                 val nodeId = "${nodeType.type}.$projectName.${file.nameWithoutExtension}"
-                return manifestService.getLineageInfoForNode(nodeId)
+                return manifestService.getLineageInfoForNode(nodeId, enforceReparse)
             }
         }
         return lineageInfo
@@ -173,6 +215,5 @@ class LineagePanel(private val project: Project, private val toolWindow: ToolWin
     }
 
     override fun dispose() {
-
     }
 }

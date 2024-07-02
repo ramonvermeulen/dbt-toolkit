@@ -4,7 +4,6 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 
-
 @Service(Service.Level.PROJECT)
 class DbtCommandExecutorService(private var project: Project) {
     private val venvInitializerService = project.service<VenvInitializerService>()

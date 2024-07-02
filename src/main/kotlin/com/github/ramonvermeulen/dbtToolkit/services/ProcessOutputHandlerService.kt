@@ -15,17 +15,18 @@ class ProcessOutputHandlerService(private var project: Project) {
     private val notificationService = project.service<NotificationService>()
 
     fun handleOutput(process: Process) {
-        val exitCode = if (process.waitFor(settings.state.settingsDbtCommandTimeout, TimeUnit.SECONDS)) {
-            process.exitValue()
-        } else {
-            process.destroy()
-            loggingService.log(
-                "dbt command timeout of: ${settings.state.settingsDbtCommandTimeout} exceeded, please " +
+        val exitCode =
+            if (process.waitFor(settings.state.settingsDbtCommandTimeout, TimeUnit.SECONDS)) {
+                process.exitValue()
+            } else {
+                process.destroy()
+                loggingService.log(
+                    "dbt command timeout of: ${settings.state.settingsDbtCommandTimeout} exceeded, please " +
                         "increase the dbt command timeout in the settings and try again",
-                ConsoleViewContentType.ERROR_OUTPUT
-            )
-            -1
-        }
+                    ConsoleViewContentType.ERROR_OUTPUT,
+                )
+                -1
+            }
         val stdout = process.inputStream.bufferedReader().readText() + "\n"
         val stderr = process.errorStream.bufferedReader().readText() + "\n"
         val output = stdout + stderr
