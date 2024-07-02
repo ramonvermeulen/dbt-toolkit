@@ -1,6 +1,6 @@
 import dagre from 'dagre';
 import { Dispatch, SetStateAction, useCallback, useMemo } from 'react';
-import { Edge, Node, Position, MarkerType, Connection } from 'reactflow';
+import { Edge, Node, Position, MarkerType, Connection, useReactFlow } from 'reactflow';
 
 import { LineageInfo } from '../types';
 import { DEdge, DNode } from '../types.ts';
@@ -18,6 +18,7 @@ type UseLineageLayoutProps = {
 };
 
 export const useLineageLayout = ({ setNodes, setEdges, addEdge }: UseLineageLayoutProps) => {
+    const reactFlow = useReactFlow();
     const configureNodes = useMemo(() => {
         return (info: LineageInfo): Node[] => {
             return info.nodes.map((node: DNode) => ({
@@ -86,7 +87,9 @@ export const useLineageLayout = ({ setNodes, setEdges, addEdge }: UseLineageLayo
         const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutElements(info);
         setNodes(layoutedNodes);
         layoutedEdges.forEach(layoutEdge => setEdges((edges) => addEdge(layoutEdge, edges)));
-    }, [getLayoutElements, setNodes, setEdges, addEdge]);
+        // find a better (even driven) way to fit the view
+        setTimeout(() => reactFlow.fitView({ duration: 300 }), 500);
+    }, [reactFlow, getLayoutElements, setNodes, setEdges, addEdge]);
 
     return { setLineageInfo };
 };

@@ -47,6 +47,7 @@ class LineagePanel(private val project: Project, private val toolWindow: ToolWin
     private val javaScriptEngineProxy: JBCefJSQuery = JBCefJSQuery.create(browser as JBCefBrowserBase)
     private val mainPanel = JPanel(BorderLayout())
     private var lineageInfo: LineageInfo? = null
+    private var isRefreshingLineage = false
 
     init {
         project.messageBus.connect().subscribe(ActiveFileService.TOPIC, this)
@@ -68,8 +69,15 @@ class LineagePanel(private val project: Project, private val toolWindow: ToolWin
     private fun handleJavaScriptCallback(result: String): JBCefJSQuery.Response? {
         if (result == "refresh") {
             val file = FileEditorManager.getInstance(project).selectedFiles.firstOrNull()
-            if (file != null) {
-                refreshLineageInfo(file, true)
+            if (file != null && !isRefreshingLineage) {
+                isRefreshingLineage = true
+                ApplicationManager.getApplication().executeOnPooledThread {
+                    try {
+                        refreshLineageInfo(file, true)
+                    } finally {
+                        isRefreshingLineage = false
+                    }
+                }
             }
         } else {
             val path = "file://${settings.state.dbtProjectsDir}/$result"
@@ -135,11 +143,11 @@ class LineagePanel(private val project: Project, private val toolWindow: ToolWin
         }
 
         SwingUtilities.invokeLater {
+            lineageInfo = newLineageInfo
             lineageInfo?.let {
                 browser.cefBrowser.executeJavaScript("setLineageInfo(${it.toJson()})", browser.cefBrowser.url, -1)
             }
         }
-        lineageInfo = newLineageInfo
     }
 
     private fun handleSameNodesAndEdges(

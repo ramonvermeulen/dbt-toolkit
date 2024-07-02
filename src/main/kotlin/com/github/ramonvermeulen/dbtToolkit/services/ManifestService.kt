@@ -97,8 +97,9 @@ class ManifestService(private var project: Project) {
     private var manifest: JsonObject? = null
     private val manifestLock = ReentrantLock()
 
+    @Synchronized
     private fun parseManifest() {
-        dbtCommandExecutorService.executeCommand(listOf("parse"))
+        dbtCommandExecutorService.executeCommand(listOf("parse", "--no-partial-parse"))
         val file = File("${settings.state.settingsDbtTargetDir}/manifest.json")
         if (file.exists()) {
             manifest = JsonParser.parseString(file.readText()).asJsonObject

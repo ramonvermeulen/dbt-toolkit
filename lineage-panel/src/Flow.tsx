@@ -9,7 +9,7 @@ import {
     ReactFlow,
     addEdge,
     useEdgesState,
-    useNodesState, useReactFlow
+    useNodesState,
 } from 'reactflow';
 
 import { isDevMode } from './constants.ts';
@@ -35,7 +35,6 @@ const nodeTypes = {
 };
 
 export default function Flow() {
-    const reactFlow = useReactFlow();
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
     const { setLineageInfo } = useLineageLayout({ setNodes, setEdges, addEdge });
@@ -51,9 +50,6 @@ export default function Flow() {
         setNodes(newNodes);
     }, [nodes, setNodes]);
 
-    useEffect(() => {
-        reactFlow.fitView();
-    }, [nodes, reactFlow]);
 
     function onNodeClick(_event: ReactMouseEvent, node: Node) : void {
         setActiveNode(node.id);
@@ -100,7 +96,7 @@ export default function Flow() {
                 proOptions={{ hideAttribution: true }}
                 fitView={true}
                 fitViewOptions={{
-                    duration: 500,
+                    duration: 300,
                 }}
                 autoPanOnConnect={true}
                 edgesFocusable={false}
@@ -113,6 +109,5 @@ export default function Flow() {
                     </ControlButton>
                 </Controls>
             </ReactFlow>
-
     );
 }
