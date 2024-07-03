@@ -139,7 +139,7 @@ class DbtToolkitSettingsConfigurable(project: Project) : Configurable {
 
         dbtToolkitSettingsService.state.settingsDbtProjectDir = dbtProjectDirField.text
         dbtToolkitSettingsService.state.settingsDbtTargetDir = dbtTargetDirField.text
-        dbtToolkitSettingsService.state.settingsDbtCommandTimeout = (dbtCommandTimeoutField.value as Int).toLong()
+        dbtToolkitSettingsService.state.settingsDbtCommandTimeout = dbtCommandTimeoutField.value as Long
         dbtToolkitSettingsService.state.settingsEnvVars = envVars
     }
 }
