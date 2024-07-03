@@ -12,7 +12,6 @@ import java.io.File
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
-
 @Service(Service.Level.PROJECT)
 class ManifestService(private var project: Project) {
     private val lineageInfoService = project.service<LineageInfoService>()
@@ -52,13 +51,14 @@ class ManifestService(private var project: Project) {
             val children = manifest!!.getAsJsonObject("child_map").getAsJsonArray(node)
             val parents = manifest!!.getAsJsonObject("parent_map").getAsJsonArray(node)
 
-            val nodePath: String = if (manifestNodes.has(node)) {
-                manifestNodes.getAsJsonObject(node).get("original_file_path").asString
-            } else if ("source" in node) {
-                manifestSources.getAsJsonObject(node).get("original_file_path").asString
-            } else {
-                ""
-            }
+            val nodePath: String =
+                if (manifestNodes.has(node)) {
+                    manifestNodes.getAsJsonObject(node).get("original_file_path").asString
+                } else if ("source" in node) {
+                    manifestSources.getAsJsonObject(node).get("original_file_path").asString
+                } else {
+                    ""
+                }
 
             children?.forEach { child ->
                 if (child.asString.startsWith("test.")) {

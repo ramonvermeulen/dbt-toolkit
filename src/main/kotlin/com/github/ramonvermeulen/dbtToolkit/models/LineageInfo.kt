@@ -1,8 +1,5 @@
 package com.github.ramonvermeulen.dbtToolkit.models
 
-import com.github.ramonvermeulen.dbtToolkit.services.Edge
-import com.github.ramonvermeulen.dbtToolkit.services.Node
-import com.github.ramonvermeulen.dbtToolkit.services.toJson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 
@@ -35,4 +32,3 @@ fun LineageInfo.toJson(): JsonObject {
     json.add("edges", JsonArray().apply { edges.forEach { add(it.toJson()) } })
     return json
 }
-

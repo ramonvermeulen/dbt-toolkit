@@ -1,5 +1,6 @@
 package com.github.ramonvermeulen.dbtToolkit.services
 
+import com.github.ramonvermeulen.dbtToolkit.models.LineageInfo
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.DumbService
@@ -11,7 +12,7 @@ interface LineageInfoListener {
 }
 
 @Service(Service.Level.PROJECT)
-class LineageInfoService(private val project: Project): DumbAware {
+class LineageInfoService(private val project: Project) : DumbAware {
     private var publisher: LineageInfoListener = project.messageBus.syncPublisher(TOPIC)
 
     fun setLineageInfo(lineageInfo: LineageInfo) {
