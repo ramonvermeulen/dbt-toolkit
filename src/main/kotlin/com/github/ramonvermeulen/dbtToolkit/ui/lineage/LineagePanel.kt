@@ -9,6 +9,8 @@ import com.github.ramonvermeulen.dbtToolkit.services.ActiveFileListener
 import com.github.ramonvermeulen.dbtToolkit.services.ActiveFileService
 import com.github.ramonvermeulen.dbtToolkit.services.DbtToolkitSettingsService
 import com.github.ramonvermeulen.dbtToolkit.services.LineageInfo
+import com.github.ramonvermeulen.dbtToolkit.services.LineageInfoListener
+import com.github.ramonvermeulen.dbtToolkit.services.LineageInfoService
 import com.github.ramonvermeulen.dbtToolkit.services.ManifestService
 import com.github.ramonvermeulen.dbtToolkit.services.toJson
 import com.github.ramonvermeulen.dbtToolkit.ui.IdeaPanel
@@ -38,7 +40,7 @@ import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.SwingUtilities
 
-class LineagePanel(private val project: Project, private val toolWindow: ToolWindow) : ActiveFileListener, IdeaPanel, Disposable {
+class LineagePanel(private val project: Project, private val toolWindow: ToolWindow) : ActiveFileListener, LineageInfoListener, IdeaPanel, Disposable {
     private val manifestService = project.service<ManifestService>()
     private val settings = project.service<DbtToolkitSettingsService>()
     private val ourCefClient = JBCefApp.getInstance().createClient()
@@ -47,10 +49,12 @@ class LineagePanel(private val project: Project, private val toolWindow: ToolWin
     private val javaScriptEngineProxy: JBCefJSQuery = JBCefJSQuery.create(browser as JBCefBrowserBase)
     private val mainPanel = JPanel(BorderLayout())
     private var lineageInfo: LineageInfo? = null
+    private var activeFile: VirtualFile? = null
     private var isRefreshingLineage = false
 
     init {
         project.messageBus.connect().subscribe(ActiveFileService.TOPIC, this)
+        project.messageBus.connect().subscribe(LineageInfoService.TOPIC, this)
         ApplicationManager.getApplication().executeOnPooledThread {
             initiateCefRequestHandler()
             SwingUtilities.invokeLater {
@@ -131,25 +135,6 @@ class LineagePanel(private val project: Project, private val toolWindow: ToolWin
         ourCefClient.addRequestHandler(myRequestHandler, browser.cefBrowser)
     }
 
-    private fun refreshLineageInfo(
-        file: VirtualFile,
-        enforceReparse: Boolean,
-    ) {
-        val newLineageInfo = getLineageInfo(file, enforceReparse)
-
-        if (newLineageInfo == lineageInfo) {
-            handleSameNodesAndEdges(file, newLineageInfo)
-            return
-        }
-
-        SwingUtilities.invokeLater {
-            lineageInfo = newLineageInfo
-            lineageInfo?.let {
-                browser.cefBrowser.executeJavaScript("setLineageInfo(${it.toJson()})", browser.cefBrowser.url, -1)
-            }
-        }
-    }
-
     private fun handleSameNodesAndEdges(
         file: VirtualFile,
         newLineageInfo: LineageInfo?,
@@ -173,18 +158,36 @@ class LineagePanel(private val project: Project, private val toolWindow: ToolWin
         }
     }
 
+    // subscribers
     override fun activeFileChanged(file: VirtualFile?) {
         ApplicationManager.getApplication().executeOnPooledThread {
             if (file != null) {
+                activeFile = file
                 refreshLineageInfo(file, false)
             }
         }
     }
 
-    private fun getLineageInfo(
+    override fun lineageInfoChanged(newLineageInfo: LineageInfo) {
+        ApplicationManager.getApplication().executeOnPooledThread {
+            if (newLineageInfo == lineageInfo && activeFile!!.exists()) {
+                handleSameNodesAndEdges(activeFile!!, newLineageInfo)
+                return@executeOnPooledThread
+            }
+
+            SwingUtilities.invokeLater {
+                lineageInfo = newLineageInfo
+                lineageInfo?.let {
+                    browser.cefBrowser.executeJavaScript("setLineageInfo(${it.toJson()})", browser.cefBrowser.url, -1)
+                }
+            }
+        }
+    }
+
+    private fun refreshLineageInfo(
         activeFile: VirtualFile?,
         enforceReparse: Boolean,
-    ): LineageInfo? {
+    ) {
         val projectName = settings.state.dbtProjectName
 
         data class NodeType(val pattern: Regex, val type: String)
@@ -212,10 +215,9 @@ class LineagePanel(private val project: Project, private val toolWindow: ToolWin
         activeFile?.let { file ->
             nodeTypes.firstOrNull { file.path.matches(it.pattern) }?.let { nodeType ->
                 val nodeId = "${nodeType.type}.$projectName.${file.nameWithoutExtension}"
-                return manifestService.getLineageInfoForNode(nodeId, enforceReparse)
+                manifestService.refreshLineageInfoForNode(nodeId, enforceReparse)
             }
         }
-        return lineageInfo
     }
 
     override fun getContent(): JComponent {

@@ -92,6 +92,7 @@ fun LineageInfo.toJson(): JsonObject {
 
 @Service(Service.Level.PROJECT)
 class ManifestService(private var project: Project) {
+    private val lineageInfoService = project.service<LineageInfoService>()
     private var settings = project.service<DbtToolkitSettingsService>()
     private val dbtCommandExecutorService = project.service<DbtCommandExecutorService>()
     private var manifest: JsonObject? = null
@@ -109,7 +110,7 @@ class ManifestService(private var project: Project) {
         }
     }
 
-    private fun getCompleteLineageForNode(node: String): LineageInfo {
+    private fun getCompleteLineageForNode(node: String) {
         val visited = mutableSetOf<String>()
         val nodes = mutableSetOf<Node>()
         val relationships = mutableSetOf<Edge>()
@@ -153,21 +154,20 @@ class ManifestService(private var project: Project) {
         }
 
         depthFirstSearch(node, true)
-
-        return LineageInfo(nodes, relationships)
+        lineageInfoService.setLineageInfo(lineageInfo = LineageInfo(nodes = nodes, edges = relationships))
     }
 
-    fun getLineageInfoForNode(
+    fun refreshLineageInfoForNode(
         node: String,
         enforceReparse: Boolean,
-    ): LineageInfo {
+    ) {
         manifestLock.withLock {
             if (enforceReparse || manifest == null ||
                 !(manifest!!.getAsJsonObject("nodes").has(node) || manifest!!.getAsJsonObject("sources").has(node))
             ) {
                 parseManifest()
             }
-            return getCompleteLineageForNode(node)
+            getCompleteLineageForNode(node)
         }
     }
 }
