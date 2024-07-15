@@ -13,7 +13,6 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.wm.ToolWindow
 import com.intellij.ui.jcef.JBCefApp
 import com.intellij.ui.jcef.JBCefBrowser
 import com.intellij.ui.jcef.JBCefBrowserBuilder
@@ -30,7 +29,7 @@ import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.SwingUtilities
 
-class DocsPanel(private var project: Project, private var toolWindow: ToolWindow) : IdeaPanel, Disposable {
+class DocsPanel(private var project: Project) : IdeaPanel, Disposable {
     private val docsService = project.service<DocsService>()
     private val settings = project.service<DbtToolkitSettingsService>()
     private val ourCefClient = JBCefApp.getInstance().createClient()
