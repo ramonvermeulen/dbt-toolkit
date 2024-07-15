@@ -22,7 +22,8 @@ class ManifestService(private var project: Project) {
 
     @Synchronized
     private fun parseManifest() {
-        dbtCommandExecutorService.executeCommand(listOf("parse", "--no-partial-parse"))
+        // todo(ramon) maybe remove --no-partial-parse flag since it is dbt 1.6 >
+        dbtCommandExecutorService.executeCommand(listOf("parse"))
         val file = File("${settingsService.state.settingsDbtTargetDir}/manifest.json")
         if (file.exists()) {
             manifest = JsonParser.parseString(file.readText()).asJsonObject
@@ -37,43 +38,44 @@ class ManifestService(private var project: Project) {
         val visited = mutableSetOf<String>()
         val nodes = mutableSetOf<Node>()
         val relationships = mutableSetOf<Edge>()
-        val manifestNodes = manifest!!.getAsJsonObject("nodes")
-        val manifestSources = manifest!!.getAsJsonObject("sources")
 
         fun depthFirstSearch(
             node: String,
             initialNode: Boolean = false,
         ) {
             if (node in visited) return
-            val tests = mutableListOf<String>()
             visited.add(node)
 
-            val children = manifest!!.getAsJsonObject("child_map").getAsJsonArray(node)
-            val parents = manifest!!.getAsJsonObject("parent_map").getAsJsonArray(node)
+            manifest?.run {
+                val manifestNodes = getAsJsonObject("nodes")
+                val manifestSources = getAsJsonObject("sources")
+                val children = getAsJsonObject("child_map").getAsJsonArray(node)
+                val parents = getAsJsonObject("parent_map").getAsJsonArray(node)
 
-            val nodePath: String =
-                if (manifestNodes.has(node)) {
-                    manifestNodes.getAsJsonObject(node).get("original_file_path").asString
-                } else if ("source" in node) {
-                    manifestSources.getAsJsonObject(node).get("original_file_path").asString
-                } else {
-                    ""
+                val nodePath: String =
+                    when {
+                        manifestNodes.has(node) -> manifestNodes.getAsJsonObject(node).get("original_file_path").asString
+                        "source" in node -> manifestSources.getAsJsonObject(node).get("original_file_path").asString
+                        else -> ""
+                    }
+
+                val tests = children?.mapNotNull { child ->
+                    child.asString.takeIf { it.startsWith("test.") }
+                } ?: emptyList()
+
+                children?.forEach { child ->
+                    if (!child.asString.startsWith("test.")) {
+                        depthFirstSearch(child.asString)
+                        relationships.add(Edge(node, child.asString))
+                    }
+                }
+                parents?.forEach { parent ->
+                    depthFirstSearch(parent.asString)
+                    relationships.add(Edge(parent.asString, node))
                 }
 
-            children?.forEach { child ->
-                if (child.asString.startsWith("test.")) {
-                    tests.add(child.asString)
-                    return@forEach
-                }
-                depthFirstSearch(child.asString)
-                relationships.add(Edge(node, child.asString))
+                nodes.add(Node(node, isSelected = initialNode, tests = tests, relativePath = nodePath))
             }
-            parents?.forEach { parent ->
-                depthFirstSearch(parent.asString)
-                relationships.add(Edge(parent.asString, node))
-            }
-
-            nodes.add(Node(node, isSelected = initialNode, tests = tests, relativePath = nodePath))
         }
 
         depthFirstSearch(node, true)

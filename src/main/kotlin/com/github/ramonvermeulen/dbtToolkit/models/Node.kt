@@ -5,7 +5,7 @@ import com.google.gson.JsonObject
 
 data class Node(
     val id: String,
-    val tests: MutableList<String> = mutableListOf(),
+    val tests: List<String> = listOf(),
     val isSelected: Boolean = false,
     val relativePath: String,
 ) {
