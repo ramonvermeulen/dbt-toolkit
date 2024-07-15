@@ -59,9 +59,10 @@ class ManifestService(private var project: Project) {
                         else -> ""
                     }
 
-                val tests = children?.mapNotNull { child ->
-                    child.asString.takeIf { it.startsWith("test.") }
-                } ?: emptyList()
+                val tests =
+                    children?.mapNotNull { child ->
+                        child.asString.takeIf { it.startsWith("test.") }
+                    } ?: emptyList()
 
                 children?.forEach { child ->
                     if (!child.asString.startsWith("test.")) {
