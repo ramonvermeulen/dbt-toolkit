@@ -7,7 +7,7 @@ import com.intellij.openapi.fileEditor.FileEditorManagerListener
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 
-class DbtToolkitFileListener(private val project: Project) : FileEditorManagerListener {
+class DbtToolkitFileListener(project: Project) : FileEditorManagerListener {
     private val activeFileService = project.service<ActiveFileService>()
 
     companion object {

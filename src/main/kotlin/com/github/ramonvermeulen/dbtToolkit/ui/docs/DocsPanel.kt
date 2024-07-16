@@ -29,7 +29,7 @@ import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.SwingUtilities
 
-class DocsPanel(private var project: Project) : IdeaPanel, Disposable {
+class DocsPanel(project: Project) : IdeaPanel, Disposable {
     private val docsService = project.service<DocsService>()
     private val settings = project.service<DbtToolkitSettingsService>()
     private val ourCefClient = JBCefApp.getInstance().createClient()
@@ -69,7 +69,7 @@ class DocsPanel(private var project: Project) : IdeaPanel, Disposable {
         val executor = Executors.newSingleThreadExecutor()
         val future =
             CompletableFuture.runAsync(
-                Runnable {
+                {
                     initiateCefRequestHandler()
                 },
                 executor,

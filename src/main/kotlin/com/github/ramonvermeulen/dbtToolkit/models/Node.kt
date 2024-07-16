@@ -5,7 +5,7 @@ import com.google.gson.JsonObject
 
 data class Node(
     val id: String,
-    val tests: List<String> = listOf(),
+    val tests: Set<String> = setOf(),
     val isSelected: Boolean = false,
     val relativePath: String,
 ) {

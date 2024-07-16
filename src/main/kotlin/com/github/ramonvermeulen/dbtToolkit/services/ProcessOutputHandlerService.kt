@@ -9,7 +9,7 @@ import com.intellij.openapi.project.Project
 import java.util.concurrent.TimeUnit
 
 @Service(Service.Level.PROJECT)
-class ProcessOutputHandlerService(private var project: Project) {
+class ProcessOutputHandlerService(project: Project) {
     private val settings = project.service<DbtToolkitSettingsService>()
     private val loggingService = project.service<LoggingService>()
     private val notificationService = project.service<NotificationService>()

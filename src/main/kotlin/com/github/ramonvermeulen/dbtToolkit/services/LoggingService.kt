@@ -14,7 +14,7 @@ interface LoggingListener {
 }
 
 @Service(Service.Level.PROJECT)
-class LoggingService(private val project: Project) {
+class LoggingService(project: Project) {
     private val publisher: LoggingListener = project.messageBus.syncPublisher(TOPIC)
 
     init {
@@ -31,10 +31,6 @@ class LoggingService(private val project: Project) {
         type: ConsoleViewContentType,
     ) {
         publisher.logEvent(LoggingEvent(message, type))
-    }
-
-    fun flush() {
-        publisher.flush()
     }
 
     companion object {
