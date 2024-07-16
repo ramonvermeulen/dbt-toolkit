@@ -4,7 +4,6 @@ import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
-import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import org.yaml.snakeyaml.Yaml
 import java.io.BufferedReader
@@ -15,7 +14,7 @@ import java.io.InputStreamReader
     storages = [Storage("dbtToolkitSettings.xml")],
 )
 @Service(Service.Level.PROJECT)
-class DbtToolkitSettingsService(private var project: Project) : PersistentStateComponent<DbtToolkitSettingsService.State> {
+class DbtToolkitSettingsService : PersistentStateComponent<DbtToolkitSettingsService.State> {
     data class State(
         var settingsDbtProjectDir: String = "",
         var settingsDbtTargetDir: String = "",

@@ -7,7 +7,7 @@ import com.intellij.openapi.project.Project
 import java.io.File
 
 @Service(Service.Level.PROJECT)
-class DocsService(private var project: Project) {
+class DocsService(project: Project) {
     private val dbtCommandExecutorService = project.service<DbtCommandExecutorService>()
     private val settings = project.service<DbtToolkitSettingsService>()
 

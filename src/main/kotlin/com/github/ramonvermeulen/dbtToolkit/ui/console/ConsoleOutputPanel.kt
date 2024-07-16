@@ -8,13 +8,12 @@ import com.intellij.execution.impl.ConsoleViewImpl
 import com.intellij.execution.ui.ConsoleView
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.wm.ToolWindow
 import java.awt.BorderLayout
 import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.SwingUtilities
 
-class ConsoleOutputPanel(private val project: Project, private val toolWindow: ToolWindow) : IdeaPanel, Disposable, LoggingListener {
+class ConsoleOutputPanel(project: Project) : IdeaPanel, Disposable, LoggingListener {
     private val mainPanel: JPanel = JPanel(BorderLayout())
     private val consoleView: ConsoleView = ConsoleViewImpl(project, false)
 

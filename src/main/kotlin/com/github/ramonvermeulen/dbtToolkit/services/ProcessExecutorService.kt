@@ -7,7 +7,7 @@ import com.intellij.openapi.project.Project
 import java.io.File
 
 @Service(Service.Level.PROJECT)
-class ProcessExecutorService(private var project: Project) {
+class ProcessExecutorService(project: Project) {
     private val settings = project.service<DbtToolkitSettingsService>()
     private val venvInitializerService = project.service<VenvInitializerService>()
     private val loggingService = project.service<LoggingService>()

@@ -31,9 +31,9 @@ class DbtToolkitMainToolWindow : ToolWindowFactory, DumbAware {
 
         val panelCreators =
             mapOf(
-                "dbt lineage" to PanelInfo(Supplier { LineagePanel(project) }, false),
-                "dbt docs" to PanelInfo(Supplier { DocsPanel(project) }, true),
-                "console (read-only)" to PanelInfo(Supplier { ConsoleOutputPanel(project, toolWindow) }, false),
+                "dbt lineage" to PanelInfo({ LineagePanel(project) }, false),
+                "dbt docs" to PanelInfo({ DocsPanel(project) }, true),
+                "console (read-only)" to PanelInfo({ ConsoleOutputPanel(project) }, false),
             )
 
         val panels = mutableMapOf<String, IdeaPanel>()

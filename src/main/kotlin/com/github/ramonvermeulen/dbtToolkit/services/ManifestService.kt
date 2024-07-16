@@ -13,7 +13,7 @@ import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
 @Service(Service.Level.PROJECT)
-class ManifestService(private var project: Project) {
+class ManifestService(project: Project) {
     private val lineageInfoService = project.service<LineageInfoService>()
     private var settingsService = project.service<DbtToolkitSettingsService>()
     private val dbtCommandExecutorService = project.service<DbtCommandExecutorService>()
@@ -22,7 +22,6 @@ class ManifestService(private var project: Project) {
 
     @Synchronized
     private fun parseManifest() {
-        // todo(ramon) maybe remove --no-partial-parse flag since it is dbt 1.6 >
         dbtCommandExecutorService.executeCommand(listOf("parse"))
         val file = File("${settingsService.state.settingsDbtTargetDir}/manifest.json")
         if (file.exists()) {
@@ -62,7 +61,7 @@ class ManifestService(private var project: Project) {
                 val tests =
                     children?.mapNotNull { child ->
                         child.asString.takeIf { it.startsWith("test.") }
-                    } ?: emptyList()
+                    }?.toSet() ?: emptySet()
 
                 children?.forEach { child ->
                     if (!child.asString.startsWith("test.")) {
