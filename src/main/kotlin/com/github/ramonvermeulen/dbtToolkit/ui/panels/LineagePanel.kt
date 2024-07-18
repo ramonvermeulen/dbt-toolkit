@@ -1,4 +1,4 @@
-package com.github.ramonvermeulen.dbtToolkit.ui.lineage
+package com.github.ramonvermeulen.dbtToolkit.ui.panels
 
 import com.github.ramonvermeulen.dbtToolkit.JS_TRIGGERED_KEY
 import com.github.ramonvermeulen.dbtToolkit.LINEAGE_PANEL_APP_DIR_NAME

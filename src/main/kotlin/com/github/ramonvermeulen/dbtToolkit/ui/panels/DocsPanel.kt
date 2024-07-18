@@ -1,4 +1,4 @@
-package com.github.ramonvermeulen.dbtToolkit.ui.docs
+package com.github.ramonvermeulen.dbtToolkit.ui.panels
 
 import com.github.ramonvermeulen.dbtToolkit.DBT_CATALOG_FILE
 import com.github.ramonvermeulen.dbtToolkit.DBT_DOCS_FILE

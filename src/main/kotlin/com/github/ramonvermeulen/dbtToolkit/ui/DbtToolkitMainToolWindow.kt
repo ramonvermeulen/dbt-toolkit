@@ -2,8 +2,9 @@ package com.github.ramonvermeulen.dbtToolkit.ui
 
 import com.github.ramonvermeulen.dbtToolkit.services.DbtToolkitSettingsService
 import com.github.ramonvermeulen.dbtToolkit.ui.console.ConsoleOutputPanel
-import com.github.ramonvermeulen.dbtToolkit.ui.docs.DocsPanel
-import com.github.ramonvermeulen.dbtToolkit.ui.lineage.LineagePanel
+import com.github.ramonvermeulen.dbtToolkit.ui.panels.CompiledSqlPanel
+import com.github.ramonvermeulen.dbtToolkit.ui.panels.DocsPanel
+import com.github.ramonvermeulen.dbtToolkit.ui.panels.LineagePanel
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
@@ -31,8 +32,9 @@ class DbtToolkitMainToolWindow : ToolWindowFactory, DumbAware {
 
         val panelCreators =
             mapOf(
-                "dbt lineage" to PanelInfo({ LineagePanel(project) }, false),
-                "dbt docs" to PanelInfo({ DocsPanel(project) }, true),
+                "lineage" to PanelInfo({ LineagePanel(project) }, false),
+                "docs" to PanelInfo({ DocsPanel(project) }, true),
+                "compiled sql" to PanelInfo({ CompiledSqlPanel(project) }, true),
                 "console (read-only)" to PanelInfo({ ConsoleOutputPanel(project) }, false),
             )
 
