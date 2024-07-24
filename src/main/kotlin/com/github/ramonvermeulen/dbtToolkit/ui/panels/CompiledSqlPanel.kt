@@ -35,29 +35,31 @@ class CompiledSqlPanel(project: Project) : IdeaPanel, Disposable, ActiveFileList
         document = EditorFactory.getInstance().createDocument("")
         val editor = EditorFactory.getInstance().createEditor(document!!, project, fileType, false)
         val editorTextField = editor.component
-        recompileButton.addActionListener {
-            SwingUtilities.invokeLater {
-                recompileButton.isEnabled = false
-                recompileButton.text = "Re-compiling..."
-            }
-            ApplicationManager.getApplication().executeOnPooledThread {
-                try {
-                    if (activeFile != null) {
-                        dbtCommandExecutorService.executeCommand(
-                            listOf("compile", "--no-populate-cache", "--select", activeFile!!.nameWithoutExtension),
-                        )
-                        activeFileChanged(activeFile)
-                    }
-                } finally {
-                    SwingUtilities.invokeLater {
-                        recompileButton.isEnabled = true
-                        recompileButton.text = "Re-compile model"
-                    }
+        recompileButton.addActionListener { handleRecompileButtonClick() }
+        mainPanel.add(recompileButton, BorderLayout.NORTH)
+        mainPanel.add(editorTextField, BorderLayout.CENTER)
+    }
+
+    private fun handleRecompileButtonClick() {
+        SwingUtilities.invokeLater {
+            recompileButton.isEnabled = false
+            recompileButton.text = "Re-compiling..."
+        }
+        ApplicationManager.getApplication().executeOnPooledThread {
+            try {
+                if (activeFile != null) {
+                    dbtCommandExecutorService.executeCommand(
+                        listOf("compile", "--no-populate-cache", "--select", activeFile!!.nameWithoutExtension),
+                    )
+                    activeFileChanged(activeFile)
+                }
+            } finally {
+                SwingUtilities.invokeLater {
+                    recompileButton.isEnabled = true
+                    recompileButton.text = "Re-compile model"
                 }
             }
         }
-        mainPanel.add(recompileButton, BorderLayout.NORTH)
-        mainPanel.add(editorTextField, BorderLayout.CENTER)
     }
 
     override fun activeFileChanged(file: VirtualFile?) {
