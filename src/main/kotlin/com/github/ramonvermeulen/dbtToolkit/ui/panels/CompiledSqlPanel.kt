@@ -10,6 +10,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.EditorFactory
+import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileTypes.FileTypeManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
@@ -48,6 +49,14 @@ class CompiledSqlPanel(project: Project) : IdeaPanel, Disposable, ActiveFileList
         ApplicationManager.getApplication().executeOnPooledThread {
             try {
                 if (activeFile != null) {
+                    // save the active file on disk before recompiling, IDE can have an open buffer
+                    ApplicationManager.getApplication().invokeLater {
+                        ApplicationManager.getApplication().runWriteAction {
+                            FileDocumentManager.getInstance().getDocument(activeFile!!).let {
+                                FileDocumentManager.getInstance().saveDocument(it!!)
+                            }
+                        }
+                    }
                     dbtCommandExecutorService.executeCommand(
                         listOf("compile", "--no-populate-cache", "--select", activeFile!!.nameWithoutExtension),
                     )
