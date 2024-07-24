@@ -21,7 +21,7 @@ import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.SwingUtilities
 
-class CompiledSqlPanel(project: Project): IdeaPanel, Disposable, ActiveFileListener {
+class CompiledSqlPanel(project: Project) : IdeaPanel, Disposable, ActiveFileListener {
     private val settings = project.service<DbtToolkitSettingsService>()
     private val dbtCommandExecutorService = project.service<DbtCommandExecutorService>()
     private val mainPanel = JPanel(BorderLayout())
@@ -43,7 +43,9 @@ class CompiledSqlPanel(project: Project): IdeaPanel, Disposable, ActiveFileListe
             ApplicationManager.getApplication().executeOnPooledThread {
                 try {
                     if (activeFile != null) {
-                        dbtCommandExecutorService.executeCommand(listOf("compile", "--no-populate-cache", "--select", activeFile!!.nameWithoutExtension))
+                        dbtCommandExecutorService.executeCommand(
+                            listOf("compile", "--no-populate-cache", "--select", activeFile!!.nameWithoutExtension),
+                        )
                         activeFileChanged(activeFile)
                     }
                 } finally {
