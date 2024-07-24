@@ -75,8 +75,12 @@ class CompiledSqlPanel(private val project: Project): IdeaPanel, Disposable, Act
 
     private fun displayCompiledFile(file: VirtualFile?) {
         if (file != null && file.exists()) {
-            ApplicationManager.getApplication().runWriteAction {
-                document?.setText(file.contentsToByteArray().toString(Charsets.UTF_8))
+            // VirtualFiles are cached by default, so we need to refresh the file to get the latest contents
+            file.refresh(false, false)
+            SwingUtilities.invokeLater {
+                ApplicationManager.getApplication().runWriteAction {
+                    document?.setText(file.contentsToByteArray().toString(Charsets.UTF_8))
+                }
             }
         }
     }
