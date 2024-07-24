@@ -14,7 +14,6 @@ import com.intellij.openapi.fileTypes.FileTypeManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
-import com.intellij.ui.EditorTextField
 import java.awt.BorderLayout
 import java.io.File
 import javax.swing.JButton
@@ -22,7 +21,7 @@ import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.SwingUtilities
 
-class CompiledSqlPanel(private val project: Project): IdeaPanel, Disposable, ActiveFileListener {
+class CompiledSqlPanel(project: Project): IdeaPanel, Disposable, ActiveFileListener {
     private val settings = project.service<DbtToolkitSettingsService>()
     private val dbtCommandExecutorService = project.service<DbtCommandExecutorService>()
     private val mainPanel = JPanel(BorderLayout())
@@ -67,9 +66,8 @@ class CompiledSqlPanel(private val project: Project): IdeaPanel, Disposable, Act
 
     private fun findCompiledFile(file: VirtualFile?): VirtualFile? {
         // todo(ramon) reconsider alternative to basePath
-        val relativePath = file?.path?.replace(File(settings.state.dbtProjectsDir).parentFile.path, "")
-        val targetPath = settings.state.dbtTargetDir + "/compiled" + relativePath
-        print(relativePath)
+        val relativePathFromDbtProjectRoot = file?.path?.replace(File(settings.state.dbtProjectsDir).parentFile.path, "")
+        val targetPath = settings.state.dbtTargetDir + "/compiled" + relativePathFromDbtProjectRoot
         return VirtualFileManager.getInstance().findFileByUrl("file://$targetPath")
     }
 
