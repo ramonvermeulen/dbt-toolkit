@@ -14,7 +14,9 @@
 <!-- Plugin description -->
 The dbtToolkit is an early-stage plugin designed to enhance your experience working with [**dbt-core**](https://github.com/dbt-labs/dbt-core)
 projects within JetBrains IDEs. It currently supports lineage rendering and dbt documentation, 
-providing a more streamlined and integrated approach to managing your dbt projects.
+providing a more streamlined and integrated approach to managing your dbt projects. The dbtToolkit is inspired by the
+well-known VSCode plugin [**vscode-dbt-power-user**](https://github.com/AltimateAI/vscode-dbt-power-user), and aims to become an alternative
+for JetBrains IDEs.
 
 
 ## Features
