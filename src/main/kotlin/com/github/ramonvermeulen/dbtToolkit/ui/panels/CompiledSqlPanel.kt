@@ -82,9 +82,8 @@ class CompiledSqlPanel(project: Project) : IdeaPanel, Disposable, ActiveFileList
     }
 
     private fun findCompiledFile(file: VirtualFile?): VirtualFile? {
-        // todo(ramon) reconsider alternative to basePath
         val relativePathFromDbtProjectRoot = file?.path?.replace(File(settings.state.dbtProjectsDir).parentFile.path, "")
-        val targetPath = settings.state.dbtTargetDir + "/compiled" + relativePathFromDbtProjectRoot
+        val targetPath = "${settings.state.dbtTargetDir}/compiled$relativePathFromDbtProjectRoot"
         return VirtualFileManager.getInstance().findFileByUrl("file://$targetPath")
     }
 
