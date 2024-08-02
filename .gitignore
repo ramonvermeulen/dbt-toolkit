@@ -5,3 +5,4 @@ build
 **/lineage-panel-dist/**
 .kotlin
 **/.kotlin/**
+.salive

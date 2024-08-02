@@ -1,4 +1,4 @@
-package com.github.ramonvermeulen.dbtToolkit.ui.docs
+package com.github.ramonvermeulen.dbtToolkit.ui.panels
 
 import com.github.ramonvermeulen.dbtToolkit.DBT_CATALOG_FILE
 import com.github.ramonvermeulen.dbtToolkit.DBT_DOCS_FILE
@@ -37,32 +37,7 @@ class DocsPanel(project: Project) : IdeaPanel, Disposable {
     private val browser: JBCefBrowser = JBCefBrowserBuilder().setClient(ourCefClient).setEnableOpenDevToolsMenuItem(isDebug).build()
     private val mainPanel: JPanel = JPanel()
     private val buttonPanel = JPanel(FlowLayout(FlowLayout.LEFT))
-    private val regenerateButton =
-        object : JButton("Regenerate Docs") {
-            init {
-                addActionListener {
-                    SwingUtilities.invokeLater {
-                        isEnabled = false
-                        text = "Loading..."
-                    }
-                    ApplicationManager.getApplication().executeOnPooledThread {
-                        try {
-                            val docs = docsService.getDocs(forceRegen = true)
-                            docs.lastModified().let {
-                                val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-                                lastModifiedLabel.text = "Last modified: ${sdf.format(it)}"
-                            }
-                            browser.loadURL(docs.absolutePath)
-                        } finally {
-                            SwingUtilities.invokeLater {
-                                isEnabled = true
-                                text = "Regenerate Docs"
-                            }
-                        }
-                    }
-                }
-            }
-        }
+    private val regenerateButton = JButton("Regenerate Docs")
     private val lastModifiedLabel = JLabel()
 
     init {
@@ -90,10 +65,33 @@ class DocsPanel(project: Project) : IdeaPanel, Disposable {
             mainPanel.layout = BoxLayout(mainPanel, BoxLayout.Y_AXIS)
             regenerateButton.isEnabled = false
             regenerateButton.text = "Loading..."
+            regenerateButton.addActionListener { handleRegenerateButtonClick() }
             buttonPanel.add(regenerateButton)
             buttonPanel.add(lastModifiedLabel)
             mainPanel.add(buttonPanel)
             mainPanel.add(browser.component)
+        }
+    }
+
+    private fun handleRegenerateButtonClick() {
+        SwingUtilities.invokeLater {
+            regenerateButton.isEnabled = false
+            regenerateButton.text = "Loading..."
+        }
+        ApplicationManager.getApplication().executeOnPooledThread {
+            try {
+                val docs = docsService.getDocs(forceRegen = true)
+                docs.lastModified().let {
+                    val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+                    lastModifiedLabel.text = "Last modified: ${sdf.format(it)}"
+                }
+                browser.loadURL(docs.absolutePath)
+            } finally {
+                SwingUtilities.invokeLater {
+                    regenerateButton.isEnabled = true
+                    regenerateButton.text = "Regenerate Docs"
+                }
+            }
         }
     }
 
