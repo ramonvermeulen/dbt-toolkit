@@ -34,9 +34,7 @@ class DbtToolkitMainToolWindow : ToolWindowFactory, DumbAware {
             mapOf(
                 "lineage" to PanelInfo({ LineagePanel(project) }, false),
                 "docs" to PanelInfo({ DocsPanel(project) }, true),
-                // todo(ramon) find way to make this lazy - currently it doesn't pick up the initial file while lazy
-                // (which is logical, subscriber doesn't exist yet)
-                "compiled sql" to PanelInfo({ CompiledSqlPanel(project) }, false),
+                "compiled sql" to PanelInfo({ CompiledSqlPanel(project) }, true),
                 "console (read-only)" to PanelInfo({ ConsoleOutputPanel(project) }, false),
             )
 

@@ -11,6 +11,7 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.fileEditor.FileDocumentManager
+import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileTypes.FileTypeManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
@@ -36,6 +37,9 @@ class CompiledSqlPanel(project: Project) : IdeaPanel, Disposable, ActiveFileList
         document = EditorFactory.getInstance().createDocument("")
         val editor = EditorFactory.getInstance().createEditor(document!!, project, fileType, false)
         val editorTextField = editor.component
+        // to set the initial file, since the subscription is only set-up after
+        // opening the panel (lazy) for the first time
+        activeFileChanged(FileEditorManager.getInstance(project).selectedFiles.firstOrNull())
         recompileButton.addActionListener { handleRecompileButtonClick() }
         mainPanel.add(recompileButton, BorderLayout.NORTH)
         mainPanel.add(editorTextField, BorderLayout.CENTER)
