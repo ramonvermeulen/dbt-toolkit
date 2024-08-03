@@ -35,7 +35,7 @@ class CompiledSqlPanel(project: Project) : IdeaPanel, Disposable, ActiveFileList
         project.messageBus.connect().subscribe(ActiveFileService.TOPIC, this)
         val fileType = FileTypeManager.getInstance().getFileTypeByExtension("sql")
         document = EditorFactory.getInstance().createDocument("")
-        val editor = EditorFactory.getInstance().createEditor(document!!, project, fileType, false)
+        val editor = EditorFactory.getInstance().createEditor(document!!, project, fileType, true)
         val editorTextField = editor.component
         // to set the initial file, since the subscription is only set-up after
         // opening the panel (lazy) for the first time
