@@ -28,14 +28,13 @@ class CompiledSqlPanel(project: Project) : IdeaPanel, Disposable, ActiveFileList
     private val dbtCommandExecutorService = project.service<DbtCommandExecutorService>()
     private val mainPanel = JPanel(BorderLayout())
     private val recompileButton = JButton("Re-compile model")
-    private var document: Document? = null
+    private var document = EditorFactory.getInstance().createDocument("")
     private var activeFile: VirtualFile? = null
 
     init {
         project.messageBus.connect().subscribe(ActiveFileService.TOPIC, this)
         val fileType = FileTypeManager.getInstance().getFileTypeByExtension("sql")
-        document = EditorFactory.getInstance().createDocument("")
-        val editor = EditorFactory.getInstance().createEditor(document!!, project, fileType, true)
+        val editor = EditorFactory.getInstance().createEditor(document, project, fileType, true)
         val editorTextField = editor.component
         // to set the initial file, since the subscription is only set-up after
         // opening the panel (lazy) for the first time
@@ -100,13 +99,17 @@ class CompiledSqlPanel(project: Project) : IdeaPanel, Disposable, ActiveFileList
             file.refresh(false, false)
             SwingUtilities.invokeLater {
                 ApplicationManager.getApplication().runWriteAction {
-                    document?.setText(file.contentsToByteArray().toString(Charsets.UTF_8))
+                    val fileContent = file.contentsToByteArray().toString(Charsets.UTF_8)
+                    // On windows line separators are typically \r\n instead of \n
+                    // This can cause issues with the editor, so we normalize the line separators
+                    val normalizedContent = fileContent.replace("\r\n", "\n")
+                    document.setText(normalizedContent)
                 }
             }
         } else {
             SwingUtilities.invokeLater {
                 ApplicationManager.getApplication().runWriteAction {
-                    document?.setText("No compiled file found. Please compile the model first by clicking the 'Re-compile model' button.")
+                    document.setText("No compiled file found. Please compile the model first by clicking the 'Re-compile model' button.")
                 }
             }
         }
