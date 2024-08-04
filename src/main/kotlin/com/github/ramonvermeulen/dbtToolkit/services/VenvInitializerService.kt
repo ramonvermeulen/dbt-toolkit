@@ -3,6 +3,7 @@ package com.github.ramonvermeulen.dbtToolkit.services
 import com.intellij.execution.ui.ConsoleViewContentType
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
+import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.roots.ProjectRootManager
@@ -26,34 +27,36 @@ class VenvInitializerService(private var project: Project) {
     }
 
     fun initializeEnvironment() {
-        val venvExecutablePath = getPythonVenvExecutablePath(project)
-        if (venvExecutablePath == null) {
+        DumbService.getInstance(project).runWhenSmart {
+            val venvExecutablePath = getPythonVenvExecutablePath(project)
+            if (venvExecutablePath == null) {
+                loggingService.log(
+                    "Python virtual environment not detected. Attempting to use a global dbt installation.\n\n",
+                    ConsoleViewContentType.ERROR_OUTPUT,
+                )
+                isInitialized = true
+                return@runWhenSmart
+            }
+
+            loggingService.log("Detected Python virtual environment at: $venvExecutablePath\n", ConsoleViewContentType.NORMAL_OUTPUT)
+            val dbtPath = getDbtPath(venvExecutablePath.parent)
+
+            if (!Files.exists(dbtPath)) {
+                loggingService.log(
+                    "dbt installation not found within the virtual environment. Please install dbt and restart your IDE.\n\n",
+                    ConsoleViewContentType.ERROR_OUTPUT,
+                )
+                isInitialized = true
+                return@runWhenSmart
+            }
+
+            venvDbtExecutablePath = dbtPath.toString()
             loggingService.log(
-                "Python virtual environment not detected. Attempting to use a global dbt installation.\n\n",
-                ConsoleViewContentType.ERROR_OUTPUT,
+                "Located dbt installation within the virtual environment at: $venvDbtExecutablePath\n\n",
+                ConsoleViewContentType.NORMAL_OUTPUT,
             )
             isInitialized = true
-            return
         }
-
-        loggingService.log("Detected Python virtual environment at: $venvExecutablePath\n", ConsoleViewContentType.NORMAL_OUTPUT)
-        val dbtPath = getDbtPath(venvExecutablePath.parent)
-
-        if (!Files.exists(dbtPath)) {
-            loggingService.log(
-                "dbt installation not found within the virtual environment. Please install dbt and restart your IDE.\n\n",
-                ConsoleViewContentType.ERROR_OUTPUT,
-            )
-            isInitialized = true
-            return
-        }
-
-        venvDbtExecutablePath = dbtPath.toString()
-        loggingService.log(
-            "Located dbt installation within the virtual environment at: $venvDbtExecutablePath\n\n",
-            ConsoleViewContentType.NORMAL_OUTPUT,
-        )
-        isInitialized = true
     }
 
     private fun getPythonVenvExecutablePath(project: Project): Path? {
