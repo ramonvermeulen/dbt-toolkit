@@ -64,9 +64,9 @@ class CompiledSqlPanel(project: Project) : IdeaPanel, Disposable, ActiveFileList
                     dbtCommandExecutorService.executeCommand(
                         listOf("compile", "--no-populate-cache", "--select", activeFile!!.nameWithoutExtension),
                     )
-                    activeFileChanged(activeFile)
                 }
             } finally {
+                activeFileChanged(activeFile)
                 SwingUtilities.invokeLater {
                     recompileButton.isEnabled = true
                     recompileButton.text = "Re-compile model"
@@ -76,16 +76,22 @@ class CompiledSqlPanel(project: Project) : IdeaPanel, Disposable, ActiveFileList
     }
 
     override fun activeFileChanged(file: VirtualFile?) {
-        activeFile = file
-        val compiledFile = findCompiledFile(file)
-        displayCompiledFile(compiledFile)
+        if (file != null && file.extension == "sql") {
+            activeFile = file
+            val compiledFile = findCompiledFile(file)
+            displayCompiledFile(compiledFile)
+        }
     }
 
-    private fun findCompiledFile(file: VirtualFile?): VirtualFile? {
-        val dbtProjectRoot = Paths.get(settings.state.dbtProjectsDir).parent
-        val relativePathFromDbtProjectsRoot = file?.path?.let { Paths.get(it) }?.let { dbtProjectRoot.relativize(it) }
-        val targetPath = Paths.get(settings.state.dbtTargetDir, "compiled", relativePathFromDbtProjectsRoot.toString())
-        return VirtualFileManager.getInstance().findFileByUrl(targetPath.toUri().toString())
+    private fun findCompiledFile(file: VirtualFile): VirtualFile? {
+        return file.let { nonNullFile ->
+            settings.state.dbtModelPaths.map { Regex("${it}.*").find(nonNullFile.path)?.value }
+                .firstOrNull { it != null }
+                ?.let { relativePath ->
+                    val targetPath = Paths.get(settings.state.dbtTargetDir, "compiled", settings.state.dbtProjectName, relativePath)
+                    VirtualFileManager.getInstance().refreshAndFindFileByUrl(targetPath.toUri().toString())
+                }
+        }
     }
 
     private fun displayCompiledFile(file: VirtualFile?) {
@@ -95,6 +101,12 @@ class CompiledSqlPanel(project: Project) : IdeaPanel, Disposable, ActiveFileList
             SwingUtilities.invokeLater {
                 ApplicationManager.getApplication().runWriteAction {
                     document?.setText(file.contentsToByteArray().toString(Charsets.UTF_8))
+                }
+            }
+        } else {
+            SwingUtilities.invokeLater {
+                ApplicationManager.getApplication().runWriteAction {
+                    document?.setText("No compiled file found. Please compile the model first by clicking the 'Re-compile model' button.")
                 }
             }
         }
