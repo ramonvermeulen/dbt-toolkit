@@ -17,7 +17,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
 import java.awt.BorderLayout
-import java.io.File
+import java.nio.file.Paths
 import javax.swing.JButton
 import javax.swing.JComponent
 import javax.swing.JPanel
@@ -35,7 +35,7 @@ class CompiledSqlPanel(project: Project) : IdeaPanel, Disposable, ActiveFileList
         project.messageBus.connect().subscribe(ActiveFileService.TOPIC, this)
         val fileType = FileTypeManager.getInstance().getFileTypeByExtension("sql")
         document = EditorFactory.getInstance().createDocument("")
-        val editor = EditorFactory.getInstance().createEditor(document!!, project, fileType, false)
+        val editor = EditorFactory.getInstance().createEditor(document!!, project, fileType, true)
         val editorTextField = editor.component
         // to set the initial file, since the subscription is only set-up after
         // opening the panel (lazy) for the first time
@@ -82,9 +82,10 @@ class CompiledSqlPanel(project: Project) : IdeaPanel, Disposable, ActiveFileList
     }
 
     private fun findCompiledFile(file: VirtualFile?): VirtualFile? {
-        val relativePathFromDbtProjectRoot = file?.path?.replace(File(settings.state.dbtProjectsDir).parentFile.path, "")
-        val targetPath = "${settings.state.dbtTargetDir}/compiled$relativePathFromDbtProjectRoot"
-        return VirtualFileManager.getInstance().findFileByUrl("file://$targetPath")
+        val dbtProjectRoot = Paths.get(settings.state.dbtProjectsDir).parent
+        val relativePathFromDbtProjectsRoot = file?.path?.let { Paths.get(it) }?.let { dbtProjectRoot.relativize(it) }
+        val targetPath = Paths.get(settings.state.dbtTargetDir, "compiled", relativePathFromDbtProjectsRoot.toString())
+        return VirtualFileManager.getInstance().findFileByUrl(targetPath.toUri().toString())
     }
 
     private fun displayCompiledFile(file: VirtualFile?) {
