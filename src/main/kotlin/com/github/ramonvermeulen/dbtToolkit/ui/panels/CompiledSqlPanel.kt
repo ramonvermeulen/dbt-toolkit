@@ -8,7 +8,6 @@ import com.github.ramonvermeulen.dbtToolkit.ui.IdeaPanel
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.service
-import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileEditorManager
@@ -84,7 +83,7 @@ class CompiledSqlPanel(project: Project) : IdeaPanel, Disposable, ActiveFileList
 
     private fun findCompiledFile(file: VirtualFile): VirtualFile? {
         return file.let { nonNullFile ->
-            settings.state.dbtModelPaths.map { Regex("${it}.*").find(nonNullFile.path)?.value }
+            settings.state.dbtModelPaths.map { Regex("$it.*").find(nonNullFile.path)?.value }
                 .firstOrNull { it != null }
                 ?.let { relativePath ->
                     val targetPath = Paths.get(settings.state.dbtTargetDir, "compiled", settings.state.dbtProjectName, relativePath)

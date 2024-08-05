@@ -3,7 +3,6 @@ package com.github.ramonvermeulen.dbtToolkit.services
 import com.intellij.execution.ui.ConsoleViewContentType
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
-import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.roots.ProjectRootManager
