@@ -83,3 +83,21 @@ body,
 .react-flow__handle {
   visibility: hidden;
 }
+
+.ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100px;
+}
+
+.react-flow__node-default:hover {
+  .ellipsis {
+    overflow: visible;
+    max-width: none;
+  }
+}
+
+.react-flow__node-default.width-auto:hover {
+  width: auto;
+}
