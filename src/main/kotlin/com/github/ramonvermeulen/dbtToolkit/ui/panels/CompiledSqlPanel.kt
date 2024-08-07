@@ -78,6 +78,18 @@ class CompiledSqlPanel(project: Project) : IdeaPanel, Disposable, ActiveFileList
             activeFile = file
             val compiledFile = findCompiledFile(file)
             displayCompiledFile(compiledFile)
+            SwingUtilities.invokeLater {
+                recompileButton.isEnabled = true
+                recompileButton.text = "Re-compile model"
+            }
+        } else {
+            SwingUtilities.invokeLater {
+                recompileButton.isEnabled = false
+                recompileButton.text = "Open a SQL file"
+                ApplicationManager.getApplication().runWriteAction {
+                    document.setText("")
+                }
+            }
         }
     }
 

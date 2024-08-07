@@ -29,9 +29,9 @@ class DbtCommandExecutorService(private var project: Project) {
     }
 
     @Synchronized
-    fun executeCommand(command: List<String>): String {
+    fun executeCommand(command: List<String>): Pair<Int, String> {
         val latch = CountDownLatch(1)
-        var output = ""
+        var output: Pair<Int, String> = Pair(-1, "")
         showLoadingIndicator("Executing dbt ${command.joinToString(" ")}...") {
             try {
                 if (!venvInitializerService.isInitialized) {

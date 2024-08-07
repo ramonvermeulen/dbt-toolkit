@@ -10,13 +10,7 @@ import com.intellij.openapi.vfs.VirtualFile
 class DbtToolkitFileListener(project: Project) : FileEditorManagerListener {
     private val activeFileService = project.service<ActiveFileService>()
 
-    companion object {
-        val SUPPORTED_EXTENSIONS = setOf("sql", "csv")
-    }
-
     override fun selectionChanged(event: FileEditorManagerEvent) {
-        if (SUPPORTED_EXTENSIONS.contains(event.newFile?.extension)) {
-            activeFileService.setActiveFile(event.newFile as VirtualFile)
-        }
+        activeFileService.setActiveFile(event.newFile as VirtualFile)
     }
 }

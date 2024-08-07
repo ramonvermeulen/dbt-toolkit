@@ -3,7 +3,6 @@ package com.github.ramonvermeulen.dbtToolkit.ui.panels
 import com.github.ramonvermeulen.dbtToolkit.services.ActiveFileListener
 import com.github.ramonvermeulen.dbtToolkit.services.ActiveFileService
 import com.github.ramonvermeulen.dbtToolkit.services.DbtCommandExecutorService
-import com.github.ramonvermeulen.dbtToolkit.services.DbtToolkitSettingsService
 import com.github.ramonvermeulen.dbtToolkit.ui.IdeaPanel
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
@@ -14,16 +13,13 @@ import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileTypes.FileTypeManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.openapi.vfs.VirtualFileManager
 import java.awt.BorderLayout
-import java.nio.file.Paths
 import javax.swing.JButton
 import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.SwingUtilities
 
-class PreviewDataPanel(private val project: Project): IdeaPanel, Disposable, ActiveFileListener {
-    private val settings = project.service<DbtToolkitSettingsService>()
+class PreviewDataPanel(private val project: Project) : IdeaPanel, Disposable, ActiveFileListener {
     private val dbtCommandExecutorService = project.service<DbtCommandExecutorService>()
     private val mainPanel = JPanel(BorderLayout())
     private val previewDataButton = JButton("Preview Data")
@@ -69,20 +65,46 @@ class PreviewDataPanel(private val project: Project): IdeaPanel, Disposable, Act
     override fun activeFileChanged(file: VirtualFile?) {
         if (file != null && file.extension == "sql") {
             activeFile = file
+            SwingUtilities.invokeLater {
+                previewDataButton.isEnabled = true
+                previewDataButton.text = "Preview Data"
+            }
+        } else {
+            SwingUtilities.invokeLater {
+                previewDataButton.isEnabled = false
+                previewDataButton.text = "Open a SQL file"
+                ApplicationManager.getApplication().runWriteAction {
+                    document.setText("")
+                }
+            }
         }
     }
 
     private fun previewData() {
         ApplicationManager.getApplication().executeOnPooledThread {
-            val output = dbtCommandExecutorService.executeCommand(
-                listOf("show", "--no-populate-cache", "--select", activeFile!!.nameWithoutExtension, "--limit", "10")
-            )
-            val data = output.split("\n").takeLast(16).joinToString("\n")
-            SwingUtilities.invokeLater {
-                ApplicationManager.getApplication().runWriteAction {
-                    document.setText(data)
-                    previewDataButton.isEnabled = true
-                    previewDataButton.text = "Preview Data"
+            val output =
+                dbtCommandExecutorService.executeCommand(
+                    listOf("show", "--no-populate-cache", "--select", activeFile!!.nameWithoutExtension, "--limit", "10"),
+                )
+            if (output.first == 0) {
+                val data = output.second.split("\n").takeLast(16).joinToString("\n").trimEnd()
+                SwingUtilities.invokeLater {
+                    ApplicationManager.getApplication().runWriteAction {
+                        document.setText(data)
+                        previewDataButton.isEnabled = true
+                        previewDataButton.text = "Preview Data"
+                    }
+                }
+            } else {
+                SwingUtilities.invokeLater {
+                    ApplicationManager.getApplication().runWriteAction {
+                        document.setText(
+                            "Error occured during execution of \"dbt show\" command. " +
+                                "Please check the logs in the console tab.",
+                        )
+                        previewDataButton.isEnabled = true
+                        previewDataButton.text = "Preview Data"
+                    }
                 }
             }
         }
@@ -94,4 +116,5 @@ class PreviewDataPanel(private val project: Project): IdeaPanel, Disposable, Act
 
     override fun dispose() {
         // Implement your dispose logic here
-    }}
+    }
+}
