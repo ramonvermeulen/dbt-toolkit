@@ -11,6 +11,8 @@ class DbtToolkitFileListener(project: Project) : FileEditorManagerListener {
     private val activeFileService = project.service<ActiveFileService>()
 
     override fun selectionChanged(event: FileEditorManagerEvent) {
-        activeFileService.setActiveFile(event.newFile as VirtualFile)
+        if (event.newFile != null) {
+            activeFileService.setActiveFile(event.newFile as VirtualFile)
+        }
     }
 }
