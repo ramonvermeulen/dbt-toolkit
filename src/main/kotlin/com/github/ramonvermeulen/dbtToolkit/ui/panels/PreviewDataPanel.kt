@@ -19,7 +19,7 @@ import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.SwingUtilities
 
-class PreviewDataPanel(private val project: Project) : IdeaPanel, Disposable, ActiveFileListener {
+class PreviewDataPanel(project: Project) : IdeaPanel, Disposable, ActiveFileListener {
     private val dbtCommandExecutorService = project.service<DbtCommandExecutorService>()
     private val mainPanel = JPanel(BorderLayout())
     private val previewDataButton = JButton("Preview Data")

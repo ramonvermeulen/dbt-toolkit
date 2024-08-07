@@ -36,7 +36,7 @@ class DbtToolkitMainToolWindow : ToolWindowFactory, DumbAware {
                 "lineage" to PanelInfo({ LineagePanel(project) }, false),
                 "docs" to PanelInfo({ DocsPanel(project) }, true),
                 "compiled sql" to PanelInfo({ CompiledSqlPanel(project) }, true),
-                "preview model" to PanelInfo({ PreviewDataPanel(project) }, true),
+                "preview data" to PanelInfo({ PreviewDataPanel(project) }, true),
                 "console (read-only)" to PanelInfo({ ConsoleOutputPanel(project) }, false),
             )
 
