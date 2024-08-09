@@ -4,6 +4,24 @@
 
 ## [Unreleased]
 
+## [0.0.5-alpha] - 2024-08-09
+
+- Changelog update - `v0.04-alpha` by @github-actions in https://github.com/ramonvermeulen/dbt-toolkit/pull/56
+- Bump react and @types/react in /lineage-panel by @dependabot in https://github.com/ramonvermeulen/dbt-toolkit/pull/62
+- Bump eslint-plugin-react-hooks from 4.6.0 to 4.6.2 in /lineage-panel by @dependabot in https://github.com/ramonvermeulen/dbt-toolkit/pull/59
+- Bump gradle/actions from 3 to 4 by @dependabot in https://github.com/ramonvermeulen/dbt-toolkit/pull/58
+- Upgraded npm dependencies for eslint plugin by @ramonvermeulen in https://github.com/ramonvermeulen/dbt-toolkit/pull/57
+- Bump @types/node from 20.12.12 to 22.1.0 in /lineage-panel by @dependabot in https://github.com/ramonvermeulen/dbt-toolkit/pull/61
+- Bump @typescript-eslint/parser from 6.20.0 to 8.0.1 in /lineage-panel by @dependabot in https://github.com/ramonvermeulen/dbt-toolkit/pull/63
+- Bump org.jetbrains.kotlin.jvm from 2.0.0 to 2.0.10 by @dependabot in https://github.com/ramonvermeulen/dbt-toolkit/pull/66
+- Bump @typescript-eslint/eslint-plugin from 8.0.0 to 8.0.1 in /lineage-panel by @dependabot in https://github.com/ramonvermeulen/dbt-toolkit/pull/65
+- Resolve issue with fixed width for nodes by @ramonvermeulen in https://github.com/ramonvermeulen/dbt-toolkit/pull/68
+- Bump react-dom and @types/react-dom in /lineage-panel by @dependabot in https://github.com/ramonvermeulen/dbt-toolkit/pull/64
+- Bump org.jetbrains.qodana from 2024.1.5 to 2024.1.9 by @dependabot in https://github.com/ramonvermeulen/dbt-toolkit/pull/69
+- Bump vite from 5.3.5 to 5.4.0 in /lineage-panel by @dependabot in https://github.com/ramonvermeulen/dbt-toolkit/pull/71
+- Bump JetBrains/qodana-action from 2024.1.8 to 2024.1.9 by @dependabot in https://github.com/ramonvermeulen/dbt-toolkit/pull/70
+- Preview Data panel implementation by @ramonvermeulen in https://github.com/ramonvermeulen/dbt-toolkit/pull/67
+
 ## [0.0.4-alpha] - 2024-08-04
 
 - Bump vite from 5.3.1 to 5.3.5 in /lineage-panel by @dependabot in https://github.com/ramonvermeulen/dbt-toolkit/pull/49
@@ -35,7 +53,8 @@
 - **Lineage Rendering**: Visualize the dependencies and relationships between your dbt models directly in your IDE. This feature aids in understanding the impact of changes and the flow of data in your project. Additionally, it provides a quicker way to navigate through your dbt project.  
 - **dbt Documentation**: Access your dbt documentation within your IDE, eliminating the need to switch between different tools and platforms. This feature promotes a more efficient workflow and keeps essential information at your fingertips.
 
-[Unreleased]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.0.4-alpha...HEAD
+[Unreleased]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.0.5-alpha...HEAD
+[0.0.5-alpha]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.0.4-alpha...v0.0.5-alpha
 [0.0.4-alpha]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.0.3-alpha...v0.0.4-alpha
 [0.0.3-alpha]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.0.2-alpha...v0.0.3-alpha
 [0.0.2-alpha]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.0.1-alpha...v0.0.2-alpha
