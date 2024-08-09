@@ -27,12 +27,12 @@ quicker way to navigate through your dbt project.
 tools and platforms. This feature supports a more efficient workflow and keeps essential information at your fingertips.
 * **Preview compiled SQL**: Preview the compiled SQL of a dbt model quickly in your IDE, and recompile a single model on
   the fly.
+* **Preview data**: Preview the output data of a dbt model directly in your IDE.
 
 ## Upcoming Features
 *These are features I am planning to implement in the future, however this list might change overtime*
 * **Full Jinja support in SQL files**: Highlight Jinja syntax in SQL files and navigate through files by clicking
 through `{{ ref() }}` and `{{ source() }}` tags.
-* **Preview data**: Preview the output data of a dbt model directly in your IDE.
 * **... More**: I am open to suggestions and feedback, so feel free to reach out to me with your ideas!
 
 <!-- Plugin description end -->
