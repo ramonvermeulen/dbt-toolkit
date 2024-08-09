@@ -102,7 +102,7 @@ export default function Flow() {
                 edgesFocusable={false}
             >
                 <Background color="#E9E3E6"/>
-                <MiniMap/>
+                <MiniMap pannable={true}/>
                 <Controls>
                     <ControlButton onClick={onRefreshClick}>
                         <MdRefresh size={15} />
