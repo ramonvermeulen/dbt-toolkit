@@ -5,6 +5,7 @@ import com.github.ramonvermeulen.dbtToolkit.ui.console.ConsoleOutputPanel
 import com.github.ramonvermeulen.dbtToolkit.ui.panels.CompiledSqlPanel
 import com.github.ramonvermeulen.dbtToolkit.ui.panels.DocsPanel
 import com.github.ramonvermeulen.dbtToolkit.ui.panels.LineagePanel
+import com.github.ramonvermeulen.dbtToolkit.ui.panels.PreviewDataPanel
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
@@ -35,6 +36,7 @@ class DbtToolkitMainToolWindow : ToolWindowFactory, DumbAware {
                 "lineage" to PanelInfo({ LineagePanel(project) }, false),
                 "docs" to PanelInfo({ DocsPanel(project) }, true),
                 "compiled sql" to PanelInfo({ CompiledSqlPanel(project) }, true),
+                "preview data" to PanelInfo({ PreviewDataPanel(project) }, true),
                 "console (read-only)" to PanelInfo({ ConsoleOutputPanel(project) }, false),
             )
 

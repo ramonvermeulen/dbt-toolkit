@@ -3,6 +3,7 @@ package com.github.ramonvermeulen.dbtToolkit
 import com.intellij.openapi.util.Key
 
 val JS_TRIGGERED_KEY: Key<Boolean> = Key.create("JS_TRIGGERED_KEY")
+val SUPPORTED_LINEAGE_EXTENSIONS = setOf("sql", "csv")
 const val DBT_DOCS_FILE = "index.html"
 const val DBT_MANIFEST_FILE = "manifest.json"
 const val DBT_CATALOG_FILE = "catalog.json"

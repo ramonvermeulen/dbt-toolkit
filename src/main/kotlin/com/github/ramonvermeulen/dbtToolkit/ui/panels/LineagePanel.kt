@@ -5,6 +5,7 @@ import com.github.ramonvermeulen.dbtToolkit.LINEAGE_PANEL_APP_DIR_NAME
 import com.github.ramonvermeulen.dbtToolkit.LINEAGE_PANEL_CSS
 import com.github.ramonvermeulen.dbtToolkit.LINEAGE_PANEL_INDEX
 import com.github.ramonvermeulen.dbtToolkit.LINEAGE_PANEL_JS
+import com.github.ramonvermeulen.dbtToolkit.SUPPORTED_LINEAGE_EXTENSIONS
 import com.github.ramonvermeulen.dbtToolkit.models.LineageInfo
 import com.github.ramonvermeulen.dbtToolkit.models.toJson
 import com.github.ramonvermeulen.dbtToolkit.services.ActiveFileListener
@@ -161,7 +162,7 @@ class LineagePanel(private val project: Project) :
     // subscribers
     override fun activeFileChanged(file: VirtualFile?) {
         ApplicationManager.getApplication().executeOnPooledThread {
-            if (file != null) {
+            if (file != null && SUPPORTED_LINEAGE_EXTENSIONS.contains(file.extension)) {
                 activeFile = file
                 refreshLineageInfo(file, false)
             }

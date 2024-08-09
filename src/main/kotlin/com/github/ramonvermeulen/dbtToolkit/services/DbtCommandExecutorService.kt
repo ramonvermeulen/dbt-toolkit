@@ -29,21 +29,21 @@ class DbtCommandExecutorService(private var project: Project) {
     }
 
     @Synchronized
-    fun executeCommand(command: List<String>) {
+    fun executeCommand(command: List<String>): Pair<Int, String> {
         val latch = CountDownLatch(1)
-
+        var output: Pair<Int, String> = Pair(-1, "")
         showLoadingIndicator("Executing dbt ${command.joinToString(" ")}...") {
             try {
                 if (!venvInitializerService.isInitialized) {
                     venvInitializerService.initializeEnvironment()
                 }
                 val process = processExecutorService.executeCommand(command)
-                outputHandler.handleOutput(process)
+                output = outputHandler.handleOutput(process)
             } finally {
                 latch.countDown()
             }
         }
-
         latch.await()
+        return output
     }
 }

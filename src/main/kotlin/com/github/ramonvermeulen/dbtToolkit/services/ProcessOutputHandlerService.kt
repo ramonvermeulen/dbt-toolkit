@@ -14,7 +14,7 @@ class ProcessOutputHandlerService(project: Project) {
     private val loggingService = project.service<LoggingService>()
     private val notificationService = project.service<NotificationService>()
 
-    fun handleOutput(process: Process) {
+    fun handleOutput(process: Process): Pair<Int, String> {
         val exitCode =
             if (process.waitFor(settings.state.settingsDbtCommandTimeout, TimeUnit.SECONDS)) {
                 process.exitValue()
@@ -41,5 +41,6 @@ class ProcessOutputHandlerService(project: Project) {
         } else {
             loggingService.log(stdout, ConsoleViewContentType.NORMAL_OUTPUT)
         }
+        return Pair(exitCode, output)
     }
 }
