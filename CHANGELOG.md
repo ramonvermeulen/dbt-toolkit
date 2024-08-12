@@ -4,6 +4,13 @@
 
 ## [Unreleased]
 
+## [0.1.0] - 2024-08-12
+
+- First public release of the plugin
+- Changelog update - `v0.05-alpha` by @github-actions in https://github.com/ramonvermeulen/dbt-toolkit/pull/72
+- Bump @types/node from 22.1.0 to 22.2.0 in /lineage-panel by @dependabot in https://github.com/ramonvermeulen/dbt-toolkit/pull/75
+- make react-flow minimap pannable by @ramonvermeulen in https://github.com/ramonvermeulen/dbt-toolkit/pull/74
+
 ## [0.0.5-alpha] - 2024-08-09
 
 - Changelog update - `v0.04-alpha` by @github-actions in https://github.com/ramonvermeulen/dbt-toolkit/pull/56
@@ -53,7 +60,8 @@
 - **Lineage Rendering**: Visualize the dependencies and relationships between your dbt models directly in your IDE. This feature aids in understanding the impact of changes and the flow of data in your project. Additionally, it provides a quicker way to navigate through your dbt project.  
 - **dbt Documentation**: Access your dbt documentation within your IDE, eliminating the need to switch between different tools and platforms. This feature promotes a more efficient workflow and keeps essential information at your fingertips.
 
-[Unreleased]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.0.5-alpha...HEAD
+[Unreleased]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.0.5-alpha...v0.1.0
 [0.0.5-alpha]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.0.4-alpha...v0.0.5-alpha
 [0.0.4-alpha]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.0.3-alpha...v0.0.4-alpha
 [0.0.3-alpha]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.0.2-alpha...v0.0.3-alpha
