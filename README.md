@@ -40,7 +40,7 @@ through `{{ ref() }}` and `{{ source() }}` tags.
 * For IntelliJ users, it is required to have the [**Python**](https://plugins.jetbrains.com/plugin/631-python) plugin installed so that you can configure a venv.
 * I also recommended to have a venv configured and [**dbt-core**](https://pypi.org/project/dbt-core/) with your required adapter installed within the venv: <br>
 `File` > `Project Structure` > `SDK` > `Select Python` > `Select New Virtual Environment`. If not it is required to have dbt-core globally installed.
-* Supported/Tested dbt versions as of now are: >=1.7.0
+* Supported/Tested dbt versions are: >=1.7.0
 
 If there is a venv configured within the IDE, the plugin will automatically try to use the dbt executable from the venv. 
 If there is no venv configured the plugin will use the globally installed dbt version.
