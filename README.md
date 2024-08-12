@@ -35,11 +35,12 @@ tools and platforms. This feature supports a more efficient workflow and keeps e
 through `{{ ref() }}` and `{{ source() }}` tags.
 * **... More**: I am open to suggestions and feedback, so feel free to reach out to me with your ideas!
 
-<!-- Plugin description end -->
+
 ## Prerequisites
-* For IntelliJ users, I recommend to have the [**Python**](https://plugins.jetbrains.com/plugin/631-python) plugin installed so that you can configure a venv.
-* I also recommend to have a venv configured and [**dbt-core**](https://pypi.org/project/dbt-core/) installed within the venv: <br>
-`File` > `Project Structure` > `SDK` > `Select Python` > `Select New Virtual Environment`
+* For IntelliJ users, it is required to have the [**Python**](https://plugins.jetbrains.com/plugin/631-python) plugin installed so that you can configure a venv.
+* I also recommended to have a venv configured and [**dbt-core**](https://pypi.org/project/dbt-core/) with your required adapter installed within the venv: <br>
+`File` > `Project Structure` > `SDK` > `Select Python` > `Select New Virtual Environment`. If not it is required to have dbt-core globally installed.
+* Supported/Tested dbt versions as of now are: >=1.7.0
 
 If there is a venv configured within the IDE, the plugin will automatically try to use the dbt executable from the venv. 
 If there is no venv configured the plugin will use the globally installed dbt version.
@@ -47,6 +48,7 @@ If there is no venv configured the plugin will use the globally installed dbt ve
 ## Installation
 You can download dbtToolkit from the JetBrains plugin marketplace. For more information on how to install JetBrains plugins, 
 please refer to the [**official documentation**](https://www.jetbrains.com/help/idea/managing-plugins.html).
+<!-- Plugin description end -->
 
 ## Feedback and Contributions
 I highly appreciate any feedback and contributions as I am developing and improving dbtToolkit. 
