@@ -48,6 +48,10 @@ If there is no venv configured the plugin will use the globally installed dbt ve
 ## Installation
 You can download dbtToolkit from the JetBrains plugin marketplace. For more information on how to install JetBrains plugins, 
 please refer to the [**official documentation**](https://www.jetbrains.com/help/idea/managing-plugins.html).
+
+## Setting environment variables
+If your dbt project requires environment variables (e.g. `DBT_SOME_ENV_VAR`), please set them via the plugin settings.
+`File` > `Settings` > `dbtToolkit` > `Environment Variables`
 <!-- Plugin description end -->
 
 ## Feedback and Contributions
