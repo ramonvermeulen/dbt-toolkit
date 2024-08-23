@@ -8,7 +8,7 @@ import {
     ReactFlow,
     addEdge,
     useEdgesState,
-    useNodesState,
+    useNodesState, NodeTypes,
 } from '@xyflow/react';
 import { type MouseEvent as ReactMouseEvent, useCallback, useEffect } from 'react';
 import { MdRefresh } from 'react-icons/md';
@@ -32,8 +32,8 @@ declare global {
 }
 
 const nodeTypes = {
-    dbtModel: DbtModelNode
-};
+    'dbtModel': DbtModelNode,
+} satisfies NodeTypes;
 
 export default function Flow() {
     const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
