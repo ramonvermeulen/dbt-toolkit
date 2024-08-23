@@ -1,4 +1,6 @@
 
+import { Handle, Position, XYPosition } from '@xyflow/react';
+import type { NodeProps } from '@xyflow/react';
 import { useEffect, useRef, useState } from 'react';
 import { FaChartArea } from 'react-icons/fa';
 import { FaRegNoteSticky } from 'react-icons/fa6';
@@ -7,13 +9,18 @@ import { MdQueryStats } from 'react-icons/md';
 import { PiCubeDuotone } from 'react-icons/pi';
 import { RiSeedlingLine } from 'react-icons/ri';
 import { TbBoxModel } from 'react-icons/tb';
-import { Handle, Position } from 'reactflow';
-import type { NodeProps } from 'reactflow';
 
 
 export type PositionLoggerNodeData = {
+    id: string;
+    position: XYPosition;
     isSelected?: boolean;
     label?: string;
+    data: {
+        label: string;
+        isSelected?: boolean;
+    }
+
 };
 
 export function DbtModelNode({

@@ -1,16 +1,17 @@
-import { type MouseEvent as ReactMouseEvent, useCallback, useEffect } from 'react';
-import { MdRefresh } from 'react-icons/md';
 import {
     Background,
     ControlButton,
     Controls,
     MiniMap,
     Node,
+    Edge,
     ReactFlow,
     addEdge,
     useEdgesState,
     useNodesState,
-} from 'reactflow';
+} from '@xyflow/react';
+import { type MouseEvent as ReactMouseEvent, useCallback, useEffect } from 'react';
+import { MdRefresh } from 'react-icons/md';
 
 import { isDevMode } from './constants.ts';
 import { edgeTypes } from './edges';
@@ -18,12 +19,12 @@ import { useLineageLayout } from './hooks/useLineageLayout.ts';
 import { DbtModelNode } from './nodes/DbtModelNode.tsx';
 import { LineageInfo } from './types.ts';
 
-import 'reactflow/dist/style.css';
+
 
 declare global {
     interface Window {
         // javascript -> kotlin bridge functions (set by the kotlin code)
-        kotlinCallback: (value: string) => void;
+        kotlinCallback: (value: unknown) => void;
         // kotlin -> javascript bridge functions (set by the JavaScript code)
         setLineageInfo?: (info: LineageInfo) => void;
         setActiveNode?: (nodeId: string) => void;
@@ -35,8 +36,8 @@ const nodeTypes = {
 };
 
 export default function Flow() {
-    const [nodes, setNodes, onNodesChange] = useNodesState([]);
-    const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+    const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
+    const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
     const { setLineageInfo } = useLineageLayout({ setNodes, setEdges, addEdge });
 
     const setActiveNode = useCallback((nodeId: string) => {
@@ -83,6 +84,9 @@ export default function Flow() {
         };
     });
 
+    /*
+     @ts-expect-error - this is a known issue with the types
+    */
     return (
         <ReactFlow
                 nodes={nodes}
@@ -102,7 +106,7 @@ export default function Flow() {
                 edgesFocusable={false}
             >
                 <Background color="#E9E3E6"/>
-                <MiniMap pannable={true}/>
+                <MiniMap pannable={true} zoomable={true} inversePan={false} zoomStep={1} offsetScale={1}/>
                 <Controls>
                     <ControlButton onClick={onRefreshClick}>
                         <MdRefresh size={15} />

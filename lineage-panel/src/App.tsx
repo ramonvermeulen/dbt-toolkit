@@ -1,5 +1,5 @@
-import 'reactflow/dist/style.css';
-import { ReactFlowProvider } from 'reactflow';
+import '@xyflow/react/dist/style.css';
+import { ReactFlowProvider } from '@xyflow/react';
 
 import Flow from './Flow.tsx';
 
