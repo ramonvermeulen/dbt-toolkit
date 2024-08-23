@@ -112,7 +112,7 @@ export default function Flow() {
                     inversePan={false}
                     zoomStep={1}
                     offsetScale={1}
-                    nodeColor={"#CECECE"}
+                    nodeColor={'#CECECE'}
                 />
                 <Controls>
                     <ControlButton onClick={onRefreshClick}>
