@@ -1,6 +1,6 @@
+import { Edge, Node, Position, MarkerType, Connection, useReactFlow } from '@xyflow/react';
 import dagre from 'dagre';
 import { Dispatch, SetStateAction, useCallback, useMemo } from 'react';
-import { Edge, Node, Position, MarkerType, Connection, useReactFlow } from 'reactflow';
 
 import { LineageInfo } from '../types';
 import { DEdge, DNode } from '../types.ts';
