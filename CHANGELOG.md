@@ -4,6 +4,27 @@
 
 ## [Unreleased]
 
+## [0.1.1] - 2024-08-23
+
+- Changelog update - `v0.1.0` by @github-actions in https://github.com/ramonvermeulen/dbt-toolkit/pull/76
+- Bump @typescript-eslint/parser from 8.0.1 to 8.1.0 in /lineage-panel by @dependabot in https://github.com/ramonvermeulen/dbt-toolkit/pull/79
+- Bump @typescript-eslint/eslint-plugin from 8.0.1 to 8.1.0 in /lineage-panel by @dependabot in https://github.com/ramonvermeulen/dbt-toolkit/pull/77
+- Bump react-icons from 5.2.1 to 5.3.0 in /lineage-panel by @dependabot in https://github.com/ramonvermeulen/dbt-toolkit/pull/80
+- Bump @types/node from 22.2.0 to 22.3.0 in /lineage-panel by @dependabot in https://github.com/ramonvermeulen/dbt-toolkit/pull/81
+- Bump vite from 5.4.0 to 5.4.1 in /lineage-panel by @dependabot in https://github.com/ramonvermeulen/dbt-toolkit/pull/82
+- Bump @types/node from 22.3.0 to 22.4.0 in /lineage-panel by @dependabot in https://github.com/ramonvermeulen/dbt-toolkit/pull/83
+- Bump @typescript-eslint/parser from 8.1.0 to 8.2.0 in /lineage-panel by @dependabot in https://github.com/ramonvermeulen/dbt-toolkit/pull/86
+- Bump @types/node from 22.4.0 to 22.4.1 in /lineage-panel by @dependabot in https://github.com/ramonvermeulen/dbt-toolkit/pull/85
+- Bump @typescript-eslint/eslint-plugin from 8.1.0 to 8.2.0 in /lineage-panel by @dependabot in https://github.com/ramonvermeulen/dbt-toolkit/pull/84
+- Bump vite from 5.4.1 to 5.4.2 in /lineage-panel by @dependabot in https://github.com/ramonvermeulen/dbt-toolkit/pull/87
+- Bump eslint-plugin-react-refresh from 0.4.9 to 0.4.10 in /lineage-panel by @dependabot in https://github.com/ramonvermeulen/dbt-toolkit/pull/88
+- Bump @types/node from 22.4.1 to 22.5.0 in /lineage-panel by @dependabot in https://github.com/ramonvermeulen/dbt-toolkit/pull/89
+- Bump @types/react from 18.3.3 to 18.3.4 in /lineage-panel by @dependabot in https://github.com/ramonvermeulen/dbt-toolkit/pull/90
+- Bump org.jetbrains.kotlin.jvm from 2.0.10 to 2.0.20 by @dependabot in https://github.com/ramonvermeulen/dbt-toolkit/pull/91
+- Bump eslint-plugin-react-refresh from 0.4.10 to 0.4.11 in /lineage-panel by @dependabot in https://github.com/ramonvermeulen/dbt-toolkit/pull/92
+- change reactflow to @xyflow/react package + fix panning/zoom issues by @ramonvermeulen in https://github.com/ramonvermeulen/dbt-toolkit/pull/97
+- added functionality to auto-center when changing node by @ramonvermeulen in https://github.com/ramonvermeulen/dbt-toolkit/pull/98
+
 ## [0.1.0] - 2024-08-12
 
 - First public release of the plugin
@@ -60,7 +81,8 @@
 - **Lineage Rendering**: Visualize the dependencies and relationships between your dbt models directly in your IDE. This feature aids in understanding the impact of changes and the flow of data in your project. Additionally, it provides a quicker way to navigate through your dbt project.  
 - **dbt Documentation**: Access your dbt documentation within your IDE, eliminating the need to switch between different tools and platforms. This feature promotes a more efficient workflow and keeps essential information at your fingertips.
 
-[Unreleased]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.0.5-alpha...v0.1.0
 [0.0.5-alpha]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.0.4-alpha...v0.0.5-alpha
 [0.0.4-alpha]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.0.3-alpha...v0.0.4-alpha
