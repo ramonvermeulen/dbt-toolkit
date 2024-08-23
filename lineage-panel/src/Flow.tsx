@@ -8,7 +8,7 @@ import {
     ReactFlow,
     addEdge,
     useEdgesState,
-    useNodesState, NodeTypes,
+    useNodesState, NodeTypes, useReactFlow,
 } from '@xyflow/react';
 import { type MouseEvent as ReactMouseEvent, useCallback, useEffect } from 'react';
 import { MdRefresh } from 'react-icons/md';
@@ -38,9 +38,10 @@ const nodeTypes = {
 export default function Flow() {
     const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
+    const reactFlow = useReactFlow();
     const { setLineageInfo } = useLineageLayout({ setNodes, setEdges, addEdge });
 
-    const setActiveNode = useCallback((nodeId: string) => {
+    const setActiveNode = useCallback(async (nodeId: string) => {
         const newNodes = nodes.map(n => ({
             ...n,
             data: {
@@ -49,11 +50,15 @@ export default function Flow() {
             }
         }));
         setNodes(newNodes);
-    }, [nodes, setNodes]);
+        const newActiveNode = nodes.find(n => n.id === nodeId);
+        if (newActiveNode) {
+            await reactFlow.setCenter(newActiveNode.position.x, newActiveNode.position.y, { duration: 100, zoom: reactFlow.getZoom() });
+        }
+    }, [reactFlow, nodes, setNodes]);
 
 
-    function onNodeClick(_event: ReactMouseEvent, node: Node) : void {
-        setActiveNode(node.id);
+    async function onNodeClick(_event: ReactMouseEvent, node: Node) : Promise<void> {
+        await setActiveNode(node.id);
         if (isDevMode) {
             return;
         }
