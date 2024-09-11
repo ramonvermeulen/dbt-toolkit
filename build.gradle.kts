@@ -2,6 +2,8 @@ import com.github.gradle.node.npm.task.NpmTask
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.changelog.markdownToHTML
 
+// import org.jsonschema2pojo.Jsonschema2Pojo
+
 fun properties(key: String) = providers.gradleProperty(key)
 
 fun environment(key: String) = providers.environmentVariable(key)
@@ -16,6 +18,7 @@ plugins {
     alias(libs.plugins.kover) // Gradle Kover Plugin
     id("com.github.node-gradle.node") version "7.0.2"
     id("org.jlleitschuh.gradle.ktlint") version "12.1.1"
+    id("org.jsonschema2pojo") version "1.2.1" // for dbt manifest
 }
 
 group = properties("pluginGroup").get()
@@ -23,7 +26,7 @@ version = properties("pluginVersion").get()
 
 node {
     download = true
-    version = "18.17.1"
+    version = "22.8.0"
     nodeProjectDir = file("$projectDir/lineage-panel")
 }
 
@@ -51,9 +54,26 @@ repositories {
 }
 
 // Dependencies are managed with Gradle version catalog - read more: https://docs.gradle.org/current/userguide/platforms.html#sub:version-catalog
+// different gradle version than example, config might vary?
+jsonSchema2Pojo {
+    setSource(
+        listOf(
+            File("${sourceSets.main.get().output.resourcesDir}/schema"),
+        ),
+    )
+    setAnnotationStyle("gson")
+    serializable = true
+    targetVersion = "22"
+    targetDirectory = File("$projectDir/src/main/kotlin/com/github/ramonvermeulen/dbtToolkit/generated")
+
+}
+
 dependencies {
 //    implementation(libs.annotations)
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.15.2")
 }
+
+// configuration of the json schema to pojo code generation, e.g. for dbt manifest files
 
 // Set the JVM language level used to build the project.
 kotlin {
