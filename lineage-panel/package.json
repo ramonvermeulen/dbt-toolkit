@@ -20,7 +20,7 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@types/react": "^18.3.6",
+    "@types/react": "^18.3.7",
     "@types/node": "^22.5.4",
     "@types/react-dom": "^18.3.0",
     "@typescript-eslint/eslint-plugin": "^8.6.0",
