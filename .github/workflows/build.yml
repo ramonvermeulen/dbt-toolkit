@@ -175,6 +175,7 @@ jobs:
       - name: Qodana - Code Inspection
         uses: JetBrains/qodana-action@v2024.2.3
         with:
+          upload-result: true # upload results as github action artifacts
           cache-default-branch-only: true
 
   # Run plugin structure verification along with IntelliJ Plugin Verifier
