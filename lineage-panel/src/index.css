@@ -34,6 +34,7 @@ body,
 .dbt-model-node:active {
   transform: scale(1.35) rotate(-5deg);
   transition: transform 0.3s ease;
+  z-index: 1;
 }
 
 .dbt-model-node {
@@ -92,6 +93,9 @@ body,
   max-width: 100px;
 }
 
+.react-flow__node:hover {
+  z-index: 2;
+}
 .react-flow__node-default:hover {
   .ellipsis {
     overflow: visible;

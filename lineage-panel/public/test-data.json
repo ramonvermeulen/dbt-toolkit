@@ -112,7 +112,7 @@
       "relativePath": ""
     },
     {
-      "id": "metric.jaffle_shop.median_revenue",
+      "id": "metric.jaffle_shop.median_revenue_with_a_very_long_name_for_testing",
       "isSelected": false,
       "tests": [],
       "relativePath": ""
@@ -516,11 +516,11 @@
     },
     {
       "parent": "semantic_model.jaffle_shop.order_item",
-      "child": "metric.jaffle_shop.median_revenue"
+      "child": "metric.jaffle_shop.median_revenue_with_a_very_long_name_for_testing"
     },
     {
       "parent": "semantic_model.jaffle_shop.order_item",
-      "child": "metric.jaffle_shop.median_revenue"
+      "child": "metric.jaffle_shop.median_revenue_with_a_very_long_name_for_testing"
     },
     {
       "parent": "semantic_model.jaffle_shop.order_item",
