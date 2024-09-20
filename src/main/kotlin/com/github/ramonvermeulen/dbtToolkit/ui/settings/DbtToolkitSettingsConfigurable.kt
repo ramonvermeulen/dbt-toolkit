@@ -26,6 +26,7 @@ class DbtToolkitSettingsConfigurable(project: Project) : Configurable {
     private var dbtToolkitSettingsService = project.service<DbtToolkitSettingsService>()
     private var dbtProjectDirField = JBTextField()
     private var dbtTargetDirField = JBTextField()
+    private var dotEnvFilePathField = JBTextField() // todo(ramon) in help bubble explain that env vars overrule
     private var dbtCommandTimeoutField = JBIntSpinner(0, 0, 3600)
     private var envVarsTable = JBTable()
     private var settingsPanel = JPanel(BorderLayout(5, 5))
@@ -59,6 +60,8 @@ class DbtToolkitSettingsConfigurable(project: Project) : Configurable {
             add(dbtProjectDirField, gbc)
             add(JLabel("dbt target directory:"), gbc)
             add(dbtTargetDirField, gbc)
+            add(JLabel("dot env file path:"), gbc)
+            add(dotEnvFilePathField, gbc)
             add(JLabel("dbt command timeout (seconds):"), gbc)
             add(dbtCommandTimeoutField, gbc)
         }
@@ -115,13 +118,18 @@ class DbtToolkitSettingsConfigurable(project: Project) : Configurable {
         }
     }
 
-    override fun isModified(): Boolean {
+    private fun getConfiguredEnvVars(): MutableMap<String, String> {
         val envVars = mutableMapOf<String, String>()
         for (i in 0 until envVarsTable.model.rowCount) {
             val name = envVarsTable.model.getValueAt(i, 0) as String
             val value = envVarsTable.model.getValueAt(i, 1) as String
             envVars[name] = value
         }
+        return envVars
+    }
+
+    override fun isModified(): Boolean {
+        val envVars = getConfiguredEnvVars()
 
         return dbtProjectDirField.text != dbtToolkitSettingsService.state.settingsDbtProjectDir ||
             dbtTargetDirField.text != dbtToolkitSettingsService.state.settingsDbtTargetDir ||
@@ -130,12 +138,7 @@ class DbtToolkitSettingsConfigurable(project: Project) : Configurable {
     }
 
     override fun apply() {
-        val envVars = mutableMapOf<String, String>()
-        for (i in 0 until envVarsTable.model.rowCount) {
-            val name = envVarsTable.model.getValueAt(i, 0) as String
-            val value = envVarsTable.model.getValueAt(i, 1) as String
-            envVars[name] = value
-        }
+        val envVars = getConfiguredEnvVars()
 
         dbtToolkitSettingsService.state.settingsDbtProjectDir = dbtProjectDirField.text
         dbtToolkitSettingsService.state.settingsDbtTargetDir = dbtTargetDirField.text
