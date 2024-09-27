@@ -25,7 +25,7 @@ class DbtToolkitSettingsConfigurable(project: Project) : Configurable {
     private var dbtToolkitSettingsService = project.service<DbtToolkitSettingsService>()
     private var dbtProjectDirField = JBTextField()
     private var dbtTargetDirField = JBTextField()
-    private var dotEnvFilePathField = JBTextField() // todo(ramon) in help bubble explain that env vars overrule
+    private var dotEnvFilePathField = JBTextField()
     private var dbtCommandTimeoutField = JBIntSpinner(0, 0, 3600)
     private var envVarsTable = JBTable()
     private var settingsPanel = JPanel()
@@ -58,7 +58,13 @@ class DbtToolkitSettingsConfigurable(project: Project) : Configurable {
             add(dbtProjectDirField, gbc)
             add(JLabel("dbt target directory:"), gbc)
             add(dbtTargetDirField, gbc)
-            add(JLabel("dot env file path:"), gbc)
+            add(
+                JLabel("dot env file path:").apply {
+                    toolTipText = "Path to a .env file that will be loaded before running dbt commands, " +
+                        "will not override environment variables defined below"
+                },
+                gbc,
+            )
             add(dotEnvFilePathField, gbc)
             add(JLabel("dbt command timeout (seconds):"), gbc)
             add(dbtCommandTimeoutField, gbc)
