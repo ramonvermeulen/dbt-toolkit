@@ -10,7 +10,7 @@ import {
     useEdgesState,
     useNodesState, NodeTypes, useReactFlow,
 } from '@xyflow/react';
-import { type MouseEvent as ReactMouseEvent, useCallback, useEffect } from 'react';
+import { type MouseEvent as ReactMouseEvent, useCallback, useEffect, useState } from 'react';
 import { MdRefresh } from 'react-icons/md';
 
 import { isDevMode } from './constants.ts';
@@ -24,7 +24,7 @@ import { LineageInfo } from './types.ts';
 declare global {
     interface Window {
         // javascript -> kotlin bridge functions (set by the kotlin code)
-        kotlinCallback: (value: unknown) => void;
+        kotlinCallback: (jsonEncodedValue: String) => void;
         // kotlin -> javascript bridge functions (set by the JavaScript code)
         setLineageInfo?: (info: LineageInfo) => void;
         setActiveNode?: (nodeId: string) => void;
@@ -39,6 +39,7 @@ export default function Flow() {
     const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
     const reactFlow = useReactFlow();
+    const [showCompleteLineage, setShowCompleteLineage] = useState(false);
     const { setLineageInfo } = useLineageLayout({ setNodes, setEdges, addEdge });
 
     const setActiveNode = useCallback(async (nodeId: string) => {
@@ -62,14 +63,18 @@ export default function Flow() {
         if (isDevMode) {
             return;
         }
-        window.kotlinCallback(node.data?.relativePath);
+        window.kotlinCallback(JSON.stringify({
+            node: node.data?.relativePath,
+        }));
     }
 
     function onRefreshClick() {
         if (isDevMode) {
             return;
         }
-        window.kotlinCallback('refresh');
+        window.kotlinCallback(JSON.stringify({
+            refresh: true,
+        }));
     }
 
     useEffect(() => {
@@ -94,36 +99,47 @@ export default function Flow() {
     */
     return (
         <ReactFlow
-                nodes={nodes}
-                nodeTypes={nodeTypes}
-                onNodesChange={onNodesChange}
-                edges={edges}
-                edgeTypes={edgeTypes}
-                onEdgesChange={onEdgesChange}
-                onNodeClick={onNodeClick}
-                nodesConnectable={false}
-                proOptions={{ hideAttribution: true }}
-                fitView={true}
-                fitViewOptions={{
-                    duration: 300,
-                }}
-                autoPanOnConnect={true}
-                edgesFocusable={false}
-            >
-                <Background color="#E9E3E6"/>
-                <MiniMap
-                    pannable={true}
-                    zoomable={true}
-                    inversePan={false}
-                    zoomStep={1}
-                    offsetScale={1}
-                    nodeColor={'#CECECE'}
-                />
-                <Controls>
-                    <ControlButton onClick={onRefreshClick}>
-                        <MdRefresh size={15} />
-                    </ControlButton>
-                </Controls>
-            </ReactFlow>
+            nodes={nodes}
+            nodeTypes={nodeTypes}
+            onNodesChange={onNodesChange}
+            edges={edges}
+            edgeTypes={edgeTypes}
+            onEdgesChange={onEdgesChange}
+            onNodeClick={onNodeClick}
+            nodesConnectable={false}
+            proOptions={{hideAttribution: true}}
+            fitView={true}
+            fitViewOptions={{
+                duration: 300,
+            }}
+            autoPanOnConnect={true}
+            edgesFocusable={false}
+        >
+            <Background color="#E9E3E6"/>
+            <MiniMap
+                pannable={true}
+                zoomable={true}
+                inversePan={false}
+                zoomStep={1}
+                offsetScale={1}
+                nodeColor={'#CECECE'}
+            />
+
+            <Controls>
+                <ControlButton onClick={onRefreshClick}>
+                    <MdRefresh size={14}/>
+                </ControlButton>
+                <label className="fancy-checkbox">
+                    <input type="checkbox" checked={showCompleteLineage}
+                        onChange={() => {
+                            window.kotlinCallback(JSON.stringify({
+                                showCompleteLineage: !showCompleteLineage
+                            }));
+                            setShowCompleteLineage(!showCompleteLineage);
+                        }}/>
+                    <span className="checkbox-label">Show full lineage</span>
+                </label>
+            </Controls>
+        </ReactFlow>
     );
 }

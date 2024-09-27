@@ -31,6 +31,10 @@ import com.intellij.ui.jcef.JBCefBrowser
 import com.intellij.ui.jcef.JBCefBrowserBase
 import com.intellij.ui.jcef.JBCefBrowserBuilder
 import com.intellij.ui.jcef.JBCefJSQuery
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.boolean
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import org.cef.browser.CefBrowser
 import org.cef.browser.CefFrame
 import org.cef.handler.CefLoadHandlerAdapter
@@ -46,12 +50,13 @@ class LineagePanel(private val project: Project) :
     private val settings = project.service<DbtToolkitSettingsService>()
     private val ourCefClient = JBCefApp.getInstance().createClient()
     private val isDebug = System.getProperty("idea.plugin.in.sandbox.mode") == "true"
-    private val browser: JBCefBrowser = JBCefBrowserBuilder().setClient(ourCefClient).setEnableOpenDevToolsMenuItem(isDebug).build()
+    private val browser: JBCefBrowser = JBCefBrowserBuilder().setClient(ourCefClient).setEnableOpenDevToolsMenuItem(isDebug).setOffScreenRendering(true).build()
     private val javaScriptEngineProxy: JBCefJSQuery = JBCefJSQuery.create(browser as JBCefBrowserBase)
     private val mainPanel = JPanel(BorderLayout())
     private var lineageInfo: LineageInfo? = null
     private var activeFile: VirtualFile? = null
     private var isRefreshingLineage = false
+    private var completeLineage = false
 
     init {
         project.messageBus.connect().subscribe(ActiveFileService.TOPIC, this)
@@ -72,13 +77,18 @@ class LineagePanel(private val project: Project) :
     }
 
     private fun handleJavaScriptCallback(result: String): JBCefJSQuery.Response? {
-        if (result == "refresh") {
+        val jsData = Json.parseToJsonElement(result)
+
+        if (jsData.jsonObject.containsKey("refresh") || jsData.jsonObject.containsKey("showCompleteLineage")) {
+            if (jsData.jsonObject.containsKey("showCompleteLineage")) {
+                completeLineage = jsData.jsonObject["showCompleteLineage"]?.jsonPrimitive?.boolean ?: false
+            }
             val file = FileEditorManager.getInstance(project).selectedFiles.firstOrNull()
             if (file != null && !isRefreshingLineage) {
                 isRefreshingLineage = true
                 ApplicationManager.getApplication().executeOnPooledThread {
                     try {
-                        refreshLineageInfo(file, true)
+                        refreshLineageInfo(file, true, completeLineage)
                     } finally {
                         isRefreshingLineage = false
                     }
@@ -164,7 +174,7 @@ class LineagePanel(private val project: Project) :
         ApplicationManager.getApplication().executeOnPooledThread {
             if (file != null && SUPPORTED_LINEAGE_EXTENSIONS.contains(file.extension)) {
                 activeFile = file
-                refreshLineageInfo(file, false)
+                refreshLineageInfo(file, false, completeLineage)
             }
         }
     }
@@ -188,6 +198,7 @@ class LineagePanel(private val project: Project) :
     private fun refreshLineageInfo(
         activeFile: VirtualFile?,
         enforceReparse: Boolean,
+        completeLineage: Boolean
     ) {
         val projectName = settings.state.dbtProjectName
 
@@ -216,7 +227,7 @@ class LineagePanel(private val project: Project) :
         activeFile?.let { file ->
             nodeTypes.firstOrNull { file.path.matches(it.pattern) }?.let { nodeType ->
                 val nodeId = "${nodeType.type}.$projectName.${file.nameWithoutExtension}"
-                manifestService.refreshLineageInfoForNode(nodeId, enforceReparse)
+                manifestService.refreshLineageInfoForNode(nodeId, enforceReparse, completeLineage)
             }
         }
     }
