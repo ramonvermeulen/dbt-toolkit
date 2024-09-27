@@ -19,7 +19,6 @@ import javax.swing.JComponent
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JScrollPane
-import javax.swing.SwingUtilities
 import javax.swing.table.DefaultTableModel
 
 class DbtToolkitSettingsConfigurable(project: Project) : Configurable {
@@ -29,20 +28,19 @@ class DbtToolkitSettingsConfigurable(project: Project) : Configurable {
     private var dotEnvFilePathField = JBTextField() // todo(ramon) in help bubble explain that env vars overrule
     private var dbtCommandTimeoutField = JBIntSpinner(0, 0, 3600)
     private var envVarsTable = JBTable()
-    private var settingsPanel = JPanel(BorderLayout(5, 5))
+    private var settingsPanel = JPanel()
 
     override fun getDisplayName(): String {
         return "dbtToolkit Settings"
     }
 
     override fun createComponent(): JComponent {
-        SwingUtilities.invokeLater {
-            val fieldsPanel = createFieldsPanel()
-            val envVarsPanel = createEnvVarsPanel()
+        val fieldsPanel = createFieldsPanel()
+        val envVarsPanel = createEnvVarsPanel()
 
-            settingsPanel.add(fieldsPanel, BorderLayout.NORTH)
-            settingsPanel.add(envVarsPanel, BorderLayout.CENTER)
-        }
+        settingsPanel.layout = BorderLayout(5, 5)
+        settingsPanel.add(fieldsPanel, BorderLayout.NORTH)
+        settingsPanel.add(envVarsPanel, BorderLayout.CENTER)
         return settingsPanel
     }
 
@@ -112,6 +110,7 @@ class DbtToolkitSettingsConfigurable(project: Project) : Configurable {
         dbtProjectDirField.text = dbtToolkitSettingsService.state.dbtProjectsDir
         dbtTargetDirField.text = dbtToolkitSettingsService.state.dbtTargetDir
         dbtCommandTimeoutField.value = dbtToolkitSettingsService.state.settingsDbtCommandTimeout
+        dotEnvFilePathField.text = dbtToolkitSettingsService.state.settingsDotEnvFilePath
 
         while (envVarsTable.model.rowCount > 0) {
             (envVarsTable.model as DefaultTableModel).removeRow(0)
@@ -134,7 +133,8 @@ class DbtToolkitSettingsConfigurable(project: Project) : Configurable {
         return dbtProjectDirField.text != dbtToolkitSettingsService.state.settingsDbtProjectDir ||
             dbtTargetDirField.text != dbtToolkitSettingsService.state.settingsDbtTargetDir ||
             dbtCommandTimeoutField.value != dbtToolkitSettingsService.state.settingsDbtCommandTimeout ||
-            envVars != dbtToolkitSettingsService.state.settingsEnvVars
+            envVars != dbtToolkitSettingsService.state.settingsEnvVars ||
+            dotEnvFilePathField.text != dbtToolkitSettingsService.state.settingsDotEnvFilePath
     }
 
     override fun apply() {
@@ -144,5 +144,10 @@ class DbtToolkitSettingsConfigurable(project: Project) : Configurable {
         dbtToolkitSettingsService.state.settingsDbtTargetDir = dbtTargetDirField.text
         dbtToolkitSettingsService.state.settingsDbtCommandTimeout = dbtCommandTimeoutField.value as Long
         dbtToolkitSettingsService.state.settingsEnvVars = envVars
+        dbtToolkitSettingsService.state.settingsDotEnvFilePath = dotEnvFilePathField.text
+    }
+
+    override fun disposeUIResources() {
+        settingsPanel.removeAll()
     }
 }

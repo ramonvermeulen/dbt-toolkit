@@ -1,6 +1,5 @@
 [*.{kt,kts}]
 ktlint_code_style = intellij_idea
-disabled_rules=filename,function-naming
 
 [*.kt]
 [*.kts]
