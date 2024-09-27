@@ -198,7 +198,7 @@ class LineagePanel(private val project: Project) :
     private fun refreshLineageInfo(
         activeFile: VirtualFile?,
         enforceReparse: Boolean,
-        completeLineage: Boolean
+        completeLineage: Boolean,
     ) {
         val projectName = settings.state.dbtProjectName
 

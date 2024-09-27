@@ -73,7 +73,7 @@ class ManifestService(project: Project) {
                                 child.asString,
                                 initialNode = false,
                                 resolveChildren = true,
-                                resolveParents = completeLineage
+                                resolveParents = completeLineage,
                             )
                             relationships.add(Edge(node, child.asString))
                         }
@@ -86,7 +86,7 @@ class ManifestService(project: Project) {
                             parent.asString,
                             initialNode = false,
                             resolveChildren = completeLineage,
-                            resolveParents = true
+                            resolveParents = true,
                         )
                         relationships.add(Edge(parent.asString, node))
                     }
@@ -103,7 +103,7 @@ class ManifestService(project: Project) {
     fun refreshLineageInfoForNode(
         node: String,
         enforceReparse: Boolean,
-        completeLineage: Boolean
+        completeLineage: Boolean,
     ) {
         manifestLock.withLock {
             if (enforceReparse || manifest == null ||
