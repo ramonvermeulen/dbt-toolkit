@@ -7,6 +7,7 @@ import com.intellij.openapi.components.Storage
 import com.intellij.openapi.vfs.VirtualFile
 import org.yaml.snakeyaml.Yaml
 import java.io.BufferedReader
+import java.io.File
 import java.io.InputStreamReader
 
 @State(
@@ -18,6 +19,7 @@ class DbtToolkitSettingsService : PersistentStateComponent<DbtToolkitSettingsSer
     data class State(
         var settingsDbtProjectDir: String = "",
         var settingsDbtTargetDir: String = "",
+        var settingsDotEnvFilePath: String = "",
         var settingsEnvVars: Map<String, String> = mapOf(),
         var settingsDbtCommandTimeout: Long = 120,
         var dbtProjectsDir: String = "",
@@ -43,6 +45,9 @@ class DbtToolkitSettingsService : PersistentStateComponent<DbtToolkitSettingsSer
         state.settingsDbtProjectDir = file.parent.path
         state.dbtProjectsDir = file.parent.path
         state.settingsDbtTargetDir = "${file.parent.path}/target"
+        if (File("${file.parent.path}/.env").exists()) {
+            state.settingsDotEnvFilePath = "${file.parent.path}/.env"
+        }
         state.dbtTargetDir = "${file.parent.path}/target"
         val reader = BufferedReader(InputStreamReader(inputStream))
         val yaml = Yaml()
