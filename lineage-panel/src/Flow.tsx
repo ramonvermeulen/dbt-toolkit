@@ -24,7 +24,7 @@ import { LineageInfo } from './types.ts';
 declare global {
     interface Window {
         // javascript -> kotlin bridge functions (set by the kotlin code)
-        kotlinCallback: (jsonEncodedValue: String) => void;
+        kotlinCallback: (jsonEncodedValue: string) => void;
         // kotlin -> javascript bridge functions (set by the JavaScript code)
         setLineageInfo?: (info: LineageInfo) => void;
         setActiveNode?: (nodeId: string) => void;
@@ -107,7 +107,7 @@ export default function Flow() {
             onEdgesChange={onEdgesChange}
             onNodeClick={onNodeClick}
             nodesConnectable={false}
-            proOptions={{hideAttribution: true}}
+            proOptions={{ hideAttribution: true }}
             fitView={true}
             fitViewOptions={{
                 duration: 300,
