@@ -16,6 +16,7 @@ plugins {
     alias(libs.plugins.kover) // Gradle Kover Plugin
     id("com.github.node-gradle.node") version "7.1.0"
     id("org.jlleitschuh.gradle.ktlint") version "12.1.1"
+    kotlin("plugin.serialization") version "2.0.20"
 }
 
 group = properties("pluginGroup").get()
@@ -52,6 +53,7 @@ repositories {
 
 // Dependencies are managed with Gradle version catalog - read more: https://docs.gradle.org/current/userguide/platforms.html#sub:version-catalog
 dependencies {
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.1")
 //    implementation(libs.annotations)
 }
 

@@ -102,3 +102,41 @@ body,
 .react-flow__node-default.width-auto:hover {
   width: auto;
 }
+
+.fancy-checkbox {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  font-size: 18px;
+  color: #FFFFFF;
+}
+
+.fancy-checkbox input[type="checkbox"] {
+  width: 18px;
+  height: 30px;
+  margin-right: 10px;
+  cursor: pointer;
+  background-color: white;
+  margin-top: 0;
+  margin-bottom: 0;
+  accent-color: #FF8E53;
+}
+
+.fancy-checkbox .checkbox-label {
+  user-select: none;
+  visibility: hidden;
+  position: absolute;
+  line-height: 30px;
+  height: 30px;
+  left: 35px;
+  top: 0;
+  white-space: nowrap;
+  transition: visibility 0.3s, opacity 0.3s;
+  opacity: 0;
+}
+
+.fancy-checkbox:hover .checkbox-label,
+.fancy-checkbox input[type="checkbox"]:hover + .checkbox-label {
+  visibility: visible;
+  opacity: 1;
+}
