@@ -23,7 +23,7 @@ import { LineageInfo } from './types.ts';
 
 declare global {
     interface Window {
-        // javascript -> kotlin bridge functions (set by the kotlin code)
+        // javascript -> kotlin bridge functions (set by the Kotlin code)
         kotlinCallback: (jsonEncodedValue: string) => void;
         // kotlin -> javascript bridge functions (set by the JavaScript code)
         setLineageInfo?: (info: LineageInfo) => void;
@@ -34,6 +34,17 @@ declare global {
 const nodeTypes = {
     'dbtModel': DbtModelNode,
 } satisfies NodeTypes;
+
+enum JsEventType {
+    NODE_CLICK = 'NODE_CLICK',
+    REFRESH_CLICK = 'REFRESH_CLICK',
+    SHOW_COMPLETE_LINEAGE_CLICK = 'SHOW_COMPLETE_LINEAGE_CLICK'
+}
+
+type JsEvent = {
+    event: JsEventType;
+    data: object
+}
 
 export default function Flow() {
     const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
@@ -57,24 +68,91 @@ export default function Flow() {
         }
     }, [reactFlow, nodes, setNodes]);
 
+    function stringifyEvent(event: JsEvent): string {
+        return JSON.stringify(event);
+    }
 
     async function onNodeClick(_event: ReactMouseEvent, node: Node) : Promise<void> {
         await setActiveNode(node.id);
         if (isDevMode) {
             return;
         }
-        window.kotlinCallback(JSON.stringify({
-            node: node.data?.relativePath,
-        }));
+        if (node.data && node.data.relativePath) {
+            const event: JsEvent = {
+                event: JsEventType.NODE_CLICK,
+                data: {
+                    node: node.data.relativePath
+                }
+            };
+            window.kotlinCallback(stringifyEvent(event));
+        }
     }
 
     function onRefreshClick() {
         if (isDevMode) {
             return;
         }
-        window.kotlinCallback(JSON.stringify({
-            refresh: true,
-        }));
+        const event: JsEvent = {
+            event: JsEventType.REFRESH_CLICK,
+            data: {}
+        };
+        window.kotlinCallback(stringifyEvent(event));
+    }
+
+    function completeLineageToggle() {
+        const newState = !showCompleteLineage
+        const event: JsEvent = {
+            event: JsEventType.SHOW_COMPLETE_LINEAGE_CLICK,
+            data: {
+                completeLineage: newState
+            }
+        }
+        window.kotlinCallback(stringifyEvent(event))
+        if (!newState) {
+            filterNodesEdgesDownToUpstreamDownstream();
+        }
+        setShowCompleteLineage(newState)
+    }
+
+    function filterNodesEdgesDownToUpstreamDownstream() {
+        const currentNode = nodes.find(n => n.data.isSelected)
+        if (currentNode?.id != null) {
+            const visitedUpstream = new Set<string>();
+            const visitedDownStream = new Set<string>()
+            const upStreamEdges = findAncestors(currentNode.id, edges, visitedUpstream);
+            const downStreamEdges = findChildren(currentNode.id, edges, visitedDownStream);
+            const upDownStreamEdges = [...upStreamEdges, ...downStreamEdges];
+            const newEdges = edges.filter(e => upDownStreamEdges.includes(e.source) || upDownStreamEdges.includes(e.target));
+            const newNodes = nodes.filter(n => upDownStreamEdges.includes(n.id) || n.data.isSelected);
+            setEdges(newEdges);
+            setNodes(newNodes)
+        }
+    }
+
+    function findAncestors(nodeId: string, edges: Edge[], visited: Set<string> = new Set()): string[] {
+        if (visited.has(nodeId)) return [];
+        visited.add(nodeId);
+
+        const ancestors = edges
+            .filter(edge => edge.target === nodeId)
+            .map(edge => edge.source);
+
+        return ancestors.reduce((acc, ancestor) => {
+            return acc.concat(ancestor, findAncestors(ancestor, edges, visited));
+        }, [] as string[]);
+    }
+
+    function findChildren(nodeId: string, edges: Edge[], visited: Set<string> = new Set()): string[] {
+        if (visited.has(nodeId)) return [];
+        visited.add(nodeId);
+
+        const children = edges
+            .filter(edge => edge.source === nodeId)
+            .map(edge => edge.target);
+
+        return children.reduce((acc, child) => {
+            return acc.concat(child, findChildren(child, edges, visited));
+        }, [] as string[]);
     }
 
     useEffect(() => {
@@ -130,13 +208,7 @@ export default function Flow() {
                     <MdRefresh size={14}/>
                 </ControlButton>
                 <label className="fancy-checkbox">
-                    <input type="checkbox" checked={showCompleteLineage}
-                        onChange={() => {
-                            window.kotlinCallback(JSON.stringify({
-                                showCompleteLineage: !showCompleteLineage
-                            }));
-                            setShowCompleteLineage(!showCompleteLineage);
-                        }}/>
+                    <input type="checkbox" checked={showCompleteLineage} onChange={completeLineageToggle}/>
                     <span className="checkbox-label">Show full lineage</span>
                 </label>
             </Controls>
