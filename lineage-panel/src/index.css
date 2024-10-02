@@ -92,6 +92,10 @@ body,
   max-width: 100px;
 }
 
+.react-flow__node:hover {
+  z-index: 999999999!important;
+}
+
 .react-flow__node-default:hover {
   .ellipsis {
     overflow: visible;
