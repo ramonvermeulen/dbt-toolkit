@@ -118,7 +118,7 @@
       "relativePath": ""
     },
     {
-      "id": "unit_test.jaffle_shop.order_items.test_supply_costs_sum_correctly",
+      "id": "unit_test.jaffle_shop.order_items_very_long_name_overlap_test.test_supply_costs_sum_correctly",
       "isSelected": false,
       "tests": [],
       "relativePath": ""
@@ -212,14 +212,14 @@
       "relativePath": "models/staging/stg_supplies.sql"
     },
     {
-      "id": "model.jaffle_shop.order_items",
+      "id": "model.jaffle_shop.order_items_very_long_name_overlap_test",
       "isSelected": false,
       "tests": [
         "test.jaffle_shop.not_null_order_items_order_item_id.c6fda366bd",
         "test.jaffle_shop.relationships_order_items_order_id__order_id__ref_orders_.a799023ee8",
         "test.jaffle_shop.unique_order_items_order_item_id.7d0a7e900a"
       ],
-      "relativePath": "models/marts/order_items.sql"
+      "relativePath": "models/marts/order_items_very_long_name_overlap_test.sql"
     },
     {
       "id": "semantic_model.jaffle_shop.order_item",
@@ -527,24 +527,24 @@
       "child": "metric.jaffle_shop.revenue"
     },
     {
-      "parent": "model.jaffle_shop.order_items",
+      "parent": "model.jaffle_shop.order_items_very_long_name_overlap_test",
       "child": "model.jaffle_shop.orders"
     },
     {
-      "parent": "model.jaffle_shop.order_items",
+      "parent": "model.jaffle_shop.order_items_very_long_name_overlap_test",
       "child": "semantic_model.jaffle_shop.order_item"
     },
     {
-      "parent": "model.jaffle_shop.order_items",
-      "child": "unit_test.jaffle_shop.order_items.test_supply_costs_sum_correctly"
+      "parent": "model.jaffle_shop.order_items_very_long_name_overlap_test",
+      "child": "unit_test.jaffle_shop.order_items_very_long_name_overlap_test.test_supply_costs_sum_correctly"
     },
     {
-      "parent": "model.jaffle_shop.order_items",
-      "child": "unit_test.jaffle_shop.order_items.test_supply_costs_sum_correctly"
+      "parent": "model.jaffle_shop.order_items_very_long_name_overlap_test",
+      "child": "unit_test.jaffle_shop.order_items_very_long_name_overlap_test.test_supply_costs_sum_correctly"
     },
     {
       "parent": "model.jaffle_shop.stg_order_items",
-      "child": "model.jaffle_shop.order_items"
+      "child": "model.jaffle_shop.order_items_very_long_name_overlap_test"
     },
     {
       "parent": "source.jaffle_shop.ecom.raw_items",
@@ -556,11 +556,11 @@
     },
     {
       "parent": "model.jaffle_shop.stg_order_items",
-      "child": "model.jaffle_shop.order_items"
+      "child": "model.jaffle_shop.order_items_very_long_name_overlap_test"
     },
     {
       "parent": "model.jaffle_shop.stg_orders",
-      "child": "model.jaffle_shop.order_items"
+      "child": "model.jaffle_shop.order_items_very_long_name_overlap_test"
     },
     {
       "parent": "model.jaffle_shop.stg_orders",
@@ -576,11 +576,11 @@
     },
     {
       "parent": "model.jaffle_shop.stg_orders",
-      "child": "model.jaffle_shop.order_items"
+      "child": "model.jaffle_shop.order_items_very_long_name_overlap_test"
     },
     {
       "parent": "model.jaffle_shop.stg_products",
-      "child": "model.jaffle_shop.order_items"
+      "child": "model.jaffle_shop.order_items_very_long_name_overlap_test"
     },
     {
       "parent": "model.jaffle_shop.products",
@@ -608,11 +608,11 @@
     },
     {
       "parent": "model.jaffle_shop.stg_products",
-      "child": "model.jaffle_shop.order_items"
+      "child": "model.jaffle_shop.order_items_very_long_name_overlap_test"
     },
     {
       "parent": "model.jaffle_shop.stg_supplies",
-      "child": "model.jaffle_shop.order_items"
+      "child": "model.jaffle_shop.order_items_very_long_name_overlap_test"
     },
     {
       "parent": "model.jaffle_shop.supplies",
@@ -640,10 +640,10 @@
     },
     {
       "parent": "model.jaffle_shop.stg_supplies",
-      "child": "model.jaffle_shop.order_items"
+      "child": "model.jaffle_shop.order_items_very_long_name_overlap_test"
     },
     {
-      "parent": "model.jaffle_shop.order_items",
+      "parent": "model.jaffle_shop.order_items_very_long_name_overlap_test",
       "child": "semantic_model.jaffle_shop.order_item"
     },
     {
@@ -743,7 +743,7 @@
       "child": "unit_test.jaffle_shop.orders.test_order_items_compute_to_bools_correctly"
     },
     {
-      "parent": "model.jaffle_shop.order_items",
+      "parent": "model.jaffle_shop.order_items_very_long_name_overlap_test",
       "child": "model.jaffle_shop.orders"
     },
     {
