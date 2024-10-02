@@ -100,32 +100,32 @@ export default function Flow() {
     }
 
     function completeLineageToggle() {
-        const newState = !showCompleteLineage
+        const newState = !showCompleteLineage;
         const event: JsEvent = {
             event: JsEventType.SHOW_COMPLETE_LINEAGE_CLICK,
             data: {
                 completeLineage: newState
             }
-        }
-        window.kotlinCallback(stringifyEvent(event))
+        };
+        window.kotlinCallback(stringifyEvent(event));
         if (!newState) {
             filterNodesEdgesDownToUpstreamDownstream();
         }
-        setShowCompleteLineage(newState)
+        setShowCompleteLineage(newState);
     }
 
     function filterNodesEdgesDownToUpstreamDownstream() {
-        const currentNode = nodes.find(n => n.data.isSelected)
+        const currentNode = nodes.find(n => n.data.isSelected);
         if (currentNode?.id != null) {
             const visitedUpstream = new Set<string>();
-            const visitedDownStream = new Set<string>()
+            const visitedDownStream = new Set<string>();
             const upStreamEdges = findAncestors(currentNode.id, edges, visitedUpstream);
             const downStreamEdges = findChildren(currentNode.id, edges, visitedDownStream);
             const upDownStreamEdges = [...upStreamEdges, ...downStreamEdges];
             const newEdges = edges.filter(e => upDownStreamEdges.includes(e.source) || upDownStreamEdges.includes(e.target));
             const newNodes = nodes.filter(n => upDownStreamEdges.includes(n.id) || n.data.isSelected);
             setEdges(newEdges);
-            setNodes(newNodes)
+            setNodes(newNodes);
         }
     }
 

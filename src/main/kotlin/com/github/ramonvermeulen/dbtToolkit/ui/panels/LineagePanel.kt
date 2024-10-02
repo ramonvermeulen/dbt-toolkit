@@ -98,7 +98,7 @@ class LineagePanel(private val project: Project) :
         } else if (jsData.event == JsEventType.SHOW_COMPLETE_LINEAGE_CLICK) {
             handleCompleteLineageClick(jsData)
         }
-        
+
         return null
     }
 
