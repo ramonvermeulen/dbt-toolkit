@@ -4,13 +4,10 @@ import {
     Controls,
     MiniMap,
     Node,
-    Edge,
     ReactFlow,
-    addEdge,
-    useEdgesState,
-    useNodesState, NodeTypes, useReactFlow,
+    NodeTypes,
 } from '@xyflow/react';
-import { type MouseEvent as ReactMouseEvent, useCallback, useEffect, useState } from 'react';
+import { type MouseEvent as ReactMouseEvent, useEffect } from 'react';
 import { MdRefresh } from 'react-icons/md';
 
 import { isDevMode } from './constants.ts';
@@ -26,7 +23,7 @@ declare global {
         // javascript -> kotlin bridge functions (set by the Kotlin code)
         kotlinCallback: (jsonEncodedValue: string) => void;
         // kotlin -> javascript bridge functions (set by the JavaScript code)
-        setLineageInfo?: (info: LineageInfo) => void;
+        processLineageInfo?: (info: LineageInfo) => void;
         setActiveNode?: (nodeId: string) => void;
     }
 }
@@ -38,7 +35,6 @@ const nodeTypes = {
 enum JsEventType {
     NODE_CLICK = 'NODE_CLICK',
     REFRESH_CLICK = 'REFRESH_CLICK',
-    SHOW_COMPLETE_LINEAGE_CLICK = 'SHOW_COMPLETE_LINEAGE_CLICK'
 }
 
 type JsEvent = {
@@ -47,26 +43,17 @@ type JsEvent = {
 }
 
 export default function Flow() {
-    const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
-    const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
-    const reactFlow = useReactFlow();
-    const [showCompleteLineage, setShowCompleteLineage] = useState(false);
-    const { setLineageInfo } = useLineageLayout({ setNodes, setEdges, addEdge });
+    const {
+        nodes,
+        setActiveNode,
+        onNodesChange,
+        edges,
+        onEdgesChange,
+        processLineageInfo,
+        renderCompleteLineage,
+        setRenderCompleteLineage,
+    } = useLineageLayout();
 
-    const setActiveNode = useCallback(async (nodeId: string) => {
-        const newNodes = nodes.map(n => ({
-            ...n,
-            data: {
-                ...n.data,
-                isSelected: n.id === nodeId,
-            }
-        }));
-        setNodes(newNodes);
-        const newActiveNode = nodes.find(n => n.id === nodeId);
-        if (newActiveNode) {
-            await reactFlow.setCenter(newActiveNode.position.x, newActiveNode.position.y, { duration: 100, zoom: reactFlow.getZoom() });
-        }
-    }, [reactFlow, nodes, setNodes]);
 
     function stringifyEvent(event: JsEvent): string {
         return JSON.stringify(event);
@@ -99,78 +86,23 @@ export default function Flow() {
         window.kotlinCallback(stringifyEvent(event));
     }
 
-    function completeLineageToggle() {
-        const newState = !showCompleteLineage;
-        const event: JsEvent = {
-            event: JsEventType.SHOW_COMPLETE_LINEAGE_CLICK,
-            data: {
-                completeLineage: newState
-            }
-        };
-        window.kotlinCallback(stringifyEvent(event));
-        if (!newState) {
-            filterNodesEdgesDownToUpstreamDownstream();
-        }
-        setShowCompleteLineage(newState);
-    }
-
-    function filterNodesEdgesDownToUpstreamDownstream() {
-        const currentNode = nodes.find(n => n.data.isSelected);
-        if (currentNode?.id != null) {
-            const visitedUpstream = new Set<string>();
-            const visitedDownStream = new Set<string>();
-            const upStreamEdges = findAncestors(currentNode.id, edges, visitedUpstream);
-            const downStreamEdges = findChildren(currentNode.id, edges, visitedDownStream);
-            const upDownStreamEdges = [...upStreamEdges, ...downStreamEdges];
-            const newEdges = edges.filter(e => upDownStreamEdges.includes(e.source) || upDownStreamEdges.includes(e.target));
-            const newNodes = nodes.filter(n => upDownStreamEdges.includes(n.id) || n.data.isSelected);
-            setEdges(newEdges);
-            setNodes(newNodes);
-        }
-    }
-
-    function findAncestors(nodeId: string, edges: Edge[], visited: Set<string> = new Set()): string[] {
-        if (visited.has(nodeId)) return [];
-        visited.add(nodeId);
-
-        const ancestors = edges
-            .filter(edge => edge.target === nodeId)
-            .map(edge => edge.source);
-
-        return ancestors.reduce((acc, ancestor) => {
-            return acc.concat(ancestor, findAncestors(ancestor, edges, visited));
-        }, [] as string[]);
-    }
-
-    function findChildren(nodeId: string, edges: Edge[], visited: Set<string> = new Set()): string[] {
-        if (visited.has(nodeId)) return [];
-        visited.add(nodeId);
-
-        const children = edges
-            .filter(edge => edge.source === nodeId)
-            .map(edge => edge.target);
-
-        return children.reduce((acc, child) => {
-            return acc.concat(child, findChildren(child, edges, visited));
-        }, [] as string[]);
-    }
 
     useEffect(() => {
         if (isDevMode && nodes.length === 0) {
             fetch('./test-data.json').then(response => response.json()).then(data => {
-                setLineageInfo(data);
+                processLineageInfo(data);
             });
         }
 
-        if (!window.setLineageInfo || !window.setActiveNode) {
-            (window as Window).setLineageInfo = setLineageInfo;
+        if (!window.processLineageInfo || !window.setActiveNode) {
+            (window as Window).processLineageInfo = processLineageInfo;
             (window as Window).setActiveNode = setActiveNode;
         }
         return () => {
-            (window as Window).setLineageInfo = undefined;
+            (window as Window).processLineageInfo = undefined;
             (window as Window).setActiveNode = undefined;
         };
-    });
+    }, []);
 
     /*
      @ts-expect-error - this is a known issue with the types
@@ -208,7 +140,7 @@ export default function Flow() {
                     <MdRefresh size={14}/>
                 </ControlButton>
                 <label className="fancy-checkbox">
-                    <input type="checkbox" checked={showCompleteLineage} onChange={completeLineageToggle}/>
+                    <input type="checkbox" checked={renderCompleteLineage} onChange={() => setRenderCompleteLineage(complete => !complete)}/>
                     <span className="checkbox-label">Show full lineage</span>
                 </label>
             </Controls>
