@@ -5,9 +5,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { LineageInfo } from '../types';
 import { DEdge, DNode } from '../types.ts';
 
-const dagreGraph = new dagre.graphlib.Graph();
-dagreGraph.setDefaultEdgeLabel(() => ({}));
-
 const nodeWidth = 200;
 const nodeHeight = 50;
 
@@ -54,64 +51,50 @@ export const useLineageLayout = () => {
         };
     }, []);
 
+    const mapNodes = (nodes: DNode[]): Node[] => {
+        return nodes.map((node: DNode) => ({
+            id: node.id,
+            position: { x: 0, y: 0 },
+            data: {
+                label: node.id,
+                isSelected: node.isSelected,
+                relativePath: node.relativePath,
+            },
+            type: 'dbtModel',
+        }));
+    };
+
+    const mapEdges = (edges: DEdge[]): Edge[] => {
+        return edges.map((edge: DEdge) => ({
+            id: `${edge.parent}-${edge.child}`,
+            source: edge.parent,
+            target: edge.child,
+            markerEnd: {
+                type: MarkerType.ArrowClosed,
+            },
+        }));
+    };
+
     const configureNodes = useMemo(() => {
         return (info: LineageInfo): Node[] => {
-            if (renderCompleteLineage) {
-                return info.nodes.map((node: DNode) => ({
-                    id: node.id,
-                    position: { x: 0, y: 0 },
-                    data: {
-                        label: node.id,
-                        isSelected: node.isSelected,
-                        relativePath: node.relativePath,
-                    },
-                    type: 'dbtModel',
-                }));
-            } else {
-                return filterNodesEdges(info).newNodes.map((node: DNode) => ({
-                    id: node.id,
-                    position: { x: 0, y: 0 },
-                    data: {
-                        label: node.id,
-                        isSelected: node.isSelected,
-                        relativePath: node.relativePath,
-                    },
-                    type: 'dbtModel',
-                }));
-            }
+            return renderCompleteLineage ? mapNodes(info.nodes) : mapNodes(filterNodesEdges(info).newNodes);
         };
     }, [renderCompleteLineage, filterNodesEdges]);
 
     const configureEdges = useMemo(() => {
         return (info: LineageInfo): Edge[] => {
-            if (renderCompleteLineage) {
-                return info.edges.map((edge: DEdge) => ({
-                    id: `${edge.parent}-${edge.child}`,
-                    source: edge.parent,
-                    target: edge.child,
-                    markerEnd: {
-                        type: MarkerType.ArrowClosed,
-                    },
-                }));
-            } else {
-                return filterNodesEdges(info).newEdges.map((edge: DEdge) => ({
-                    id: `${edge.parent}-${edge.child}`,
-                    source: edge.parent,
-                    target: edge.child,
-                    markerEnd: {
-                        type: MarkerType.ArrowClosed,
-                    },
-                }));
-            }
+            return renderCompleteLineage ? mapEdges(info.edges) : mapEdges(filterNodesEdges(info).newEdges);
         };
     }, [renderCompleteLineage, filterNodesEdges]);
 
     const getLayoutElements = useMemo(() => {
         return (info: LineageInfo) => {
+            const dagreGraph = new dagre.graphlib.Graph();
+            dagreGraph.setDefaultEdgeLabel(() => ({}));
+            dagreGraph.setGraph({ rankdir: 'LR' });
+
             const nodes = configureNodes(info);
             const edges = configureEdges(info);
-
-            dagreGraph.setGraph({ rankdir: 'LR' });
 
             nodes.forEach((node) => {
                 dagreGraph.setNode(node.id, { width: nodeWidth, height: nodeHeight });
@@ -158,9 +141,9 @@ export const useLineageLayout = () => {
             setNodes(layoutedNodes);
             layoutedEdges.forEach(layoutEdge => setEdges((edges) => addEdge(layoutEdge, edges)));
             const newActiveNode = layoutedNodes.find(n => n.data.isSelected);
-                if (newActiveNode) {
-                    reactFlow.setCenter(newActiveNode.position.x, newActiveNode.position.y, { duration: 300, zoom: reactFlow.getZoom() });
-                }
+            if (newActiveNode) {
+                reactFlow.setCenter(newActiveNode.position.x, newActiveNode.position.y, { duration: 300, zoom: reactFlow.getZoom() });
+            }
         }
     }, [getLayoutElements, reactFlow, setEdges, setNodes, renderCompleteLineage, lineageInfo]);
 
