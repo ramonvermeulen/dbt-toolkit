@@ -2,11 +2,11 @@ package com.github.ramonvermeulen.dbtToolkit.ui.settings
 
 import com.github.ramonvermeulen.dbtToolkit.services.DbtToolkitSettingsService
 import com.intellij.openapi.components.service
+import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.testFramework.LightPlatformTestCase
 import junit.framework.TestCase
 import javax.swing.JComponent
 import javax.swing.JPanel
-import javax.swing.JTextField
 
 // TODO(ramon) for UI tests, take a lookt at https://github.com/JetBrains/intellij-ui-test-robot
 class DbtToolkitSettingsConfigurableTest : LightPlatformTestCase() {
@@ -29,17 +29,17 @@ class DbtToolkitSettingsConfigurableTest : LightPlatformTestCase() {
     }
 
     fun `test isModified with some modifications`() {
-        val dbtProjectsDirField = (mainSwingComponent.getComponent(0) as JPanel).getComponent(1) as JTextField
+        val dbtProjectsDirField = (mainSwingComponent.getComponent(0) as JPanel).getComponent(1) as TextFieldWithBrowseButton
         dbtProjectsDirField.text = "some text"
-        val dbtDotEnvDirField = (mainSwingComponent.getComponent(0) as JPanel).getComponent(5) as JTextField
+        val dbtDotEnvDirField = (mainSwingComponent.getComponent(0) as JPanel).getComponent(5) as TextFieldWithBrowseButton
         dbtDotEnvDirField.text = "/foo/bar"
         TestCase.assertTrue(configurable.isModified())
     }
 
     fun `test apply`() {
-        val dbtProjectsDirField = (mainSwingComponent.getComponent(0) as JPanel).getComponent(1) as JTextField
+        val dbtProjectsDirField = (mainSwingComponent.getComponent(0) as JPanel).getComponent(1) as TextFieldWithBrowseButton
         dbtProjectsDirField.text = "some text"
-        val dbtDotEnvDirField = (mainSwingComponent.getComponent(0) as JPanel).getComponent(5) as JTextField
+        val dbtDotEnvDirField = (mainSwingComponent.getComponent(0) as JPanel).getComponent(5) as TextFieldWithBrowseButton
         dbtDotEnvDirField.text = "/foo/bar"
         configurable.apply()
         TestCase.assertEquals("some text", settingsService.state.settingsDbtProjectDir)
