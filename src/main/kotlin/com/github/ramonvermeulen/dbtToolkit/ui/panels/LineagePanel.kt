@@ -100,7 +100,6 @@ class LineagePanel(private val project: Project) :
         return null
     }
 
-
     private fun handleRefreshClick() {
         val file = FileEditorManager.getInstance(project).selectedFiles.firstOrNull()
         if (file != null && !isRefreshingLineage) {
