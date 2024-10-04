@@ -4,6 +4,15 @@
 
 ## [Unreleased]
 
+## [0.1.2] - 2024-10-04
+
+- feat: Added support for rendering only up/down by @ramonvermeulen in https://github.com/ramonvermeulen/dbt-toolkit/pull/152
+- feat: Put hovering node always on top by @ramonvermeulen in https://github.com/ramonvermeulen/dbt-toolkit/pull/161
+- refactor: do more lineage related actions on the client side by @ramonvermeulen in https://github.com/ramonvermeulen/dbt-toolkit/pull/167
+- feat: use file-pickers instead of text inputs by @ramonvermeulen in https://github.com/ramonvermeulen/dbt-toolkit/pull/168
+- fix: better error message when dbt executable can't be found by @ramonvermeulen in https://github.com/ramonvermeulen/dbt-toolkit/pull/169
+- several dependabot dependency upgrades
+
 ## [0.1.1] - 2024-08-23
 
 - Changelog update - `v0.1.0` by @github-actions in https://github.com/ramonvermeulen/dbt-toolkit/pull/76
@@ -81,7 +90,8 @@
 - **Lineage Rendering**: Visualize the dependencies and relationships between your dbt models directly in your IDE. This feature aids in understanding the impact of changes and the flow of data in your project. Additionally, it provides a quicker way to navigate through your dbt project.  
 - **dbt Documentation**: Access your dbt documentation within your IDE, eliminating the need to switch between different tools and platforms. This feature promotes a more efficient workflow and keeps essential information at your fingertips.
 
-[Unreleased]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.1.2...HEAD
+[0.1.2]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.0.5-alpha...v0.1.0
 [0.0.5-alpha]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.0.4-alpha...v0.0.5-alpha
