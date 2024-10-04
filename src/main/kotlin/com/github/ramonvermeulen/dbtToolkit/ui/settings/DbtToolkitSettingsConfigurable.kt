@@ -2,10 +2,11 @@ package com.github.ramonvermeulen.dbtToolkit.ui.settings
 
 import com.github.ramonvermeulen.dbtToolkit.services.DbtToolkitSettingsService
 import com.intellij.openapi.components.service
+import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.ui.JBIntSpinner
-import com.intellij.ui.components.JBTextField
 import com.intellij.ui.table.JBTable
 import com.intellij.util.ui.JBUI
 import java.awt.BorderLayout
@@ -23,12 +24,34 @@ import javax.swing.table.DefaultTableModel
 
 class DbtToolkitSettingsConfigurable(project: Project) : Configurable {
     private var dbtToolkitSettingsService = project.service<DbtToolkitSettingsService>()
-    private var dbtProjectDirField = JBTextField()
-    private var dbtTargetDirField = JBTextField()
-    private var dotEnvFilePathField = JBTextField()
+    private var dbtProjectDirField = TextFieldWithBrowseButton()
+    private var dbtTargetDirField = TextFieldWithBrowseButton()
+    private var dotEnvFilePathField = TextFieldWithBrowseButton()
     private var dbtCommandTimeoutField = JBIntSpinner(0, 0, 3600)
     private var envVarsTable = JBTable()
     private var settingsPanel = JPanel()
+
+
+    init {
+        dbtProjectDirField.addBrowseFolderListener(
+            "Select dbt Project Directory",
+            null,
+            project,
+            FileChooserDescriptorFactory.createSingleFolderDescriptor()
+        )
+        dbtTargetDirField.addBrowseFolderListener(
+            "Select dbt Target Directory",
+            null,
+            project,
+            FileChooserDescriptorFactory.createSingleFolderDescriptor()
+        )
+        dotEnvFilePathField.addBrowseFolderListener(
+            "Select .env File",
+            null,
+            project,
+            FileChooserDescriptorFactory.createSingleFileDescriptor()
+        )
+    }
 
     override fun getDisplayName(): String {
         return "dbtToolkit Settings"
