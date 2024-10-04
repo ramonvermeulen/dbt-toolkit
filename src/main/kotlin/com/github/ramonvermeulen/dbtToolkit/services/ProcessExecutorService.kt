@@ -5,6 +5,7 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import java.io.File
+import java.io.IOException
 
 @Service(Service.Level.PROJECT)
 class ProcessExecutorService(project: Project) {
@@ -20,7 +21,20 @@ class ProcessExecutorService(project: Project) {
     fun executeCommand(command: List<String>): Process {
         val processBuilder = getDbtProcessBuilder(command)
         loggingService.log(">>> ${processBuilder.command().joinToString(" ")}\n", ConsoleViewContentType.NORMAL_OUTPUT)
-        processBuilder.directory(settings.state.settingsDbtProjectDir.let { File(it) })
+        try {
+            processBuilder.directory(settings.state.settingsDbtProjectDir.let { File(it) })
+            return processBuilder.start()
+        } catch (e: IOException) {
+            if (e.message?.contains("Cannot run program") == true) {
+                loggingService.log(
+                    "An error occurred, could not find dbt executable. Please install dbt globally or configure a virtual environment.\n",
+                    ConsoleViewContentType.LOG_ERROR_OUTPUT,
+                )
+                loggingService.log(e.message!!, ConsoleViewContentType.LOG_ERROR_OUTPUT)
+            } else {
+                throw e
+            }
+        }
         return processBuilder.start()
     }
 

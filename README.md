@@ -39,6 +39,7 @@ through `{{ ref() }}` and `{{ source() }}` tags.
 
 ## Prerequisites
 * For IntelliJ users, it is required to have the [**Python**](https://plugins.jetbrains.com/plugin/631-python) plugin installed so that you can configure a venv.
+<br>![Set-up venv](./assets/img/settings.jpg)
 * I also recommended to have a venv configured and [**dbt-core**](https://pypi.org/project/dbt-core/) with your required adapter installed within the venv: <br>
 `File` > `Project Structure` > `SDK` > `Select Python` > `Select New Virtual Environment`. If not it is required to have dbt-core globally installed.
 * Supported/Tested dbt versions are: >=1.7.0
