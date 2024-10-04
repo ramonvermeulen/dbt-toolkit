@@ -33,8 +33,7 @@ class ManifestService(project: Project) {
     }
 
     // todo(ramon) reconsider this implementation, might be improved
-    // not writing tests yet because I'm not sure if I want to stick with this implementation
-    private fun getLineageForNode(node: String, completeLineage: Boolean) {
+    private fun getCompleteLineageForNode(node: String) {
         val visited = mutableSetOf<String>()
         val nodes = mutableSetOf<Node>()
         val relationships = mutableSetOf<Edge>()
@@ -42,8 +41,6 @@ class ManifestService(project: Project) {
         fun depthFirstSearch(
             node: String,
             initialNode: Boolean = false,
-            resolveChildren: Boolean = true,
-            resolveParents: Boolean = true,
         ) {
             if (node in visited) return
             visited.add(node)
@@ -66,30 +63,15 @@ class ManifestService(project: Project) {
                         child.asString.takeIf { it.startsWith("test.") }
                     }?.toSet() ?: emptySet()
 
-                if (resolveChildren) {
-                    children?.forEach { child ->
-                        if (!child.asString.startsWith("test.")) {
-                            depthFirstSearch(
-                                child.asString,
-                                initialNode = false,
-                                resolveChildren = true,
-                                resolveParents = completeLineage,
-                            )
-                            relationships.add(Edge(node, child.asString))
-                        }
+                children?.forEach { child ->
+                    if (!child.asString.startsWith("test.")) {
+                        depthFirstSearch(child.asString)
+                        relationships.add(Edge(node, child.asString))
                     }
                 }
-
-                if (resolveParents) {
-                    parents?.forEach { parent ->
-                        depthFirstSearch(
-                            parent.asString,
-                            initialNode = false,
-                            resolveChildren = completeLineage,
-                            resolveParents = true,
-                        )
-                        relationships.add(Edge(parent.asString, node))
-                    }
+                parents?.forEach { parent ->
+                    depthFirstSearch(parent.asString)
+                    relationships.add(Edge(parent.asString, node))
                 }
 
                 nodes.add(Node(node, isSelected = initialNode, tests = tests, relativePath = nodePath))
@@ -103,7 +85,6 @@ class ManifestService(project: Project) {
     fun refreshLineageInfoForNode(
         node: String,
         enforceReparse: Boolean,
-        completeLineage: Boolean,
     ) {
         manifestLock.withLock {
             if (enforceReparse || manifest == null ||
@@ -111,7 +92,7 @@ class ManifestService(project: Project) {
             ) {
                 parseManifest()
             }
-            getLineageForNode(node, completeLineage)
+            getCompleteLineageForNode(node)
         }
     }
 }

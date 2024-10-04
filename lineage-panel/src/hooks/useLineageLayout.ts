@@ -12,38 +12,47 @@ const nodeWidth = 200;
 const nodeHeight = 50;
 
 export const useLineageLayout = () => {
-    const [lineageInfo, setLineageInfo] = useState<LineageInfo | undefined>();
+    const [lineageInfo, setLineageInfo] = useState<LineageInfo>({ nodes: [], edges: [] });
     const [renderCompleteLineage, setRenderCompleteLineage] = useState(false);
     const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
     const reactFlow = useReactFlow();
 
     const filterNodesEdges = useMemo(() => {
-        const currentNode = nodes.find(n => n.data.isSelected);
-        if (!currentNode) return { newNodes: nodes, newEdges: edges };
+        return (info: LineageInfo) => {
+            const currentNode = info.nodes.find(n => n.isSelected);
+            if (!currentNode) return { newNodes: info.nodes, newEdges: info.edges };
 
-        const visited = new Set<string>();
-        const traverse = (nodeId: string, direction: 'up' | 'down'): string[] => {
-            if (visited.has(nodeId)) return [];
-            visited.add(nodeId);
+            const traverse = (nodeId: string, direction: 'up' | 'down'): string[] => {
+                const visited = new Set<string>();
+                const stack = [nodeId];
+                const result = [];
 
-            const relatedNodes = edges
-                .filter(edge => direction === 'up' ? edge.target === nodeId : edge.source === nodeId)
-                .map(edge => direction === 'up' ? edge.source : edge.target);
+                while (stack.length) {
+                    const current = stack.pop();
+                    if (!current || visited.has(current)) continue;
+                    visited.add(current);
+                    result.push(current);
 
-            return relatedNodes.reduce((acc, relatedNode) => {
-                return acc.concat(relatedNode, traverse(relatedNode, direction));
-            }, [] as string[]);
+                    const relatedNodes = info.edges
+                        .filter(edge => direction === 'up' ? edge.parent === current : edge.child === current)
+                        .map(edge => direction === 'up' ? edge.child : edge.parent);
+
+                    stack.push(...relatedNodes);
+                }
+
+                return result;
+            };
+
+            const upStreamEdges = traverse(currentNode.id, 'up');
+            const downStreamEdges = traverse(currentNode.id, 'down');
+            const upDownStreamEdges = new Set([...upStreamEdges, ...downStreamEdges]);
+            const newEdges = info.edges.filter(e => upDownStreamEdges.has(e.child) || upDownStreamEdges.has(e.parent));
+            const newNodes = info.nodes.filter(n => upDownStreamEdges.has(n.id) || n.isSelected);
+
+            return { newNodes, newEdges };
         };
-
-        const upStreamEdges = traverse(currentNode.id, 'up');
-        const downStreamEdges = traverse(currentNode.id, 'down');
-        const upDownStreamEdges = [...upStreamEdges, ...downStreamEdges];
-        const newEdges = edges.filter(e => upDownStreamEdges.includes(e.source) || upDownStreamEdges.includes(e.target));
-        const newNodes = nodes.filter(n => upDownStreamEdges.includes(n.id) || n.data.isSelected);
-
-        return { newNodes, newEdges };
-    }, [nodes, edges]);
+    }, []);
 
     const configureNodes = useMemo(() => {
         return (info: LineageInfo): Node[] => {
@@ -59,7 +68,16 @@ export const useLineageLayout = () => {
                     type: 'dbtModel',
                 }));
             } else {
-                return filterNodesEdges.newNodes;
+                return filterNodesEdges(info).newNodes.map((node: DNode) => ({
+                    id: node.id,
+                    position: { x: 0, y: 0 },
+                    data: {
+                        label: node.id,
+                        isSelected: node.isSelected,
+                        relativePath: node.relativePath,
+                    },
+                    type: 'dbtModel',
+                }));
             }
         };
     }, [renderCompleteLineage, filterNodesEdges]);
@@ -76,7 +94,14 @@ export const useLineageLayout = () => {
                     },
                 }));
             } else {
-                return filterNodesEdges.newEdges;
+                return filterNodesEdges(info).newEdges.map((edge: DEdge) => ({
+                    id: `${edge.parent}-${edge.child}`,
+                    source: edge.parent,
+                    target: edge.child,
+                    markerEnd: {
+                        type: MarkerType.ArrowClosed,
+                    },
+                }));
             }
         };
     }, [renderCompleteLineage, filterNodesEdges]);
@@ -113,31 +138,31 @@ export const useLineageLayout = () => {
 
             return { nodes, edges };
         };
-    }, [lineageInfo, renderCompleteLineage]);
+    }, [configureNodes, configureEdges]);
 
     const setActiveNode = useCallback(async (nodeId: string) => {
-        const newNodes = nodes.map(n => ({
-            ...n,
-            data: {
-                ...n.data,
+        const newLineageInfo: LineageInfo = {
+            edges: lineageInfo.edges,
+            nodes: lineageInfo.nodes.map(n => ({
+                ...n,
                 isSelected: n.id === nodeId,
-            }
-        }));
-        setNodes(newNodes);
-        const newActiveNode = nodes.find(n => n.id === nodeId);
-        if (newActiveNode) {
-            await reactFlow.setCenter(newActiveNode.position.x, newActiveNode.position.y, { duration: 100, zoom: reactFlow.getZoom() });
-        }
-    }, [reactFlow, nodes, setNodes]);
+            })),
+        };
+        setLineageInfo(newLineageInfo);
+
+    }, [lineageInfo.nodes, lineageInfo.edges]);
 
     useEffect(() => {
         if (lineageInfo) {
             const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutElements(lineageInfo);
             setNodes(layoutedNodes);
             layoutedEdges.forEach(layoutEdge => setEdges((edges) => addEdge(layoutEdge, edges)));
-            setTimeout(() => reactFlow.fitView({ duration: 300 }), 500);
+            const newActiveNode = layoutedNodes.find(n => n.data.isSelected);
+                if (newActiveNode) {
+                    reactFlow.setCenter(newActiveNode.position.x, newActiveNode.position.y, { duration: 300, zoom: reactFlow.getZoom() });
+                }
         }
-    }, [renderCompleteLineage, lineageInfo]);
+    }, [getLayoutElements, reactFlow, setEdges, setNodes, renderCompleteLineage, lineageInfo]);
 
     return {
         nodes,
@@ -145,7 +170,7 @@ export const useLineageLayout = () => {
         onNodesChange,
         edges,
         onEdgesChange,
-        processLineageInfo: setLineageInfo,
+        setLineageInfo,
         renderCompleteLineage,
         setRenderCompleteLineage,
     };

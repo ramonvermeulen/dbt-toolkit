@@ -23,7 +23,7 @@ declare global {
         // javascript -> kotlin bridge functions (set by the Kotlin code)
         kotlinCallback: (jsonEncodedValue: string) => void;
         // kotlin -> javascript bridge functions (set by the JavaScript code)
-        processLineageInfo?: (info: LineageInfo) => void;
+        setLineageInfo?: (info: LineageInfo) => void;
         setActiveNode?: (nodeId: string) => void;
     }
 }
@@ -49,7 +49,7 @@ export default function Flow() {
         onNodesChange,
         edges,
         onEdgesChange,
-        processLineageInfo,
+        setLineageInfo,
         renderCompleteLineage,
         setRenderCompleteLineage,
     } = useLineageLayout();
@@ -90,19 +90,19 @@ export default function Flow() {
     useEffect(() => {
         if (isDevMode && nodes.length === 0) {
             fetch('./test-data.json').then(response => response.json()).then(data => {
-                processLineageInfo(data);
+                setLineageInfo(data);
             });
         }
 
-        if (!window.processLineageInfo || !window.setActiveNode) {
-            (window as Window).processLineageInfo = processLineageInfo;
+        if (!window.setLineageInfo || !window.setActiveNode) {
+            (window as Window).setLineageInfo = setLineageInfo;
             (window as Window).setActiveNode = setActiveNode;
         }
         return () => {
-            (window as Window).processLineageInfo = undefined;
+            (window as Window).setLineageInfo = undefined;
             (window as Window).setActiveNode = undefined;
         };
-    }, []);
+    }, [nodes.length, setActiveNode, setLineageInfo]);
 
     /*
      @ts-expect-error - this is a known issue with the types

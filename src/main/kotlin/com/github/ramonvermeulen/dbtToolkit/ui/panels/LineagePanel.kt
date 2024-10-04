@@ -34,7 +34,6 @@ import com.intellij.ui.jcef.JBCefJSQuery
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.boolean
 import kotlinx.serialization.json.jsonPrimitive
 import org.cef.browser.CefBrowser
 import org.cef.browser.CefFrame
@@ -49,7 +48,6 @@ import javax.swing.SwingUtilities
 enum class JsEventType {
     NODE_CLICK,
     REFRESH_CLICK,
-    SHOW_COMPLETE_LINEAGE_CLICK,
 }
 
 @Serializable
@@ -67,7 +65,6 @@ class LineagePanel(private val project: Project) :
     private var lineageInfo: LineageInfo? = null
     private var activeFile: VirtualFile? = null
     private var isRefreshingLineage = false
-    private var completeLineage = false
 
     init {
         project.messageBus.connect().subscribe(ActiveFileService.TOPIC, this)
@@ -98,20 +95,11 @@ class LineagePanel(private val project: Project) :
             handleNodeClick(jsData)
         } else if (jsData.event == JsEventType.REFRESH_CLICK) {
             handleRefreshClick()
-        } else if (jsData.event == JsEventType.SHOW_COMPLETE_LINEAGE_CLICK) {
-            handleCompleteLineageClick(jsData)
         }
 
         return null
     }
 
-    private fun handleCompleteLineageClick(jsData: JsEvent) {
-        completeLineage = jsData.data["completeLineage"]!!.jsonPrimitive.boolean
-        // when going from complete to incomplete, we already have all necessary data on the react side
-        if (completeLineage) {
-            handleRefreshClick()
-        }
-    }
 
     private fun handleRefreshClick() {
         val file = FileEditorManager.getInstance(project).selectedFiles.firstOrNull()
@@ -119,7 +107,7 @@ class LineagePanel(private val project: Project) :
             isRefreshingLineage = true
             ApplicationManager.getApplication().executeOnPooledThread {
                 try {
-                    refreshLineageInfo(file, true, completeLineage)
+                    refreshLineageInfo(file, true)
                 } finally {
                     isRefreshingLineage = false
                 }
@@ -206,14 +194,14 @@ class LineagePanel(private val project: Project) :
         ApplicationManager.getApplication().executeOnPooledThread {
             if (file != null && SUPPORTED_LINEAGE_EXTENSIONS.contains(file.extension)) {
                 activeFile = file
-                refreshLineageInfo(file, false, completeLineage)
+                refreshLineageInfo(file, false)
             }
         }
     }
 
     override fun lineageInfoChanged(newLineageInfo: LineageInfo) {
         ApplicationManager.getApplication().executeOnPooledThread {
-            if (newLineageInfo == lineageInfo && activeFile!!.exists() && !completeLineage) {
+            if (newLineageInfo == lineageInfo && activeFile!!.exists()) {
                 handleSameNodesAndEdges(activeFile!!, newLineageInfo)
                 return@executeOnPooledThread
             }
@@ -230,7 +218,6 @@ class LineagePanel(private val project: Project) :
     private fun refreshLineageInfo(
         activeFile: VirtualFile?,
         enforceReparse: Boolean,
-        completeLineage: Boolean,
     ) {
         val projectName = settings.state.dbtProjectName
 
@@ -259,7 +246,7 @@ class LineagePanel(private val project: Project) :
         activeFile?.let { file ->
             nodeTypes.firstOrNull { file.path.matches(it.pattern) }?.let { nodeType ->
                 val nodeId = "${nodeType.type}.$projectName.${file.nameWithoutExtension}"
-                manifestService.refreshLineageInfoForNode(nodeId, enforceReparse, completeLineage)
+                manifestService.refreshLineageInfoForNode(nodeId, enforceReparse)
             }
         }
     }
