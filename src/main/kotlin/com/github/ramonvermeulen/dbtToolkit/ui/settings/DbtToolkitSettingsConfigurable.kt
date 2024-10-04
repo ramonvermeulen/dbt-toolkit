@@ -31,25 +31,24 @@ class DbtToolkitSettingsConfigurable(project: Project) : Configurable {
     private var envVarsTable = JBTable()
     private var settingsPanel = JPanel()
 
-
     init {
         dbtProjectDirField.addBrowseFolderListener(
             "Select dbt Project Directory",
             null,
             project,
-            FileChooserDescriptorFactory.createSingleFolderDescriptor()
+            FileChooserDescriptorFactory.createSingleFolderDescriptor(),
         )
         dbtTargetDirField.addBrowseFolderListener(
             "Select dbt Target Directory",
             null,
             project,
-            FileChooserDescriptorFactory.createSingleFolderDescriptor()
+            FileChooserDescriptorFactory.createSingleFolderDescriptor(),
         )
         dotEnvFilePathField.addBrowseFolderListener(
             "Select .env File",
             null,
             project,
-            FileChooserDescriptorFactory.createSingleFileDescriptor()
+            FileChooserDescriptorFactory.createSingleFileDescriptor(),
         )
     }
 
