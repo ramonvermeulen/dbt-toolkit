@@ -136,8 +136,8 @@ class DbtToolkitSettingsConfigurable(project: Project) : Configurable {
     }
 
     override fun reset() {
-        dbtProjectDirField.text = dbtToolkitSettingsService.state.dbtProjectsDir
-        dbtTargetDirField.text = dbtToolkitSettingsService.state.dbtTargetDir
+        dbtProjectDirField.text = dbtToolkitSettingsService.state.settingsDbtProjectDir
+        dbtTargetDirField.text = dbtToolkitSettingsService.state.settingsDbtTargetDir
         dbtCommandTimeoutField.value = dbtToolkitSettingsService.state.settingsDbtCommandTimeout
         dotEnvFilePathField.text = dbtToolkitSettingsService.state.settingsDotEnvFilePath
 

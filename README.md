@@ -53,6 +53,11 @@ please refer to the [**official documentation**](https://www.jetbrains.com/help/
 ## Setting environment variables
 If your dbt project requires environment variables (e.g. `DBT_SOME_ENV_VAR`), please set them via the plugin settings.
 `File` > `Settings` > `dbtToolkit` > `Environment Variables`
+
+There is also support for `.env` files, the plugin automatically checks for a `.env` file in the root of your project.
+Via the plugin settings, you can also specify a custom path to the `.env` file.
+> _Note: The global plugin environment variables will overwrite any environment variable with the same key in your 
+> `.env` files_
 <!-- Plugin description end -->
 
 ## Feedback and Contributions
