@@ -19,8 +19,8 @@ Providing a more streamlined and integrated approach to managing your dbt projec
 well-known VSCode plugin [**vscode-dbt-power-user**](https://github.com/AltimateAI/vscode-dbt-power-user), and aims to become an alternative
 for JetBrains IDEs.
 
-> Note: For larger dbt projects (e.g. hundreds of models) the performance might not be as good, I am looking for ways to improve the performance even
-> for larger dbt projects.
+> _Note: For larger dbt projects (e.g. hundreds of models) the performance might not be as good, I am looking for ways to improve the performance even
+> for larger dbt projects._
 
 
 ## Features
