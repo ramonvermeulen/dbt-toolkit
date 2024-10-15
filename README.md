@@ -27,8 +27,8 @@ for JetBrains IDEs.
 * **Lineage Rendering**: Visualize the dependencies and relationships between your dbt models directly in your IDE. 
 This feature helps you understand the impact of changes and the flow of data in your project. Besides that it offers a 
 quicker way to navigate through your dbt project.
-* **dbt Documentation**: Access your dbt documentation within your IDE, eliminating the need to switch between different 
-tools and platforms. This feature supports a more efficient workflow and keeps essential information at your fingertips.
+* **dbt Documentation**: Access your dbt documentation within your IDE, eliminating the need to constantly switch between
+   your browser and IDE.
 * **Preview compiled SQL**: Preview the compiled SQL of a dbt model quickly in your IDE, and recompile a single model on
   the fly.
 * **Preview data**: Preview the output data of a dbt model directly in your IDE.
