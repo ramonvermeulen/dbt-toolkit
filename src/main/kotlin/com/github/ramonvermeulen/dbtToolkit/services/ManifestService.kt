@@ -20,12 +20,29 @@ class ManifestService(project: Project) {
     private var manifest: JsonObject? = null
     private val manifestLock = ReentrantLock()
 
+    private fun extractMajorMinor(version: String): Pair<Int, Int>? {
+        val regex = """(\d+)\.(\d+)""".toRegex()
+
+        val matchResult = regex.find(version)
+
+        return matchResult?.let {
+            val (major, minor) = it.destructured
+            try {
+                Pair(major.toInt(), minor.toInt())
+            } catch (e: NumberFormatException) {
+                null
+            }
+        }
+    }
+
     @Synchronized
     private fun parseManifest() {
         dbtCommandExecutorService.executeCommand(listOf("parse"))
         val file = File("${settingsService.state.settingsDbtTargetDir}/manifest.json")
         if (file.exists()) {
             manifest = JsonParser.parseString(file.readText()).asJsonObject
+            val dbtVersionString = manifest!!.getAsJsonObject("metadata").get("dbt_version").asString
+            settingsService.state.dbtVersion = extractMajorMinor(dbtVersionString)
         } else {
             println("Manifest file does not exist")
             println("looked in the following path: ${settingsService.state.settingsDbtTargetDir}/manifest.json")

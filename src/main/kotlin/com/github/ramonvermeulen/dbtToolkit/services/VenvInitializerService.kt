@@ -15,7 +15,6 @@ import java.nio.file.Path
 class VenvInitializerService(private var project: Project) {
     private val loggingService = project.service<LoggingService>()
     private var venvDbtExecutablePath: String? = null
-    var isInitialized = false
 
     private fun getDbtPath(venvPath: Path): Path {
         return if (SystemUtils.IS_OS_WINDOWS) {
@@ -32,11 +31,9 @@ class VenvInitializerService(private var project: Project) {
                 "Python virtual environment not detected. Attempting to use a global dbt installation.\n\n",
                 ConsoleViewContentType.ERROR_OUTPUT,
             )
-            isInitialized = true
             return
         }
 
-        loggingService.log("Detected Python virtual environment at: $venvExecutablePath\n", ConsoleViewContentType.NORMAL_OUTPUT)
         val dbtPath = getDbtPath(venvExecutablePath.parent)
 
         if (!Files.exists(dbtPath)) {
@@ -44,7 +41,6 @@ class VenvInitializerService(private var project: Project) {
                 "dbt installation not found within the virtual environment. Please install dbt and restart your IDE.\n\n",
                 ConsoleViewContentType.ERROR_OUTPUT,
             )
-            isInitialized = true
             return
         }
 
@@ -53,7 +49,6 @@ class VenvInitializerService(private var project: Project) {
             "Located dbt installation within the virtual environment at: $venvDbtExecutablePath\n\n",
             ConsoleViewContentType.NORMAL_OUTPUT,
         )
-        isInitialized = true
     }
 
     private fun getPythonVenvExecutablePath(project: Project): Path? {

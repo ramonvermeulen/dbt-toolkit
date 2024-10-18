@@ -30,7 +30,7 @@ class ProcessExecutorService(project: Project) {
                     "An error occurred, could not find dbt executable. Please install dbt globally or configure a virtual environment.\n",
                     ConsoleViewContentType.LOG_ERROR_OUTPUT,
                 )
-                loggingService.log(e.message!!, ConsoleViewContentType.LOG_ERROR_OUTPUT)
+                loggingService.log("${e.message!!}\n", ConsoleViewContentType.LOG_ERROR_OUTPUT)
             } else {
                 throw e
             }
