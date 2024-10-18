@@ -3,6 +3,7 @@ package com.github.ramonvermeulen.dbtToolkit.ui.panels
 import com.github.ramonvermeulen.dbtToolkit.services.ActiveFileListener
 import com.github.ramonvermeulen.dbtToolkit.services.ActiveFileService
 import com.github.ramonvermeulen.dbtToolkit.services.DbtCommandExecutorService
+import com.github.ramonvermeulen.dbtToolkit.services.DbtToolkitSettingsService
 import com.github.ramonvermeulen.dbtToolkit.ui.IdeaPanel
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
@@ -20,6 +21,7 @@ import javax.swing.JPanel
 import javax.swing.SwingUtilities
 
 class PreviewDataPanel(project: Project) : IdeaPanel, Disposable, ActiveFileListener {
+    private val settings = project.service<DbtToolkitSettingsService>()
     private val dbtCommandExecutorService = project.service<DbtCommandExecutorService>()
     private val mainPanel = JPanel(BorderLayout())
     private val previewDataButton = JButton("Preview Data")
@@ -82,10 +84,13 @@ class PreviewDataPanel(project: Project) : IdeaPanel, Disposable, ActiveFileList
 
     private fun previewData() {
         ApplicationManager.getApplication().executeOnPooledThread {
-            val output =
-                dbtCommandExecutorService.executeCommand(
-                    listOf("show", "--no-populate-cache", "--select", activeFile!!.nameWithoutExtension, "--limit", "10"),
-                )
+            val command = if (settings.state.dbtVersion != null && settings.state.dbtVersion!!.first <= 1 && settings.state.dbtVersion!!.second < 5) {
+                // --no-populate-cache is only available in dbt >= 1.5
+                listOf("show", "--select", activeFile!!.nameWithoutExtension, "--limit", "10")
+            } else {
+                listOf("show", "--no-populate-cache", "--select", activeFile!!.nameWithoutExtension, "--limit", "10")
+            }
+            val output = dbtCommandExecutorService.executeCommand(command)
             if (output.first == 0) {
                 val data = output.second.split("\n").takeLast(16).joinToString("\n").trimEnd()
                 SwingUtilities.invokeLater {
@@ -99,7 +104,7 @@ class PreviewDataPanel(project: Project) : IdeaPanel, Disposable, ActiveFileList
                 SwingUtilities.invokeLater {
                     ApplicationManager.getApplication().runWriteAction {
                         document.setText(
-                            "Error occured during execution of \"dbt show\" command. " +
+                            "Error occurred during execution of \"dbt show\" command. " +
                                 "Please check the logs in the console tab.",
                         )
                         previewDataButton.isEnabled = true

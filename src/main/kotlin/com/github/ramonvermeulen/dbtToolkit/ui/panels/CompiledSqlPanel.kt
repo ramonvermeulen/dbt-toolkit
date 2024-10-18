@@ -59,9 +59,13 @@ class CompiledSqlPanel(project: Project) : IdeaPanel, Disposable, ActiveFileList
                             }
                         }
                     }
-                    dbtCommandExecutorService.executeCommand(
-                        listOf("compile", "--no-populate-cache", "--select", activeFile!!.nameWithoutExtension),
-                    )
+                    val command = if (settings.state.dbtVersion != null && settings.state.dbtVersion!!.first <= 1 && settings.state.dbtVersion!!.second < 5) {
+                        // --no-populate-cache is only available in dbt >= 1.5
+                        listOf("compile", "--select", activeFile!!.nameWithoutExtension)
+                    } else {
+                        listOf("compile", "--no-populate-cache", "--select", activeFile!!.nameWithoutExtension)
+                    }
+                    dbtCommandExecutorService.executeCommand(command)
                 }
             } finally {
                 activeFileChanged(activeFile)
