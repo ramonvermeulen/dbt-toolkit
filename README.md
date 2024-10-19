@@ -68,6 +68,9 @@ Via the plugin settings, you can also specify a custom path to the `.env` file.
 I highly appreciate any feedback and contributions as I am developing and improving dbt-toolkit. 
 Feel free to report bugs, issues, or suggest features through the GitHub repository.
 
+## Troubleshooting
+Experiencing issues after upgrading the plugin? Try to delete your `.idea/dbtToolkitSettings.xml` file.
+If you're still experiencing problems, feel free to open a ticket!
 
 ---
 Plugin based on the [IntelliJ Platform Plugin Template][template].
