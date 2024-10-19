@@ -12,21 +12,22 @@ body,
   margin: 0;
 }
 
-@keyframes rotateAndGrow {
-  1% {
-    transform: scale(1.35) rotate(-5deg);
+@keyframes background-animation {
+  0% {
+    background-position: 0% 50%;
   }
   100% {
-    transform: scale(1) rotate(0);
+    background-position: 200% 50%;
   }
 }
 
 .active {
-  animation: rotateAndGrow 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+  animation: background-animation 15s linear infinite;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
   font-weight: bold;
   border: 0;
-  background: linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%);
+  background: linear-gradient(90deg, #FE6B8B, #FF8E53, #FE6B8B, #FF8E53, #FE6B8B);
+  background-size: 300% 300%;
   color: white;
   text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
 }
