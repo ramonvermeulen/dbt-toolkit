@@ -16,7 +16,7 @@ class ProcessOutputHandlerService(project: Project) {
 
     fun handleOutput(process: Process): Pair<Int, String> {
         val exitCode =
-            if (process.waitFor(settings.state.settingsDbtCommandTimeout, TimeUnit.SECONDS)) {
+            if (process.waitFor(settings.state.settingsDbtCommandTimeout.toLong(), TimeUnit.SECONDS)) {
                 process.exitValue()
             } else {
                 process.destroy()

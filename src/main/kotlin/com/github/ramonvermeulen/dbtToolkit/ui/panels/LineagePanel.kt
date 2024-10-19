@@ -23,6 +23,7 @@ import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.components.service
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.removeUserData
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
@@ -59,7 +60,7 @@ class LineagePanel(private val project: Project) :
     private val settings = project.service<DbtToolkitSettingsService>()
     private val ourCefClient = JBCefApp.getInstance().createClient()
     private val isDebug = System.getProperty("idea.plugin.in.sandbox.mode") == "true"
-    private val browser: JBCefBrowser = JBCefBrowserBuilder().setClient(ourCefClient).setEnableOpenDevToolsMenuItem(isDebug).setOffScreenRendering(true).build()
+    private val browser: JBCefBrowser = JBCefBrowserBuilder().setClient(ourCefClient).setEnableOpenDevToolsMenuItem(isDebug).setOffScreenRendering(false).build()
     private val javaScriptEngineProxy: JBCefJSQuery = JBCefJSQuery.create(browser as JBCefBrowserBase)
     private val mainPanel = JPanel(BorderLayout())
     private var lineageInfo: LineageInfo? = null
@@ -67,8 +68,8 @@ class LineagePanel(private val project: Project) :
     private var isRefreshingLineage = false
 
     init {
-        project.messageBus.connect().subscribe(ActiveFileService.TOPIC, this)
-        project.messageBus.connect().subscribe(LineageInfoService.TOPIC, this)
+        project.messageBus.connect(project).subscribe(ActiveFileService.TOPIC, this)
+        project.messageBus.connect(project).subscribe(LineageInfoService.TOPIC, this)
         ApplicationManager.getApplication().executeOnPooledThread {
             initiateCefRequestHandler()
             SwingUtilities.invokeLater {
@@ -82,6 +83,7 @@ class LineagePanel(private val project: Project) :
                 browser.loadURL("lineage-panel-dist/${LINEAGE_PANEL_INDEX}")
             }
         }
+        Disposer.register(project, this)
     }
 
     private fun handleJavaScriptCallback(result: String): JBCefJSQuery.Response? {
@@ -263,5 +265,10 @@ class LineagePanel(private val project: Project) :
     }
 
     override fun dispose() {
+        project.messageBus.dispose()
+        javaScriptEngineProxy.dispose()
+        browser.jbCefClient.dispose()
+        browser.dispose()
+        mainPanel.removeAll()
     }
 }

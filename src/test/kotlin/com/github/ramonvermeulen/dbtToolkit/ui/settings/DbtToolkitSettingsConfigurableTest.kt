@@ -8,20 +8,23 @@ import junit.framework.TestCase
 import javax.swing.JComponent
 import javax.swing.JPanel
 
-// TODO(ramon) for UI tests, take a lookt at https://github.com/JetBrains/intellij-ui-test-robot
 class DbtToolkitSettingsConfigurableTest : LightPlatformTestCase() {
     private lateinit var mainSwingComponent: JComponent
     private lateinit var configurable: DbtToolkitSettingsConfigurable
-    private lateinit var settingsService: DbtToolkitSettingsService
 
     public override fun setUp() {
         super.setUp()
         configurable = DbtToolkitSettingsConfigurable(project)
-        // see component lifecycle: https://plugins.jetbrains.com/docs/intellij/settings-guide.html#intellij-platform-interactions-with-configurable
         mainSwingComponent = configurable.createComponent()
         configurable.reset()
-        settingsService = project.service()
-        settingsService.loadState(DbtToolkitSettingsService.State())
+    }
+
+    public override fun tearDown() {
+        try {
+            project.service<DbtToolkitSettingsService>().loadState(DbtToolkitSettingsService.State())
+        } finally {
+            super.tearDown()
+        }
     }
 
     fun `test isModified no modifications`() {
@@ -37,12 +40,32 @@ class DbtToolkitSettingsConfigurableTest : LightPlatformTestCase() {
     }
 
     fun `test apply`() {
+        val settingsService = project.service<DbtToolkitSettingsService>()
+
         val dbtProjectsDirField = (mainSwingComponent.getComponent(0) as JPanel).getComponent(1) as TextFieldWithBrowseButton
         dbtProjectsDirField.text = "some text"
         val dbtDotEnvDirField = (mainSwingComponent.getComponent(0) as JPanel).getComponent(5) as TextFieldWithBrowseButton
         dbtDotEnvDirField.text = "/foo/bar"
         configurable.apply()
+
         TestCase.assertEquals("some text", settingsService.state.settingsDbtProjectDir)
         TestCase.assertEquals("/foo/bar", settingsService.state.settingsDotEnvFilePath)
+    }
+
+    fun `test reset`() {
+        val settingsService = project.service<DbtToolkitSettingsService>()
+
+        settingsService.state.settingsDbtProjectDir = "initial project dir"
+        settingsService.state.settingsDotEnvFilePath = "initial dotenv path"
+        configurable.reset()
+
+        val dbtProjectsDirField = (mainSwingComponent.getComponent(0) as JPanel).getComponent(1) as TextFieldWithBrowseButton
+        dbtProjectsDirField.text = "modified project dir"
+        val dbtDotEnvDirField = (mainSwingComponent.getComponent(0) as JPanel).getComponent(5) as TextFieldWithBrowseButton
+        dbtDotEnvDirField.text = "modified dotenv path"
+
+        configurable.reset()
+        TestCase.assertEquals("initial project dir", dbtProjectsDirField.text)
+        TestCase.assertEquals("initial dotenv path", dbtDotEnvDirField.text)
     }
 }

@@ -5,6 +5,7 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.TextBrowseFolderListener
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.ui.JBIntSpinner
 import com.intellij.ui.table.JBTable
@@ -23,7 +24,7 @@ import javax.swing.JScrollPane
 import javax.swing.table.DefaultTableModel
 
 class DbtToolkitSettingsConfigurable(project: Project) : Configurable {
-    private var dbtToolkitSettingsService = project.service<DbtToolkitSettingsService>()
+    private var state = project.service<DbtToolkitSettingsService>().state
     private var dbtProjectDirField = TextFieldWithBrowseButton()
     private var dbtTargetDirField = TextFieldWithBrowseButton()
     private var dotEnvFilePathField = TextFieldWithBrowseButton()
@@ -33,22 +34,24 @@ class DbtToolkitSettingsConfigurable(project: Project) : Configurable {
 
     init {
         dbtProjectDirField.addBrowseFolderListener(
-            "Select dbt Project Directory",
-            null,
-            project,
-            FileChooserDescriptorFactory.createSingleFolderDescriptor(),
+            TextBrowseFolderListener(
+                FileChooserDescriptorFactory.createSingleFolderDescriptor(),
+                project,
+            ),
         )
+
         dbtTargetDirField.addBrowseFolderListener(
-            "Select dbt Target Directory",
-            null,
-            project,
-            FileChooserDescriptorFactory.createSingleFolderDescriptor(),
+            TextBrowseFolderListener(
+                FileChooserDescriptorFactory.createSingleFolderDescriptor(),
+                project,
+            ),
         )
+
         dotEnvFilePathField.addBrowseFolderListener(
-            "Select .env File",
-            null,
-            project,
-            FileChooserDescriptorFactory.createSingleFileDescriptor(),
+            TextBrowseFolderListener(
+                FileChooserDescriptorFactory.createSingleFileDescriptor(),
+                project,
+            ),
         )
     }
 
@@ -123,7 +126,7 @@ class DbtToolkitSettingsConfigurable(project: Project) : Configurable {
                 add(removeButton)
             }
 
-        dbtToolkitSettingsService.state.settingsEnvVars.forEach { (name, value) ->
+        state.settingsEnvVars.forEach { (name, value) ->
             (envVarsTable.model as DefaultTableModel).addRow(arrayOf(name, value))
         }
 
@@ -135,21 +138,29 @@ class DbtToolkitSettingsConfigurable(project: Project) : Configurable {
     }
 
     override fun reset() {
-        dbtProjectDirField.text = dbtToolkitSettingsService.state.settingsDbtProjectDir
-        dbtTargetDirField.text = dbtToolkitSettingsService.state.settingsDbtTargetDir
-        dbtCommandTimeoutField.value = dbtToolkitSettingsService.state.settingsDbtCommandTimeout
-        dotEnvFilePathField.text = dbtToolkitSettingsService.state.settingsDotEnvFilePath
+        dbtProjectDirField.text = state.settingsDbtProjectDir
+        dbtTargetDirField.text = state.settingsDbtTargetDir
+        dbtCommandTimeoutField.value = state.settingsDbtCommandTimeout
+        dotEnvFilePathField.text = state.settingsDotEnvFilePath
 
-        while (envVarsTable.model.rowCount > 0) {
-            (envVarsTable.model as DefaultTableModel).removeRow(0)
+        // Clear existing rows
+        val model = envVarsTable.model as DefaultTableModel
+        model.rowCount = 0
+
+        // Populate the table with environment variables
+        state.settingsEnvVars.forEach { (name, value) ->
+            model.addRow(arrayOf(name, value))
         }
+
+        // Notify the table that the data has changed
+        model.fireTableDataChanged()
     }
 
     private fun getConfiguredEnvVars(): MutableMap<String, String> {
         val envVars = mutableMapOf<String, String>()
         for (i in 0 until envVarsTable.model.rowCount) {
             val name = envVarsTable.model.getValueAt(i, 0) as String
-            val value = envVarsTable.model.getValueAt(i, 1) as String
+            val value = envVarsTable.model.getValueAt(i, 1) as String // is empty
             envVars[name] = value
         }
         return envVars
@@ -158,21 +169,21 @@ class DbtToolkitSettingsConfigurable(project: Project) : Configurable {
     override fun isModified(): Boolean {
         val envVars = getConfiguredEnvVars()
 
-        return dbtProjectDirField.text != dbtToolkitSettingsService.state.settingsDbtProjectDir ||
-            dbtTargetDirField.text != dbtToolkitSettingsService.state.settingsDbtTargetDir ||
-            dbtCommandTimeoutField.value != dbtToolkitSettingsService.state.settingsDbtCommandTimeout ||
-            envVars != dbtToolkitSettingsService.state.settingsEnvVars ||
-            dotEnvFilePathField.text != dbtToolkitSettingsService.state.settingsDotEnvFilePath
+        return dbtProjectDirField.text != state.settingsDbtProjectDir ||
+            dbtTargetDirField.text != state.settingsDbtTargetDir ||
+            dbtCommandTimeoutField.value != state.settingsDbtCommandTimeout ||
+            envVars != state.settingsEnvVars ||
+            dotEnvFilePathField.text != state.settingsDotEnvFilePath
     }
 
     override fun apply() {
         val envVars = getConfiguredEnvVars()
 
-        dbtToolkitSettingsService.state.settingsDbtProjectDir = dbtProjectDirField.text
-        dbtToolkitSettingsService.state.settingsDbtTargetDir = dbtTargetDirField.text
-        dbtToolkitSettingsService.state.settingsDbtCommandTimeout = dbtCommandTimeoutField.value as Long
-        dbtToolkitSettingsService.state.settingsEnvVars = envVars
-        dbtToolkitSettingsService.state.settingsDotEnvFilePath = dotEnvFilePathField.text
+        state.settingsDbtProjectDir = dbtProjectDirField.text
+        state.settingsDbtTargetDir = dbtTargetDirField.text
+        state.settingsDbtCommandTimeout = dbtCommandTimeoutField.value as Int
+        state.settingsEnvVars = envVars
+        state.settingsDotEnvFilePath = dotEnvFilePathField.text
     }
 
     override fun disposeUIResources() {

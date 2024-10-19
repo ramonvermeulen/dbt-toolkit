@@ -21,7 +21,7 @@ class DbtToolkitSettingsService : PersistentStateComponent<DbtToolkitSettingsSer
         var settingsDbtTargetDir: String = "",
         var settingsDotEnvFilePath: String = "",
         var settingsEnvVars: Map<String, String> = mapOf(),
-        var settingsDbtCommandTimeout: Long = 120,
+        var settingsDbtCommandTimeout: Int = 120,
         var dbtProjectsDir: String = "",
         var dbtTargetDir: String = "",
         var dbtProject: Map<String, Any> = mapOf(),
@@ -30,7 +30,8 @@ class DbtToolkitSettingsService : PersistentStateComponent<DbtToolkitSettingsSer
         var dbtTestPaths: List<String> = listOf(),
         var dbtMacroPaths: List<String> = listOf(),
         var dbtProjectName: String = "",
-        var dbtVersion: Pair<Int, Int>? = null,
+        var dbtVersionMajor: Int? = null,
+        var dbtVersionMinor: Int? = null,
     )
 
     private var state = State()

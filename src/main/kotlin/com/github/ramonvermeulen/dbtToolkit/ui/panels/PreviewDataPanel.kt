@@ -13,6 +13,7 @@ import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileTypes.FileTypeManager
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.VirtualFile
 import java.awt.BorderLayout
 import javax.swing.JButton
@@ -26,12 +27,11 @@ class PreviewDataPanel(project: Project) : IdeaPanel, Disposable, ActiveFileList
     private val mainPanel = JPanel(BorderLayout())
     private val previewDataButton = JButton("Preview Data")
     private var document = EditorFactory.getInstance().createDocument("")
+    private val editor = EditorFactory.getInstance().createEditor(document, project, FileTypeManager.getInstance().getFileTypeByExtension("txt"), true)
     private var activeFile: VirtualFile? = null
 
     init {
-        project.messageBus.connect().subscribe(ActiveFileService.TOPIC, this)
-        val fileType = FileTypeManager.getInstance().getFileTypeByExtension("txt")
-        val editor = EditorFactory.getInstance().createEditor(document, project, fileType, true)
+        project.messageBus.connect(project).subscribe(ActiveFileService.TOPIC, this)
         val editorTextField = editor.component
         // to set the initial file, since the subscription is only set-up after
         // opening the panel (lazy) for the first time
@@ -39,6 +39,7 @@ class PreviewDataPanel(project: Project) : IdeaPanel, Disposable, ActiveFileList
         previewDataButton.addActionListener { handleRecompileButtonClick() }
         mainPanel.add(previewDataButton, BorderLayout.NORTH)
         mainPanel.add(editorTextField, BorderLayout.CENTER)
+        Disposer.register(project, this)
     }
 
     private fun handleRecompileButtonClick() {
@@ -84,7 +85,7 @@ class PreviewDataPanel(project: Project) : IdeaPanel, Disposable, ActiveFileList
 
     private fun previewData() {
         ApplicationManager.getApplication().executeOnPooledThread {
-            val command = if (settings.state.dbtVersion != null && settings.state.dbtVersion!!.first <= 1 && settings.state.dbtVersion!!.second < 5) {
+            val command = if (settings.state.dbtVersionMajor != null && settings.state.dbtVersionMinor != null && settings.state.dbtVersionMajor!! <= 1 && settings.state.dbtVersionMinor!! < 5) {
                 // --no-populate-cache is only available in dbt >= 1.5
                 listOf("show", "--select", activeFile!!.nameWithoutExtension, "--limit", "10")
             } else {
@@ -120,6 +121,7 @@ class PreviewDataPanel(project: Project) : IdeaPanel, Disposable, ActiveFileList
     }
 
     override fun dispose() {
-        // Implement your dispose logic here
+        EditorFactory.getInstance().releaseEditor(editor)
+        mainPanel.removeAll()
     }
 }

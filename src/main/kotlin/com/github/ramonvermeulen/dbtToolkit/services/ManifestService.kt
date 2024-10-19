@@ -42,7 +42,11 @@ class ManifestService(project: Project) {
         if (file.exists()) {
             manifest = JsonParser.parseString(file.readText()).asJsonObject
             val dbtVersionString = manifest!!.getAsJsonObject("metadata").get("dbt_version").asString
-            settingsService.state.dbtVersion = extractMajorMinor(dbtVersionString)
+            val majorMinor = extractMajorMinor(dbtVersionString)
+            if (majorMinor != null) {
+                settingsService.state.dbtVersionMajor = majorMinor.first
+                settingsService.state.dbtVersionMinor = majorMinor.second
+            }
         } else {
             println("Manifest file does not exist")
             println("looked in the following path: ${settingsService.state.settingsDbtTargetDir}/manifest.json")

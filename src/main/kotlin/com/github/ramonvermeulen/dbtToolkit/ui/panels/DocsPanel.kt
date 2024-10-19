@@ -13,6 +13,7 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.Disposer
 import com.intellij.ui.jcef.JBCefApp
 import com.intellij.ui.jcef.JBCefBrowser
 import com.intellij.ui.jcef.JBCefBrowserBuilder
@@ -71,6 +72,7 @@ class DocsPanel(project: Project) : IdeaPanel, Disposable {
             mainPanel.add(buttonPanel)
             mainPanel.add(browser.component)
         }
+        Disposer.register(project, this)
     }
 
     private fun handleRegenerateButtonClick() {
@@ -132,6 +134,8 @@ class DocsPanel(project: Project) : IdeaPanel, Disposable {
     }
 
     override fun dispose() {
-        TODO("Not yet implemented")
+        browser.jbCefClient.dispose()
+        browser.dispose()
+        mainPanel.removeAll()
     }
 }
