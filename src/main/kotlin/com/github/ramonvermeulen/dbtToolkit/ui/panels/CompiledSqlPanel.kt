@@ -13,6 +13,7 @@ import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileTypes.FileTypeManager
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
 import java.awt.BorderLayout
@@ -28,12 +29,11 @@ class CompiledSqlPanel(project: Project) : IdeaPanel, Disposable, ActiveFileList
     private val mainPanel = JPanel(BorderLayout())
     private val recompileButton = JButton("Re-compile model")
     private var document = EditorFactory.getInstance().createDocument("")
+    private val editor = EditorFactory.getInstance().createEditor(document, project, FileTypeManager.getInstance().getFileTypeByExtension("sql"), true)
     private var activeFile: VirtualFile? = null
 
     init {
-        project.messageBus.connect().subscribe(ActiveFileService.TOPIC, this)
-        val fileType = FileTypeManager.getInstance().getFileTypeByExtension("sql")
-        val editor = EditorFactory.getInstance().createEditor(document, project, fileType, true)
+        project.messageBus.connect(project).subscribe(ActiveFileService.TOPIC, this)
         val editorTextField = editor.component
         // to set the initial file, since the subscription is only set-up after
         // opening the panel (lazy) for the first time
@@ -41,6 +41,7 @@ class CompiledSqlPanel(project: Project) : IdeaPanel, Disposable, ActiveFileList
         recompileButton.addActionListener { handleRecompileButtonClick() }
         mainPanel.add(recompileButton, BorderLayout.NORTH)
         mainPanel.add(editorTextField, BorderLayout.CENTER)
+        Disposer.register(project, this)
     }
 
     private fun handleRecompileButtonClick() {
@@ -59,7 +60,7 @@ class CompiledSqlPanel(project: Project) : IdeaPanel, Disposable, ActiveFileList
                             }
                         }
                     }
-                    val command = if (settings.state.dbtVersion != null && settings.state.dbtVersion!!.first <= 1 && settings.state.dbtVersion!!.second < 5) {
+                    val command = if (settings.state.dbtVersionMajor != null && settings.state.dbtVersionMinor != null && settings.state.dbtVersionMajor!! <= 1 && settings.state.dbtVersionMinor!! < 5) {
                         // --no-populate-cache is only available in dbt >= 1.5
                         listOf("compile", "--select", activeFile!!.nameWithoutExtension)
                     } else {
@@ -135,6 +136,7 @@ class CompiledSqlPanel(project: Project) : IdeaPanel, Disposable, ActiveFileList
     }
 
     override fun dispose() {
-        // Implement your dispose logic here
+        EditorFactory.getInstance().releaseEditor(editor)
+        mainPanel.removeAll()
     }
 }

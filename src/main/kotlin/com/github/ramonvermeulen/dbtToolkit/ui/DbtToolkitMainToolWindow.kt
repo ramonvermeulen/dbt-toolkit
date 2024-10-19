@@ -1,8 +1,8 @@
 package com.github.ramonvermeulen.dbtToolkit.ui
 
 import com.github.ramonvermeulen.dbtToolkit.services.DbtToolkitSettingsService
-import com.github.ramonvermeulen.dbtToolkit.ui.console.ConsoleOutputPanel
 import com.github.ramonvermeulen.dbtToolkit.ui.panels.CompiledSqlPanel
+import com.github.ramonvermeulen.dbtToolkit.ui.panels.ConsoleOutputPanel
 import com.github.ramonvermeulen.dbtToolkit.ui.panels.DocsPanel
 import com.github.ramonvermeulen.dbtToolkit.ui.panels.LineagePanel
 import com.github.ramonvermeulen.dbtToolkit.ui.panels.PreviewDataPanel
