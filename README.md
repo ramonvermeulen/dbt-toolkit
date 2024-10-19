@@ -1,6 +1,6 @@
 <div align="center">
     <img alt="logo" data-is-relative="true" src="./assets/img/logo.png" width="250" height="250"/>
-    <h1>dbtToolkit 🧰</h1>
+    <h1>dbt-toolkit 🧰</h1>
     <img alt="GitHub Workflow Status" src="https://github.com/ramonvermeulen/dbt-toolkit/actions/workflows/build.yml/badge.svg?branch=main">
     <a href="https://codecov.io/github/ramonvermeulen/dbt-toolkit" ><img src="https://codecov.io/github/ramonvermeulen/dbt-toolkit/graph/badge.svg?token=E0ATR13F60"/></a>
     <a href="https://plugins.jetbrains.com/plugin/24666-dbttoolkit"><img alt="JetBrains Plugin Version" src="https://img.shields.io/jetbrains/plugin/v/24666-dbttoolkit"></a>
@@ -13,9 +13,9 @@
 ![Lineage Example](./assets/img/sample.gif)
 
 <!-- Plugin description -->
-The dbtToolkit is an early-stage plugin designed to enhance your experience working with [**dbt-core**](https://github.com/dbt-labs/dbt-core)
+The dbt-toolkit is an early-stage plugin designed to enhance your experience working with [**dbt-core**](https://github.com/dbt-labs/dbt-core)
 projects within JetBrains IDEs. It currently supports lineage rendering, dbt documentation, compiled SQL preview, and more!
-Providing a more streamlined and integrated approach to managing your dbt projects in Jetbrains IDEs. The dbtToolkit is inspired by the
+Providing a more streamlined and integrated approach to managing your dbt projects in Jetbrains IDEs. The dbt-toolkit is inspired by the
 well-known VSCode plugin [**vscode-dbt-power-user**](https://github.com/AltimateAI/vscode-dbt-power-user), and aims to become an alternative
 for JetBrains IDEs.
 
@@ -51,7 +51,7 @@ If there is a venv configured within the IDE, the plugin will automatically try 
 If there is no venv configured the plugin will use the globally installed dbt version.
 
 ## Installation
-You can download dbtToolkit from the JetBrains plugin marketplace. For more information on how to install JetBrains plugins, 
+You can download dbt-toolkit from the JetBrains plugin marketplace. For more information on how to install JetBrains plugins, 
 please refer to the [**official documentation**](https://www.jetbrains.com/help/idea/managing-plugins.html).
 
 ## Setting environment variables
@@ -65,7 +65,7 @@ Via the plugin settings, you can also specify a custom path to the `.env` file.
 <!-- Plugin description end -->
 
 ## Feedback and Contributions
-I highly appreciate any feedback and contributions as I am developing and improving dbtToolkit. 
+I highly appreciate any feedback and contributions as I am developing and improving dbt-toolkit. 
 Feel free to report bugs, issues, or suggest features through the GitHub repository.
 
 
