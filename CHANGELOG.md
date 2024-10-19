@@ -4,6 +4,12 @@
 
 ## [Unreleased]
 
+## [0.2.0] - 2024-10-19
+
+- feat: minor quality of life improvements by @ramonvermeulen in https://github.com/ramonvermeulen/dbt-toolkit/pull/191
+- fix: better browser performance + fixed settings panel + pulled upstream plugin template (upgraded gradle and build tools) by @ramonvermeulen in https://github.com/ramonvermeulen/dbt-toolkit/pull/193
+- several dependabot dependency upgrades
+
 ## [0.1.2] - 2024-10-04
 
 - feat: Added support for rendering only up/down by @ramonvermeulen in https://github.com/ramonvermeulen/dbt-toolkit/pull/152
@@ -90,7 +96,8 @@
 - **Lineage Rendering**: Visualize the dependencies and relationships between your dbt models directly in your IDE. This feature aids in understanding the impact of changes and the flow of data in your project. Additionally, it provides a quicker way to navigate through your dbt project.  
 - **dbt Documentation**: Access your dbt documentation within your IDE, eliminating the need to switch between different tools and platforms. This feature promotes a more efficient workflow and keeps essential information at your fingertips.
 
-[Unreleased]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.1.2...HEAD
+[Unreleased]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.1.2...v0.2.0
 [0.1.2]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.0.5-alpha...v0.1.0
