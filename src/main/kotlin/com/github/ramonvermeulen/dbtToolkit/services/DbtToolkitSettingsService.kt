@@ -30,6 +30,7 @@ class DbtToolkitSettingsService : PersistentStateComponent<DbtToolkitSettingsSer
         var dbtTestPaths: List<String> = listOf(),
         var dbtMacroPaths: List<String> = listOf(),
         var dbtProjectName: String = "",
+        var dbtVersion: Pair<Int, Int>? = null,
     )
 
     private var state = State()

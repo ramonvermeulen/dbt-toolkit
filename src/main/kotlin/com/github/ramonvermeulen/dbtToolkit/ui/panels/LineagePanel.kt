@@ -202,9 +202,17 @@ class LineagePanel(private val project: Project) :
         ApplicationManager.getApplication().executeOnPooledThread {
             if (newLineageInfo == lineageInfo && activeFile!!.exists()) {
                 handleSameNodesAndEdges(activeFile!!, newLineageInfo)
+                // this still centers the active node after a refresh with same lineage data
+                SwingUtilities.invokeLater {
+                    val newActiveNode = newLineageInfo.nodes.find { it.isSelected }
+                    browser.cefBrowser.executeJavaScript(
+                        "setActiveNode('${newActiveNode?.id}')",
+                        browser.cefBrowser.url,
+                        -1,
+                    )
+                }
                 return@executeOnPooledThread
             }
-
             SwingUtilities.invokeLater {
                 lineageInfo = newLineageInfo
                 lineageInfo?.let {
