@@ -64,13 +64,19 @@ Via the plugin settings, you can also specify a custom path to the `.env` file.
 > `.env` files_
 <!-- Plugin description end -->
 
+## Releases
+The releases can be found under the repository it's [**releases section**](https://github.com/ramonvermeulen/dbt-toolkit/releases), 
+the latest release in Github doesn't always reflect the latest release in the Jetbrains Marketplace. The reason for this is that the 
+Jetbrains Marketplace needs a couple of days to review a release before publishing. If you really need to be on the latest release 
+you can always download the zip file (e.g. `dbt-toolkit-<version>.zip` and in the IDE Plugin window choose for `Install from disk`.
+
 ## Feedback and Contributions
 I highly appreciate any feedback and contributions as I am developing and improving dbt-toolkit. 
 Feel free to report bugs, issues, or suggest features through the GitHub repository.
 
 ## Troubleshooting
-Experiencing issues after upgrading the plugin? Try to delete your `.idea/dbtToolkitSettings.xml` file.
-If you're still experiencing problems, feel free to open a ticket!
+Experiencing issues after upgrading the plugin? Try to delete your `.idea/dbtToolkitSettings.xml` file. If you're still experiencing 
+problems, feel free to open a Github issue and I'll try to investigate and solve the issue in a future release.
 
 ---
 Plugin based on the [IntelliJ Platform Plugin Template][template].
