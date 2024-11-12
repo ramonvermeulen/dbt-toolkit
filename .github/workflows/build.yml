@@ -36,12 +36,12 @@ jobs:
       pluginVerifierHomeDir: ${{ steps.properties.outputs.pluginVerifierHomeDir }}
     steps:
 
-      - name: Maximize build space
-        uses: easimon/maximize-build-space@master
+      # Free GitHub Actions Environment Disk Space
+      - name: Maximize Build Space
+        uses: jlumbroso/free-disk-space@v1.3.1
         with:
-          root-reserve-mb: 512
-          swap-size-mb: 1024
-          remove-dotnet: 'true'
+          tool-cache: false
+          large-packages: false
 
       # Check out the current repository
       - name: Fetch Sources
