@@ -17,7 +17,7 @@ plugins {
     alias(libs.plugins.kover) // Gradle Kover Plugin
     id("com.github.node-gradle.node") version "7.1.0"
     id("org.jlleitschuh.gradle.ktlint") version "12.1.2"
-    kotlin("plugin.serialization") version "2.0.21"
+    kotlin("plugin.serialization") version "2.1.0"
 }
 
 group = properties("pluginGroup").get()
