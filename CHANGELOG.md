@@ -4,6 +4,11 @@
 
 ## [Unreleased]
 
+## [0.2.1] - 2025-01-16
+
+- several dependabot updates
+- fix: add support for 2025.1.x by @ramonvermeulen in https://github.com/ramonvermeulen/dbt-toolkit/pull/286
+
 ## [0.2.0] - 2024-10-19
 
 - feat: minor quality of life improvements by @ramonvermeulen in https://github.com/ramonvermeulen/dbt-toolkit/pull/191
@@ -96,7 +101,8 @@
 - **Lineage Rendering**: Visualize the dependencies and relationships between your dbt models directly in your IDE. This feature aids in understanding the impact of changes and the flow of data in your project. Additionally, it provides a quicker way to navigate through your dbt project.  
 - **dbt Documentation**: Access your dbt documentation within your IDE, eliminating the need to switch between different tools and platforms. This feature promotes a more efficient workflow and keeps essential information at your fingertips.
 
-[Unreleased]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.1.2...v0.2.0
 [0.1.2]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.1.0...v0.1.1
