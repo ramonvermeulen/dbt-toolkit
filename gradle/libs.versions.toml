@@ -1,7 +1,7 @@
 [versions]
 # libraries
 junit = "4.13.2"
-annotations = "26.0.1"
+annotations = "26.0.2"
 
 # plugins
 kotlin = "2.1.0"
