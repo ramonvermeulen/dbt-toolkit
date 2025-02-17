@@ -4,7 +4,7 @@ junit = "4.13.2"
 annotations = "26.0.2"
 
 # plugins
-kotlin = "2.1.0"
+kotlin = "2.1.10"
 changelog = "2.2.1"
 gradleIntelliJPlugin = "2.2.1"
 qodana = "2024.3.4"
