@@ -45,9 +45,9 @@ class DbtToolkitSettingsService : PersistentStateComponent<DbtToolkitSettingsSer
 
     private fun setInitialSettings(dbtProjectDir: String) {
         state.settingsDbtProjectDir = dbtProjectDir
-        state.settingsDbtTargetDir = "${dbtProjectDir}/target"
-        if (File("${dbtProjectDir}/.env").exists()) {
-            state.settingsDotEnvFilePath = "${dbtProjectDir}/.env"
+        state.settingsDbtTargetDir = "$dbtProjectDir/target"
+        if (File("$dbtProjectDir/.env").exists()) {
+            state.settingsDotEnvFilePath = "$dbtProjectDir/.env"
         }
         state.initialSettingsAreSet = true
     }
