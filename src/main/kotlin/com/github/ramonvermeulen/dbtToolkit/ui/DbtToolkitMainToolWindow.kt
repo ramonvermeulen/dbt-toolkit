@@ -84,7 +84,7 @@ class DbtToolkitMainToolWindow : ToolWindowFactory, DumbAware {
                 it,
                 object : VirtualFileVisitor<Any>() {
                     override fun visitFile(file: VirtualFile): Boolean {
-                        if (changeListManager.isIgnoredFile(file) || file.path.matches(Regex(".*/(target|dbt_packages)/.*"))) {
+                        if (changeListManager.isIgnoredFile(file) || file.path.matches(Regex(".*/(target|dbt_packages|.venv|venv)/.*"))) {
                             return false
                         }
                         if (file.name == "dbt_project.yml") {
