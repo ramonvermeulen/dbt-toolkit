@@ -17,6 +17,7 @@ import java.io.InputStreamReader
 @Service(Service.Level.PROJECT)
 class DbtToolkitSettingsService : PersistentStateComponent<DbtToolkitSettingsService.State> {
     data class State(
+        var initialSettingsAreSet: Boolean = false,
         var settingsDbtProjectDir: String = "",
         var settingsDbtTargetDir: String = "",
         var settingsDotEnvFilePath: String = "",
@@ -42,14 +43,23 @@ class DbtToolkitSettingsService : PersistentStateComponent<DbtToolkitSettingsSer
         this.state = state
     }
 
+    private fun setInitialSettings(dbtProjectDir: String) {
+        state.settingsDbtProjectDir = dbtProjectDir
+        state.settingsDbtTargetDir = "${dbtProjectDir}/target"
+        if (File("${dbtProjectDir}/.env").exists()) {
+            state.settingsDotEnvFilePath = "${dbtProjectDir}/.env"
+        }
+        state.initialSettingsAreSet = true
+    }
+
     fun parseDbtProjectFile(file: VirtualFile) {
         val inputStream = file.inputStream
-        state.settingsDbtProjectDir = file.parent.path
         state.dbtProjectsDir = file.parent.path
-        state.settingsDbtTargetDir = "${file.parent.path}/target"
-        if (File("${file.parent.path}/.env").exists()) {
-            state.settingsDotEnvFilePath = "${file.parent.path}/.env"
+
+        if (!state.initialSettingsAreSet) {
+            setInitialSettings(state.dbtProjectsDir)
         }
+
         state.dbtTargetDir = "${file.parent.path}/target"
         val reader = BufferedReader(InputStreamReader(inputStream))
         val yaml = Yaml()

@@ -58,6 +58,7 @@ repositories {
 // Dependencies are managed with Gradle version catalog - read more: https://docs.gradle.org/current/userguide/platforms.html#sub:version-catalog
 dependencies {
     testImplementation(libs.junit)
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
     intellijPlatform {
