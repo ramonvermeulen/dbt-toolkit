@@ -8,6 +8,10 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+    groups:
+      kotlin:
+        patterns:
+          - "*"
   # Maintain dependencies for GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -18,3 +22,7 @@ updates:
     directory: "/lineage-panel"
     schedule:
       interval: "daily"
+    groups:
+      react:
+        patterns:
+          - "*"
