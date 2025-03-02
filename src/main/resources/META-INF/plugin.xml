@@ -28,6 +28,7 @@
                 displayType="BALLOON"
                 key="notification.group.name"
         />
+        <psi.referenceContributor implementation="com.github.ramonvermeulen.dbtToolkit.jinja.JinjaReferenceContributor" order="last"/>
     </extensions>
 
     <projectListeners>
