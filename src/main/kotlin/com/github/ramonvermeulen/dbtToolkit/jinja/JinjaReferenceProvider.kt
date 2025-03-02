@@ -15,7 +15,7 @@ class JinjaReferenceProvider : PsiReferenceProvider() {
         return matches.map { match ->
             val refValue = match.groupValues[1]
             println("Found Jinja reference: ${match.value} -> $refValue")
-            JinjaReference(element, TextRange(match.range.start, match.range.endInclusive + 1), refValue)
+            JinjaReference(element, TextRange(match.range.first, match.range.last + 1), refValue)
         }.toList().toTypedArray()
     }
 }
