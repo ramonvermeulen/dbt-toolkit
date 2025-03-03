@@ -265,7 +265,6 @@ class LineagePanel(private val project: Project) :
     }
 
     override fun dispose() {
-        project.messageBus.dispose()
         javaScriptEngineProxy.dispose()
         browser.jbCefClient.dispose()
         browser.dispose()
