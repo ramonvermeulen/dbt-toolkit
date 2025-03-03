@@ -9,12 +9,10 @@ import com.intellij.util.ProcessingContext
 class JinjaReferenceProvider : PsiReferenceProvider() {
     override fun getReferencesByElement(element: PsiElement, context: ProcessingContext): Array<PsiReference> {
         val fileContent = element.containingFile.text
-        val refPattern = Regex("""\{\{.*?ref\s*\(\s*['"](.*?)['"]\s*\).*?\}\}""")
+        val matches = JinjaPatterns.REF_PATTERN.findAll(fileContent)
 
-        val matches = refPattern.findAll(fileContent)
         return matches.map { match ->
             val refValue = match.groupValues[1]
-            println("Found Jinja reference: ${match.value} -> $refValue")
             JinjaReference(element, TextRange(match.range.first, match.range.last + 1), refValue)
         }.toList().toTypedArray()
     }
