@@ -7,3 +7,4 @@ build
 **/.kotlin/**
 .salive
 **/node_modules/**
+.intellijPlatform/**
