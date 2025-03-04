@@ -4,6 +4,13 @@
 
 ## [Unreleased]
 
+## [0.2.3] - 2025-03-04
+
+- chore: use dependabot groups by @ramonvermeulen in https://github.com/ramonvermeulen/dbt-toolkit/pull/321
+- build(deps): bump the react group in /lineage-panel with 9 updates by @dependabot in https://github.com/ramonvermeulen/dbt-toolkit/pull/322
+- fix: project is already disposed by Disposer.register in the init by @ramonvermeulen in https://github.com/ramonvermeulen/dbt-toolkit/pull/324
+- Problem with lineage panel not rendering full lineage for some users, hopefully related to new npm dependencies (couldn't reproduce yet) https://github.com/ramonvermeulen/dbt-toolkit/issues/323
+
 ## [0.2.2] - 2025-03-01
 
 - fix: resolves bug where some dbt-toolkit user configured settings got reset on IDE restart by @ramonvermeulen in https://github.com/ramonvermeulen/dbt-toolkit/pull/318
@@ -106,7 +113,8 @@
 - **Lineage Rendering**: Visualize the dependencies and relationships between your dbt models directly in your IDE. This feature aids in understanding the impact of changes and the flow of data in your project. Additionally, it provides a quicker way to navigate through your dbt project.  
 - **dbt Documentation**: Access your dbt documentation within your IDE, eliminating the need to switch between different tools and platforms. This feature promotes a more efficient workflow and keeps essential information at your fingertips.
 
-[Unreleased]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.2.2...HEAD
+[Unreleased]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.2.3...HEAD
+[0.2.3]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.2.2...v0.2.3
 [0.2.2]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.1.2...v0.2.0
