@@ -60,7 +60,7 @@ dependencies {
     testImplementation(libs.junit)
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
     intellijPlatform {
         create(providers.gradleProperty("platformType"), providers.gradleProperty("platformVersion"))
 
