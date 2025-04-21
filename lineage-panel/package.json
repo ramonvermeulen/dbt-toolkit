@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@types/dagre": "^0.7.52",
-    "@xyflow/react": "^12.5.5",
+    "@xyflow/react": "^12.6.0",
     "dagre": "^0.8.5",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
@@ -21,18 +21,18 @@
   "license": "MIT",
   "devDependencies": {
     "@eslint/compat": "^1.2.8",
-    "@types/node": "^22.14.0",
-    "@types/react": "^19.1.0",
-    "@types/react-dom": "^19.1.1",
-    "@typescript-eslint/eslint-plugin": "^8.29.1",
-    "@typescript-eslint/parser": "^8.29.1",
-    "@vitejs/plugin-react": "^4.3.4",
-    "eslint": "^9.24.0",
+    "@types/node": "^22.14.1",
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.2",
+    "@typescript-eslint/eslint-plugin": "^8.31.0",
+    "@typescript-eslint/parser": "^8.31.0",
+    "@vitejs/plugin-react": "^4.4.1",
+    "eslint": "^9.25.1",
     "eslint-plugin-import": "^2.31.0",
-    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-hooks": "^6.0.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^16.0.0",
     "typescript": "^5.8.3",
-    "vite": "^6.2.5"
+    "vite": "^6.3.2"
   }
 }
