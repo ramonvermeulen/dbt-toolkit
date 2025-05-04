@@ -95,7 +95,7 @@ class PreviewDataPanel(project: Project) : IdeaPanel, Disposable, ActiveFileList
             val output = dbtCommandExecutorService.executeCommand(command)
             if (output.first == 0) {
                 val systemSeparator = LineSeparator.getSystemLineSeparator().separatorString
-                val data = output.second.split(systemSeparator).takeLast(16).joinToString(systemSeparator).trimEnd()
+                val data = output.second.split(systemSeparator).takeLast(16).joinToString("\n").trimEnd()
                 SwingUtilities.invokeLater {
                     ApplicationManager.getApplication().runWriteAction {
                         document.setText(data)
