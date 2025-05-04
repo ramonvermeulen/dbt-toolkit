@@ -15,6 +15,7 @@ import com.intellij.openapi.fileTypes.FileTypeManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.util.LineSeparator
 import java.awt.BorderLayout
 import javax.swing.JButton
 import javax.swing.JComponent
@@ -93,7 +94,7 @@ class PreviewDataPanel(project: Project) : IdeaPanel, Disposable, ActiveFileList
             }
             val output = dbtCommandExecutorService.executeCommand(command)
             if (output.first == 0) {
-                val data = output.second.split("\n").takeLast(16).joinToString("\n").trimEnd()
+                val data = output.second.split(LineSeparator.getSystemLineSeparator().separatorString).takeLast(16).joinToString("\n").trimEnd()
                 SwingUtilities.invokeLater {
                     ApplicationManager.getApplication().runWriteAction {
                         document.setText(data)
