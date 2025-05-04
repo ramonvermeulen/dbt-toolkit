@@ -4,6 +4,17 @@
 
 ## [Unreleased]
 
+## [0.2.4] - 2025-05-04
+
+- Changelog update - `v0.2.3` by @github-actions in https://github.com/ramonvermeulen/dbt-toolkit/pull/326
+- build(deps-dev): bump the react group in /lineage-panel with 4 updates by @dependabot in https://github.com/ramonvermeulen/dbt-toolkit/pull/325
+- build(deps): bump the kotlin group with 3 updates by @dependabot in https://github.com/ramonvermeulen/dbt-toolkit/pull/333
+- build(deps-dev): bump the react group across 1 directory with 6 updates by @dependabot in https://github.com/ramonvermeulen/dbt-toolkit/pull/332
+- build(deps-dev): bump the react group in /lineage-panel with 6 updates by @dependabot in https://github.com/ramonvermeulen/dbt-toolkit/pull/334
+- build(deps): bump the react group across 1 directory with 12 updates by @dependabot in https://github.com/ramonvermeulen/dbt-toolkit/pull/342
+- build(deps): bump the kotlin group across 1 directory with 2 updates by @dependabot in https://github.com/ramonvermeulen/dbt-toolkit/pull/338
+- fix: use StringUtil to convert the line separators by @ramonvermeulen in https://github.com/ramonvermeulen/dbt-toolkit/pull/329
+
 ## [0.2.3] - 2025-03-04
 
 - chore: use dependabot groups by @ramonvermeulen in https://github.com/ramonvermeulen/dbt-toolkit/pull/321
@@ -113,7 +124,8 @@
 - **Lineage Rendering**: Visualize the dependencies and relationships between your dbt models directly in your IDE. This feature aids in understanding the impact of changes and the flow of data in your project. Additionally, it provides a quicker way to navigate through your dbt project.  
 - **dbt Documentation**: Access your dbt documentation within your IDE, eliminating the need to switch between different tools and platforms. This feature promotes a more efficient workflow and keeps essential information at your fingertips.
 
-[Unreleased]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.2.3...HEAD
+[Unreleased]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.2.4...HEAD
+[0.2.4]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.2.3...v0.2.4
 [0.2.3]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.2.2...v0.2.3
 [0.2.2]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.2.0...v0.2.1
