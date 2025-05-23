@@ -6,10 +6,20 @@
 
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.python</depends>
+    <depends>com.intellij.database</depends>
 
     <resource-bundle>messages.DbtToolkitBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
+        <fileType
+                name="DbtJinja File"
+                implementationClass="com.github.ramonvermeulen.dbtToolkit.jinja.language.DbtJinjaFileType"
+                fieldName="INSTANCE"
+                language="DbtJinja"
+                extensions="dbt-jinja"/>
+        <lang.parserDefinition
+                language="DbtJinja"
+                implementationClass="com.github.ramonvermeulen.dbtToolkit.jinja.language.DbtJinjaParserDefinition"/>
         <projectConfigurable
             parentId="tools"
             instance="com.github.ramonvermeulen.dbtToolkit.ui.settings.DbtToolkitSettingsConfigurable"
@@ -28,7 +38,8 @@
                 displayType="BALLOON"
                 key="notification.group.name"
         />
-        <psi.referenceContributor implementation="com.github.ramonvermeulen.dbtToolkit.jinja.JinjaReferenceContributor" order="last"/>
+        <multiHostInjector implementation="com.github.ramonvermeulen.dbtToolkit.jinja.JinjaReferenceMultiHostInjector"/>
+        <psi.referenceContributor language="DbtJinja" implementation="com.github.ramonvermeulen.dbtToolkit.jinja.JinjaReferenceContributor" order="last"/>
     </extensions>
 
     <projectListeners>

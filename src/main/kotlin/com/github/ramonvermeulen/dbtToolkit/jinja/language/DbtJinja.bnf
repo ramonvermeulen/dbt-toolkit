@@ -1,0 +1,33 @@
+{
+  parserClass="com.github.ramonvermeulen.dbtToolkit.jinja.language.DbtJinjaParser"
+
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  psiClassPrefix="DbtJinja"
+  psiImplClassSuffix="Impl"
+  psiPackage="com.github.ramonvermeulen.dbtToolkit.jinja.language"
+  psiImplPackage="com.github.ramonvermeulen.dbtToolkit.jinja.language.impl"
+
+  elementTypeHolderClass="com.github.ramonvermeulen.dbtToolkit.jinja.language.DbtJinjaTypes"
+  elementTypeClass="com.github.ramonvermeulen.dbtToolkit.jinja.language.DbtJinjaElementType"
+
+  tokenTypeClass="com.github.ramonvermeulen.dbtToolkit.jinja.language.DbtJinjaTokenType"
+  tokens=[
+    identifier='regexp:[a-zA-Z_][a-zA-Z0-9_]*'
+    STRING_LITERAL_TOKEN='STRING_LITERAL_TOKEN'
+    SINGLE_QUOTED_STRING='SINGLE_QUOTED_STRING'
+    REF_START='REF_START'
+    REF_END='REF_END'
+    LINE_COMMENT='LINE_COMMENT'
+  ]
+}
+
+dbtJinjaFile ::= item_*
+
+private item_ ::= (refCall | stringLiteral | identifier | comment)
+
+refCall ::= REF_START stringLiteral REF_END
+
+stringLiteral ::= STRING_LITERAL_TOKEN | SINGLE_QUOTED_STRING
+
+comment ::= LINE_COMMENT

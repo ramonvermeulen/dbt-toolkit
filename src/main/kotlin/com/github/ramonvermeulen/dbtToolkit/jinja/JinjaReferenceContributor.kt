@@ -8,6 +8,7 @@ import com.intellij.psi.PsiReferenceRegistrar
 import com.intellij.util.ProcessingContext
 
 class JinjaReferenceContributor : PsiReferenceContributor() {
+
     override fun registerReferenceProviders(registrar: PsiReferenceRegistrar) {
         registrar.registerReferenceProvider(
             PlatformPatterns.psiElement().with(object : PatternCondition<PsiElement>("jinjaRefPattern") {
