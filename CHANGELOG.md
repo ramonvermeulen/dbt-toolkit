@@ -4,6 +4,13 @@
 
 ## [Unreleased]
 
+## [0.2.5] - 2025-08-19
+
+- Changelog update - `v0.2.4` by @github-actions[bot] in https://github.com/ramonvermeulen/dbt-toolkit/pull/356
+- build(deps): bump the react group across 1 directory with 12 updates by @dependabot[bot] in https://github.com/ramonvermeulen/dbt-toolkit/pull/357
+- chore: increase minimal versions + update python dependency by @ramonvermeulen in https://github.com/ramonvermeulen/dbt-toolkit/pull/379
+- dynamically load python plugin + deprecated older PyCharm / IntelliJ versions
+
 ## [0.2.4] - 2025-05-04
 
 - Changelog update - `v0.2.3` by @github-actions in https://github.com/ramonvermeulen/dbt-toolkit/pull/326
@@ -124,7 +131,8 @@
 - **Lineage Rendering**: Visualize the dependencies and relationships between your dbt models directly in your IDE. This feature aids in understanding the impact of changes and the flow of data in your project. Additionally, it provides a quicker way to navigate through your dbt project.  
 - **dbt Documentation**: Access your dbt documentation within your IDE, eliminating the need to switch between different tools and platforms. This feature promotes a more efficient workflow and keeps essential information at your fingertips.
 
-[Unreleased]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.2.4...HEAD
+[Unreleased]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.2.5...HEAD
+[0.2.5]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.2.4...v0.2.5
 [0.2.4]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.2.3...v0.2.4
 [0.2.3]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.2.2...v0.2.3
 [0.2.2]: https://github.com/ramonvermeulen/dbt-toolkit/compare/v0.2.1...v0.2.2
