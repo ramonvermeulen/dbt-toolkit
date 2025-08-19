@@ -10,6 +10,12 @@
 
 <br>
 
+> [!WARNING]  
+> Due to a shift in interest, I am no longer actively maintaining this plugin.
+> However, I am open to accepting pull requests and will review them as time permits.
+> Also I will try to keep the plugin up-to-date with the latest dbt versions and JetBrains IDEs, but without a guarantee.
+
+
 ![Lineage Example](./assets/img/sample.gif)
 
 <!-- Plugin description -->
