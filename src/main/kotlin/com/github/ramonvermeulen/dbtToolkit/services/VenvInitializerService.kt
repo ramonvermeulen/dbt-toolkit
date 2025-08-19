@@ -6,7 +6,6 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.roots.ProjectRootManager
-import com.jetbrains.python.sdk.PythonSdkUtil
 import org.apache.commons.lang3.SystemUtils
 import java.nio.file.Files
 import java.nio.file.Path
@@ -52,11 +51,37 @@ class VenvInitializerService(private var project: Project) {
     }
 
     private fun getPythonVenvExecutablePath(project: Project): Path? {
-        val projectSdk: Sdk? = ProjectRootManager.getInstance(project).projectSdk
-        if (projectSdk != null && PythonSdkUtil.isVirtualEnv(projectSdk)) {
-            return Path.of(projectSdk.homePath!!)
+        return try {
+            val pythonSdkUtilClass = Class.forName("com.jetbrains.python.sdk.PythonSdkUtil")
+            val isVirtualEnvMethod = pythonSdkUtilClass.getMethod("isVirtualEnv", Sdk::class.java)
+
+            val projectSdk: Sdk? = ProjectRootManager.getInstance(project).projectSdk
+            if (projectSdk != null) {
+                val isVirtualEnv = isVirtualEnvMethod.invoke(null, projectSdk) as Boolean
+                if (isVirtualEnv) {
+                    return Path.of(projectSdk.homePath!!)
+                }
+            }
+            null
+        } catch (e: ClassNotFoundException) {
+            loggingService.log(
+                "Python SDK not found. Please ensure that the Python plugin is installed and enabled.\n\n",
+                ConsoleViewContentType.ERROR_OUTPUT,
+            )
+            null
+        } catch (e: NoClassDefFoundError) {
+            loggingService.log(
+                "Python SDK not found. Please ensure that the Python plugin is installed and enabled.\n\n",
+                ConsoleViewContentType.ERROR_OUTPUT,
+            )
+            null
+        } catch (e: Exception) {
+            loggingService.log(
+                "Error accessing Python SDK: ${e.message}\n\n",
+                ConsoleViewContentType.ERROR_OUTPUT,
+            )
+            null
         }
-        return null
     }
 
     fun getDbtPath(): String? {
