@@ -62,6 +62,10 @@ class VenvInitializerService(private var project: Project) {
                     return Path.of(projectSdk.homePath!!)
                 }
             }
+            loggingService.log(
+                "Python virtual environment not detected. Be sure to have the python plugin installed and a venv configured via `File` > `Project Structure` > `SDK` > `Select Python` > `Select New Virtual Environment`.\n\n",
+                ConsoleViewContentType.ERROR_OUTPUT,
+            )
             null
         } catch (e: ClassNotFoundException) {
             loggingService.log(
