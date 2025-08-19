@@ -16,8 +16,8 @@ plugins {
     alias(libs.plugins.qodana) // Gradle Qodana Plugin
     alias(libs.plugins.kover) // Gradle Kover Plugin
     id("com.github.node-gradle.node") version "7.1.0"
-    id("org.jlleitschuh.gradle.ktlint") version "12.2.0"
-    kotlin("plugin.serialization") version "2.1.20"
+    id("org.jlleitschuh.gradle.ktlint") version "13.0.0"
+    kotlin("plugin.serialization") version "2.2.0"
 }
 
 group = properties("pluginGroup").get()
@@ -58,9 +58,9 @@ repositories {
 // Dependencies are managed with Gradle version catalog - read more: https://docs.gradle.org/current/userguide/platforms.html#sub:version-catalog
 dependencies {
     testImplementation(libs.junit)
-    testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:6.0.0")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
     intellijPlatform {
         create(providers.gradleProperty("platformType"), providers.gradleProperty("platformVersion"))
 
