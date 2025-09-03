@@ -1,13 +1,13 @@
 [versions]
 # libraries
 junit = "4.13.2"
-annotations = "26.0.2"
+annotations = "26.0.2-1"
 
 # plugins
-kotlin = "2.1.20"
-changelog = "2.2.1"
-gradleIntelliJPlugin = "2.5.0"
-qodana = "2024.3.4"
+kotlin = "2.2.10"
+changelog = "2.4.0"
+gradleIntelliJPlugin = "2.7.2"
+qodana = "2025.2.1"
 kover = "0.9.1"
 
 [libraries]
