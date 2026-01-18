@@ -1,14 +1,14 @@
 [versions]
 # libraries
 junit = "4.13.2"
-annotations = "26.0.2"
+annotations = "26.0.2-1"
 
 # plugins
-kotlin = "2.1.20"
-changelog = "2.2.1"
-gradleIntelliJPlugin = "2.5.0"
-qodana = "2024.3.4"
-kover = "0.9.1"
+kotlin = "2.3.0"
+changelog = "2.5.0"
+gradleIntelliJPlugin = "2.10.5"
+qodana = "2025.3.1"
+kover = "0.9.4"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
