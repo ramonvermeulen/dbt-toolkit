@@ -181,7 +181,7 @@ jobs:
 
       # Run Qodana inspections
       - name: Qodana - Code Inspection
-        uses: JetBrains/qodana-action@v2025.1
+        uses: JetBrains/qodana-action@v2025.3.1
         with:
           upload-result: true # upload results as github action artifacts
           cache-default-branch-only: true
