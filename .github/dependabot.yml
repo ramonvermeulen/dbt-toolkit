@@ -17,6 +17,10 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+    groups:
+      gha:
+        patterns:
+          - "*"
   # Maintain dependencies for npm in lineage-panel
   - package-ecosystem: "npm"
     directory: "/lineage-panel"
